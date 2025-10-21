@@ -15,6 +15,7 @@ if os.path.exists(secret_env_path):
     load_dotenv(secret_env_path)
     print("Loaded secret file from /etc/secrets/.env")
 
+# Import Flask app
 from app import app, init_db
 
 def create_app():
@@ -31,7 +32,7 @@ def create_app():
         print(f"Error creating app: {e}")
         sys.exit(1)
 
-# WSGI application object
+# WSGI application object for Gunicorn
 application = create_app()
 
 if __name__ == '__main__':
