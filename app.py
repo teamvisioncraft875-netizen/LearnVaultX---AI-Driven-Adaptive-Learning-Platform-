@@ -21,17 +21,17 @@ import re
 # Load environment variables from .env file
 load_dotenv()
 
-# Load secret file from Render if it exists
-secret_env_path = '/etc/secrets/.env'
-if os.path.exists(secret_env_path):
-    load_dotenv(secret_env_path)
-    logger.info("Loaded secret file from /etc/secrets/.env")
-
-# Configure logging
+# Configure logging first
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
+
+# Load secret file from Render if it exists
+secret_env_path = '/etc/secrets/.env'
+if os.path.exists(secret_env_path):
+    load_dotenv(secret_env_path)
+    print("Loaded secret file from /etc/secrets/.env")
 logger = logging.getLogger(__name__)
 
 # ============================================================================
