@@ -68,7 +68,7 @@ JITSI_DOMAIN = os.getenv('JITSI_DOMAIN', 'meet.jit.si')
 # Initialize Flask-Mail (optional, we'll use direct SMTP for more control)
 # mail = Mail(app)
 
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
 
 # AI API clients - Multiple providers for reliability!
 deepseek_api_key = os.environ.get('DEEPSEEK_API_KEY', '')
