@@ -1,0 +1,576 @@
+/* ===============================================
+   LEARNVAULTX DESIGN SYSTEM
+   Complete Design Tokens & Variables
+   =============================================== */
+
+:root {
+    /* ===============================================
+       COLOR PALETTE - Neural Blue & Intelligence Purple
+       =============================================== */
+
+    /* Primary - Neural Blue */
+    --neural-50: #EFF6FF;
+    --neural-100: #DBEAFE;
+    --neural-200: #BFDBFE;
+    --neural-300: #93C5FD;
+    --neural-400: #60A5FA;
+    --neural-500: #4F7CFF;
+    /* Primary Brand Color */
+    --neural-600: #2563EB;
+    --neural-700: #1D4ED8;
+    --neural-800: #1E40AF;
+    --neural-900: #1E3A8A;
+
+    /* Accent - Intelligence Purple */
+    --intel-50: #FAF5FF;
+    --intel-100: #F3E8FF;
+    --intel-200: #E9D5FF;
+    --intel-300: #D8B4FE;
+    --intel-400: #C084FC;
+    --intel-500: #8B5CF6;
+    /* Accent Color */
+    --intel-600: #7C3AED;
+    --intel-700: #6D28D9;
+    --intel-800: #5B21B6;
+    --intel-900: #4C1D95;
+
+    /* Semantic Colors */
+    --success: #10B981;
+    --success-light: rgba(16, 185, 129, 0.1);
+    --success-dark: #059669;
+
+    --warning: #F59E0B;
+    --warning-light: rgba(245, 158, 11, 0.1);
+    --warning-dark: #D97706;
+
+    --error: #EF4444;
+    --error-light: rgba(239, 68, 68, 0.1);
+    --error-dark: #DC2626;
+
+    --info: #3B82F6;
+    --info-light: rgba(59, 130, 246, 0.1);
+    --info-dark: #2563EB;
+
+    /* Neutral Grays */
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-300: #D1D5DB;
+    --gray-400: #9CA3AF;
+    --gray-500: #6B7280;
+    --gray-600: #4B5563;
+    --gray-700: #374151;
+    --gray-800: #1F2937;
+    --gray-900: #111827;
+
+    /* ===============================================
+       THEME VARIABLES - Light (Default)
+       =============================================== */
+
+    --primary: var(--neural-500);
+    --primary-hover: var(--neural-600);
+    --primary-light: var(--neural-100);
+
+    --bg-primary: #FFFFFF;
+    --bg-secondary: var(--gray-50);
+    --surface: #FFFFFF;
+    --surface-hover: var(--gray-100);
+
+    --text-primary: var(--gray-900);
+    --text-secondary: var(--gray-600);
+    --text-tertiary: var(--gray-400);
+
+    --border-primary: var(--gray-200);
+    --border-secondary: var(--gray-300);
+
+    /* ===============================================
+       TYPOGRAPHY
+       =============================================== */
+
+    /* Font Families */
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+
+    /* Font Sizes - Fluid Scale */
+    --text-xs: 0.75rem;
+    /* 12px */
+    --text-sm: 0.875rem;
+    /* 14px */
+    --text-base: 1rem;
+    /* 16px */
+    --text-lg: 1.125rem;
+    /* 18px */
+    --text-xl: 1.25rem;
+    /* 20px */
+    --text-2xl: 1.5rem;
+    /* 24px */
+    --text-3xl: 1.875rem;
+    /* 30px */
+    --text-4xl: 2.25rem;
+    /* 36px */
+    --text-5xl: 3rem;
+    /* 48px */
+    --text-6xl: 3.75rem;
+    /* 60px */
+    --text-7xl: 4.5rem;
+    /* 72px */
+
+    /* Font Weights */
+    --font-light: 300;
+    --font-normal: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+    --font-extrabold: 800;
+
+    /* Line Heights */
+    --leading-none: 1;
+    --leading-tight: 1.25;
+    --leading-snug: 1.375;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.625;
+    --leading-loose: 2;
+
+    /* ===============================================
+       SPACING - 8px Base Grid
+       =============================================== */
+
+    --space-0: 0;
+    --space-1: 0.25rem;
+    /* 4px */
+    --space-2: 0.5rem;
+    /* 8px */
+    --space-3: 0.75rem;
+    /* 12px */
+    --space-4: 1rem;
+    /* 16px */
+    --space-5: 1.25rem;
+    /* 20px */
+    --space-6: 1.5rem;
+    /* 24px */
+    --space-8: 2rem;
+    /* 32px */
+    --space-10: 2.5rem;
+    /* 40px */
+    --space-12: 3rem;
+    /* 48px */
+    --space-16: 4rem;
+    /* 64px */
+    --space-20: 5rem;
+    /* 80px */
+    --space-24: 6rem;
+    /* 96px */
+    --space-32: 8rem;
+    /* 128px */
+
+    /* ===============================================
+       BORDER RADIUS
+       =============================================== */
+
+    --radius-none: 0;
+    --radius-sm: 0.125rem;
+    /* 2px */
+    --radius-md: 0.375rem;
+    /* 6px */
+    --radius-lg: 0.5rem;
+    /* 8px */
+    --radius-xl: 0.75rem;
+    /* 12px */
+    --radius-2xl: 1rem;
+    /* 16px */
+    --radius-3xl: 1.5rem;
+    /* 24px */
+    --radius-full: 9999px;
+
+    /* ===============================================
+       SHADOWS
+       =============================================== */
+
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+    /* ===============================================
+       TRANSITIONS
+       =============================================== */
+
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Easing Functions */
+    --ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* ===============================================
+       Z-INDEX SCALE
+       =============================================== */
+
+    --z-base: 0;
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
+    --z-toast: 1080;
+}
+
+/* ===============================================
+   DARK THEME
+   =============================================== */
+
+[data-theme="dark"] {
+    --primary: var(--neural-400);
+    --primary-hover: var(--neural-300);
+    --primary-light: rgba(79, 124, 255, 0.1);
+
+    --bg-primary: #0A0E1A;
+    --bg-secondary: #111827;
+    --surface: #1F2937;
+    --surface-hover: #374151;
+
+    --text-primary: var(--gray-50);
+    --text-secondary: var(--gray-300);
+    --text-tertiary: var(--gray-500);
+
+    --border-primary: var(--gray-700);
+    --border-secondary: var(--gray-600);
+}
+
+/* ===============================================
+   FUTURISTIC THEME (Enhanced Dark Mode + Energy)
+   =============================================== */
+
+[data-theme="futuristic"] {
+    /* Base Colors - Refined Dark Palette */
+    --bg-primary: #0B1220;
+    --bg-secondary: #0F172A;
+    --surface: #1E293B;
+    --surface-hover: #1F2937;
+
+    /* Text Colors - Enhanced Readability */
+    --text-primary: #F1F5F9;
+    --text-secondary: #CBD5E1;
+    --text-tertiary: #94A3B8;
+
+    /* Futuristic Accent Colors (Subtle Neon) */
+    --primary: #38BDF8;
+    --primary-hover: #22D3EE;
+    --primary-light: rgba(56, 189, 248, 0.12);
+
+    /* Secondary Accent - Purple Glow */
+    --accent-purple: #A78BFA;
+    --accent-purple-light: rgba(167, 139, 250, 0.12);
+
+    /* Borders with Subtle Glow */
+    --border-primary: rgba(56, 189, 248, 0.2);
+    --border-secondary: rgba(56, 189, 248, 0.4);
+    --border-accent: rgba(167, 139, 250, 0.25);
+
+    /* Neon Glow Effects */
+    --glow-primary: 0 0 20px rgba(56, 189, 248, 0.15);
+    --glow-accent: 0 0 30px rgba(56, 189, 248, 0.25);
+    --glow-purple: 0 0 25px rgba(167, 139, 250, 0.2);
+
+    /* Gradient Overlays */
+    --gradient-surface: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+    --gradient-card: linear-gradient(135deg, rgba(56, 189, 248, 0.05) 0%, rgba(167, 139, 250, 0.05) 100%);
+    --gradient-button: linear-gradient(135deg, #38BDF8 0%, #22D3EE 100%);
+
+    /* Shadows - Layered Depth */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 12px rgba(56, 189, 248, 0.08);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.12);
+    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 30px rgba(56, 189, 248, 0.15);
+    --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 40px rgba(56, 189, 248, 0.2);
+}
+
+/* Futuristic Theme - Enhanced Components */
+[data-theme="futuristic"] body {
+    background: var(--bg-primary);
+    background-image:
+        radial-gradient(circle at 20% 50%, rgba(56, 189, 248, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 30%, rgba(167, 139, 250, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 50% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+}
+
+[data-theme="futuristic"] .surface,
+[data-theme="futuristic"] .glass-card,
+[data-theme="futuristic"] .class-card,
+[data-theme="futuristic"] .action-card {
+    background: var(--gradient-surface);
+    border: 1px solid var(--border-primary);
+    box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(56, 189, 248, 0.1);
+    position: relative;
+}
+
+[data-theme="futuristic"] .surface::before,
+[data-theme="futuristic"] .glass-card::before,
+[data-theme="futuristic"] .class-card::before,
+[data-theme="futuristic"] .action-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gradient-card);
+    border-radius: inherit;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+[data-theme="futuristic"] .btn-primary,
+[data-theme="futuristic"] button.btn-primary {
+    background: var(--gradient-button);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    box-shadow:
+        0 4px 16px rgba(56, 189, 248, 0.3),
+        0 0 20px rgba(56, 189, 248, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="futuristic"] .btn-primary:hover,
+[data-theme="futuristic"] button.btn-primary:hover {
+    box-shadow:
+        0 6px 24px rgba(56, 189, 248, 0.4),
+        0 0 30px rgba(56, 189, 248, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    border-color: rgba(56, 189, 248, 0.5);
+}
+
+[data-theme="futuristic"] .nav-link.active,
+[data-theme="futuristic"] .nav-item.active {
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid var(--border-primary);
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.2), inset 0 0 20px rgba(56, 189, 248, 0.05);
+}
+
+[data-theme="futuristic"] a:hover,
+[data-theme="futuristic"] .nav-link:hover {
+    color: var(--primary);
+    text-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+}
+
+[data-theme="futuristic"] input:focus,
+[data-theme="futuristic"] textarea:focus,
+[data-theme="futuristic"] .form-control:focus {
+    border-color: var(--primary);
+    box-shadow:
+        0 0 0 3px rgba(56, 189, 248, 0.15),
+        0 0 20px rgba(56, 189, 248, 0.2);
+}
+
+/* ===============================================
+   UTILITY CLASSES
+   =============================================== */
+
+/* Display */
+.block {
+    display: block;
+}
+
+.inline-block {
+    display: inline-block;
+}
+
+.inline {
+    display: inline;
+}
+
+.flex {
+    display: flex;
+}
+
+.inline-flex {
+    display: inline-flex;
+}
+
+.grid {
+    display: grid;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Flexbox */
+.flex-row {
+    flex-direction: row;
+}
+
+.flex-col {
+    flex-direction: column;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.items-start {
+    align-items: flex-start;
+}
+
+.items-end {
+    align-items: flex-end;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.justify-between {
+    justify-content: space-between;
+}
+
+.justify-start {
+    justify-content: flex-start;
+}
+
+.justify-end {
+    justify-content: flex-end;
+}
+
+/* Text Alignment */
+.text-left {
+    text-align: left;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+/* Font Weights */
+.font-light {
+    font-weight: var(--font-light);
+}
+
+.font-normal {
+    font-weight: var(--font-normal);
+}
+
+.font-medium {
+    font-weight: var(--font-medium);
+}
+
+.font-semibold {
+    font-weight: var(--font-semibold);
+}
+
+.font-bold {
+    font-weight: var(--font-bold);
+}
+
+/* Text Colors */
+.text-primary {
+    color: var(--text-primary);
+}
+
+.text-secondary {
+    color: var(--text-secondary);
+}
+
+.text-tertiary {
+    color: var(--text-tertiary);
+}
+
+/* Spacing Utilities */
+.m-0 {
+    margin: 0;
+}
+
+.p-0 {
+    padding: 0;
+}
+
+.mt-4 {
+    margin-top: var(--space-4);
+}
+
+.mb-4 {
+    margin-bottom: var(--space-4);
+}
+
+.pt-4 {
+    padding-top: var(--space-4);
+}
+
+.pb-4 {
+    padding-bottom: var(--space-4);
+}
+
+/* Accessibility */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* ===============================================
+   REDUCED MOTION
+   =============================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ===============================================
+   GLOBAL RESETS
+   =============================================== */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+    color: var(--text-primary);
+    background: var(--bg-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+    color: var(--primary);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+a:hover {
+    color: var(--primary-hover);
+}
+
+button {
+    font-family: var(--font-body);
+    cursor: pointer;
+}
+
+input,
+textarea,
+select {
+    font-family: var(--font-body);
+}

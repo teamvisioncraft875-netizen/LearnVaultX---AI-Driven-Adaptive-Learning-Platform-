@@ -1,0 +1,125 @@
+/* =============================================================================
+   HOMEPAGE SPECIFIC STYLES
+   ============================================================================= */
+
+/* Card Grid for Features */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-6);
+}
+
+/* FAQ Styles */
+.faq-container {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.faq-item {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    transition: all var(--transition-base);
+}
+
+.faq-item:hover {
+    border-color: var(--primary);
+}
+
+.faq-question {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-5);
+    background: transparent;
+    border: none;
+    text-align: left;
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.faq-question:hover {
+    color: var(--primary);
+}
+
+.faq-icon {
+    font-size: var(--text-2xl);
+    font-weight: 300;
+    transition: transform var(--transition-base);
+}
+
+.faq-item.active .faq-icon {
+    transform: rotate(45deg);
+    color: var(--primary);
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height var(--transition-slow);
+}
+
+.faq-item.active .faq-answer {
+    max-height: 500px;
+}
+
+.faq-answer p {
+    padding: 0 var(--space-5) var(--space-5);
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+/* Homepage card styles */
+.homepage-container .card {
+    transition: all var(--transition-base);
+}
+
+.homepage-container .card:hover {
+    transform: translateY(-8px);
+}
+
+/* Smooth scroll behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Hero section animations */
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+.homepage-container h1 {
+    animation: fadeIn 0.8s ease-out;
+}
+
+.homepage-container .btn {
+    animation: fadeIn 1s ease-out 0.2s both;
+}
+
+/* Avatar utility for footer */
+.avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    font-weight: 600;
+    overflow: hidden;
+}

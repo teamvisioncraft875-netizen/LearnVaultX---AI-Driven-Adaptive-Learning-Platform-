@@ -3,89 +3,144 @@
 {% block title %}Register - LearnVaultX{% endblock %}
 
 {% block content %}
-<div class="auth-container">
-    <div class="auth-card">
-        <div class="auth-header">
-            <h1>Join LearnVaultX</h1>
-            <p>Create your account to get started</p>
+<div class="auth-page-container">
+    <!-- Left Panel - Branding with Fixed Readability -->
+    <div class="auth-branding-panel">
+        <div class="auth-branding-content">
+            <div class="auth-logo-container">
+                <div class="auth-logo-box">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LearnVaultX">
+                </div>
+                <h1 class="auth-brand-name">LearnVaultX</h1>
+            </div>
+
+            <p class="auth-tagline">
+                Join thousands of students using AI-powered education
+            </p>
+
+            <div class="auth-features">
+                <div class="auth-feature-item">
+                    <span class="checkmark">✓</span>
+                    <span>Free to get started</span>
+                </div>
+                <div class="auth-feature-item">
+                    <span class="checkmark">✓</span>
+                    <span>No credit card required</span>
+                </div>
+                <div class="auth-feature-item">
+                    <span class="checkmark">✓</span>
+                    <span>Start learning immediately</span>
+                </div>
+            </div>
         </div>
-        
-        <form id="register-form" onsubmit="handleRegister(event)">
-            <div class="form-group">
-                <label for="name">Full Name</label>
-                <input type="text" id="name" name="name" required placeholder="Enter your full name">
-            </div>
-            
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" required placeholder="Enter your email">
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required placeholder="Create a password" minlength="6">
-            </div>
-            
-            <div class="form-group">
-                <label for="role">I am a:</label>
-                <select id="role" name="role" required>
-                    <option value="student">Student</option>
-                    <option value="teacher">Teacher</option>
-                </select>
-            </div>
-            
-            <div class="error-message" id="error-message"></div>
-            <div class="success-message" id="success-message"></div>
-            
-            <button type="submit" class="btn btn-primary btn-full">Create Account</button>
-        </form>
-        
-        <div class="auth-footer">
-            <p>Already have an account? <a href="/login">Login here</a></p>
+    </div>
+
+    <!-- Right Panel - Register Form with Proper Sizing -->
+    <div class="auth-form-panel">
+        <!-- Background decoration -->
+        <div class="auth-form-decoration"></div>
+
+        <div class="auth-form-container">
+            <h2 class="auth-form-title">Create account</h2>
+            <p class="auth-form-subtitle">Start your learning journey today</p>
+
+            {% if error %}
+            <div class="auth-alert auth-alert-error show">{{ error }}</div>
+            {% endif %}
+
+            <div id="error-message" class="auth-alert auth-alert-error"></div>
+
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="auth-form-group">
+                    <label class="auth-form-label" for="name">Full Name</label>
+                    <input type="text" name="name" id="name" required autocomplete="name" class="auth-form-input"
+                        placeholder="Enter your full name">
+                </div>
+
+                <div class="auth-form-group">
+                    <label class="auth-form-label" for="email">Email</label>
+                    <input type="email" name="email" id="email" required autocomplete="email" class="auth-form-input"
+                        placeholder="Enter your email">
+                </div>
+
+                <div class="auth-form-group">
+                    <label class="auth-form-label" for="password">Password</label>
+                    <input type="password" name="password" id="password" required autocomplete="new-password"
+                        class="auth-form-input" placeholder="Create a password">
+                </div>
+
+                <div class="auth-form-group">
+                    <label class="auth-form-label" for="role">I am a</label>
+                    <select name="role" id="role" required class="auth-form-select">
+                        <option value="student">Student</option>
+                        <option value="teacher">Teacher</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="auth-submit-btn" id="submitBtn">
+                    Create Account
+                </button>
+
+                <p class="auth-footer-text">
+                    Already have an account? <a href="/login" class="auth-footer-link">Sign in</a>
+                </p>
+            </form>
         </div>
     </div>
 </div>
 
 <script>
-async function handleRegister(event) {
-    event.preventDefault();
-    
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const role = document.getElementById('role').value;
-    const errorMsg = document.getElementById('error-message');
-    const successMsg = document.getElementById('success-message');
-    
-    errorMsg.style.display = 'none';
-    successMsg.style.display = 'none';
-    
-    try {
-        const response = await fetch('/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ name, email, password, role })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-            successMsg.textContent = 'Account created successfully! Redirecting to login...';
-            successMsg.style.display = 'block';
-            setTimeout(() => {
-                window.location.href = '/login';
-            }, 2000);
-        } else {
-            errorMsg.textContent = data.error || 'Registration failed';
-            errorMsg.style.display = 'block';
-        }
-    } catch (error) {
-        errorMsg.textContent = 'Network error. Please try again.';
-        errorMsg.style.display = 'block';
-    }
-}
-</script>
-{% endblock %}
+    async function handleRegister(event) {
+        event.preventDefault();
 
+        const errorDiv = document.getElementById('error-message');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Get form data
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const role = document.getElementById('role').value;
+
+        // Disable button and show loading
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Creating Account...';
+        errorDiv.classList.remove('show');
+
+        try {
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, email, password, role })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Registration successful - redirect to login
+                window.location.href = '/login';
+            } else {
+                // Show error
+                errorDiv.textContent = data.error || 'Registration failed';
+                errorDiv.classList.add('show');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Account';
+            }
+        } catch (error) {
+            errorDiv.textContent = 'Network error. Please try again.';
+            errorDiv.classList.add('show');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Create Account';
+        }
+    }
+</script>
+
+<style>
+    /* Add auth page body class for FAB hiding */
+    body {
+        overflow-x: hidden;
+    }
+</style>
+{% endblock %}

@@ -3,504 +3,1743 @@
 {% block title %}Teacher Dashboard - LearnVaultX{% endblock %}
 
 {% block content %}
-<!-- Sidebar Toggle Button -->
-<button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+<!-- TEACHER DASHBOARD - UNIFIED WITH STUDENT DASHBOARD STRUCTURE -->
+<div class="dashboard-app">
+    <!-- LEFT SIDEBAR - FIXED - UNIFIED STRUCTURE -->
+    <aside class="dash-sidebar" id="dashSidebar">
+        <div class="sidebar-brand-area">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LearnVaultX" class="brand-logo-img">
+            <span class="brand-title-text">LearnVaultX</span>
+            <span class="brand-role-badge teacher">Teacher</span>
+        </div>
 
-<div class="dashboard">
-    <nav class="sidebar">
-        <div class="sidebar-header">
-            <h2>LearnVaultX</h2>
-            <p class="role-badge">Teacher</p>
+        <nav class="sidebar-nav-menu">
+            <a href="#" class="nav-menu-item active" onclick="switchView('dashboard'); return false;">
+                <span class="item-icon">⊞</span>
+                <span class="item-label">Dashboard</span>
+            </a>
+            <a href="#" class="nav-menu-item" onclick="switchView('classes'); return false;">
+                <span class="item-icon">◈</span>
+                <span class="item-label">My Classes</span>
+            </a>
+            <a href="/teacher/analytics" class="nav-menu-item">
+                <span class="item-icon">📊</span>
+                <span class="item-label">Analytics</span>
+            </a>
+            <a href="#" class="nav-menu-item" onclick="switchView('students'); return false;">
+                <span class="item-icon">👥</span>
+                <span class="item-label">Students</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-user-profile">
+            <div class="user-avatar teacher">{{ session.name[0] if session.name else 'T' }}</div>
+            <div class="user-info">
+                <div class="user-name">{{ session.name }}</div>
+                <div class="user-email">{{ session.get('email', 'teacher@example.com') }}</div>
+            </div>
         </div>
-        <ul class="nav-menu">
-            <li class="active"><a href="#" onclick="showSection('classes')">My Classes</a></li>
-            <li><a href="#" onclick="showSection('interventions')">🚨 Student Alerts</a></li>
-            <li><a href="#" onclick="showSection('analytics')">Analytics</a></li>
-            <li><a href="#" onclick="showSection('feedback')">View Feedback</a></li>
-            <li><a href="/logout">Logout</a></li>
-        </ul>
-        <div class="user-info">
-            <p>{{ session.name }}</p>
-            <p class="text-muted">{{ session.email }}</p>
+
+        <div class="sidebar-logout-area">
+            <a href="/logout" class="logout-button">
+                <span class="logout-ico">🚪</span>
+                <span class="logout-txt">Logout</span>
+            </a>
         </div>
-    </nav>
-    
-    <main class="main-content">
-        <!-- Classes Section -->
-        <section id="classes-section" class="dashboard-section">
-            <div class="section-header">
-                <h2>My Classes</h2>
-                <button class="btn btn-primary" onclick="showCreateClassModal()">+ Create Class</button>
+    </aside>
+
+    <!-- CENTER CONTENT - ADAPTIVE - UNIFIED STRUCTURE -->
+    <main class="dash-center" id="dashCenter">
+        <!-- Mobile Header -->
+        <div class="dash-mobile-head">
+            <button class="mob-sidebar-btn" onclick="toggleMobileSidebar()">☰</button>
+            <span class="mob-brand-text">LearnVaultX Teacher</span>
+            <button class="mob-ai-btn" onclick="toggleAI()">◆</button>
+        </div>
+
+        <!-- DASHBOARD VIEW -->
+        <div class="dash-view" id="dashboardView">
+            <div class="dash-view-head">
+                <h1 class="view-main-title">Welcome back, {{ session.name }}!</h1>
+                <p class="view-sub-text">Manage your classes and empower your students</p>
             </div>
-            
-            <div id="classes-grid" class="cards-grid">
-                <!-- Classes will be loaded here -->
+
+            <div class="dash-view-body">
+                <!-- Quick Actions -->
+                <section class="view-section">
+                    <h2 class="section-label">Quick Actions</h2>
+                    <div class="quick-act-grid">
+                        <div class="quick-act-box" onclick="showCreateClassModal()">
+                            <div class="qact-icon">+</div>
+                            <h3 class="qact-title">Create Class</h3>
+                            <p class="qact-text">Start a new course</p>
+                        </div>
+                        <div class="quick-act-box" onclick="switchView('analytics')">
+                            <div class="qact-icon">◭</div>
+                            <h3 class="qact-title">View Analytics</h3>
+                            <p class="qact-text">Track performance</p>
+                        </div>
+                        <div class="quick-act-box" onclick="openAI()">
+                            <div class="qact-icon">◆</div>
+                            <h3 class="qact-title">AI Assistant</h3>
+                            <p class="qact-text">Get teaching insights</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Overview Stats -->
+                <section class="view-section">
+                    <h2 class="section-label">Overview</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalClasses">{{ classes|length }}</div>
+                            <div class="stat-label">Total Classes</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalStudents">0</div>
+                            <div class="stat-label">Total Students</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalLectures">0</div>
+                            <div class="stat-label">Lectures Uploaded</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalQuizzes">0</div>
+                            <div class="stat-label">Quizzes Created</div>
+                        </div>
+                    </div>
+                </section>
             </div>
-        </section>
-        
-        <!-- Intervention Alerts Section -->
-        <section id="interventions-section" class="dashboard-section hidden">
-            <div class="section-header">
-                <h2>🚨 Student Intervention Alerts</h2>
-                <p style="color: var(--text-muted); font-size: 14px;">AI-detected students who need your attention</p>
+        </div>
+
+        <!-- MY CLASSES VIEW -->
+        <div class="dash-view" id="classesView" style="display: none;">
+            <div class="dash-view-head">
+                <h1 class="view-main-title">My Classes</h1>
+                <button class="btn-primary" onclick="showCreateClassModal()">+ Create Class</button>
             </div>
-            
-            <div id="interventions-container">
-                <!-- Interventions will be loaded here -->
+
+            <div class="dash-view-body">
+                <div id="classListContainer" class="class-grid">
+                    {% if classes %}
+                    {% for class in classes %}
+                    <div class="class-card">
+                        <div class="card-border-glow"></div>
+                        <h3 class="card-title">{{ class.title }}</h3>
+                        <p class="card-desc">{{ class.description }}</p>
+                        <div class="card-meta">
+                            <span class="meta-item">👥 {{ class.student_count or 0 }} students</span>
+                            <span class="meta-item">📚 {{ class.lecture_count or 0 }} lectures</span>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-card primary" onclick="window.location.href='/class/{{ class.id }}'">View
+                                Class</button>
+                            <button class="btn-card secondary"
+                                onclick="showUploadLectureModal({{ class.id }}, '{{ class.title }}')">Upload</button>
+                            <button class="btn-card secondary"
+                                onclick="showCreateQuizModal({{ class.id }}, '{{ class.title }}')">Quiz</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-state">
+                        <div class="empty-icon">◈</div>
+                        <h3 class="empty-title">No classes yet</h3>
+                        <p class="empty-text">Create your first class to start teaching</p>
+                        <button class="btn-primary" onclick="showCreateClassModal()">Create Class</button>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
-        </section>
-        
-        <!-- Analytics Section -->
-        <section id="analytics-section" class="dashboard-section hidden">
-            <div class="section-header">
-                <h2>Student Analytics</h2>
+        </div>
+
+        <!-- ANALYTICS VIEW -->
+        <div class="dash-view" id="analyticsView" style="display: none;">
+            <div class="dash-view-head">
+                <h1 class="view-main-title">Analytics & Insights</h1>
             </div>
-            
-            <div class="analytics-filters">
-                <select id="class-filter" onchange="loadAnalytics()">
-                    <option value="">All Classes</option>
-                </select>
+
+            <div class="dash-view-body">
+                <section class="view-section">
+                    <div class="select-container">
+                        <label for="analyticsClassSelect" class="select-label">Select a class to view analytics:</label>
+                        <select id="analyticsClassSelect" class="select-input"
+                            onchange="loadClassAnalytics(this.value)">
+                            <option value="">Select a class...</option>
+                            {% for class in classes %}
+                            <option value="{{ class.id }}">{{ class.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div id="analyticsData" class="analytics-container"></div>
+                </section>
             </div>
-            
-            <div id="analytics-table" class="table-container">
-                <!-- Analytics will be loaded here -->
+        </div>
+
+        <!-- STUDENTS VIEW -->
+        <div class="dash-view" id="studentsView" style="display: none;">
+            <div class="dash-view-head">
+                <h1 class="view-main-title">Students Overview</h1>
             </div>
-        </section>
-        
-        <!-- Feedback Section -->
-        <section id="feedback-section" class="dashboard-section hidden">
-            <div class="section-header">
-                <h2>Student Feedback</h2>
-                <button class="btn btn-secondary" onclick="loadFeedback()">Refresh</button>
+
+            <div class="dash-view-body">
+                <div id="studentsListContainer" class="students-grid"></div>
             </div>
-            
-            <div id="feedback-container" class="cards-grid">
-                <!-- Feedback will be loaded here -->
-            </div>
-        </section>
+        </div>
     </main>
+
+    <!-- RIGHT PANEL - AI TEACHING ASSISTANT (Unified structure) -->
+    <aside class="dash-ai" id="dashAIPanel">
+        <div class="ai-header">
+            <div class="ai-brand">
+                <span class="ai-name">KyKnoX AI</span>
+                <span class="ai-tag">Teaching Assistant</span>
+            </div>
+            <button class="ai-close" onclick="closeAI()">✕</button>
+        </div>
+
+        <div class="ai-modes">
+            <button class="mode-tab active" onclick="switchAIMode('expert')">Expert</button>
+            <button class="mode-tab" onclick="switchAIMode('coach')">Coach</button>
+        </div>
+
+        <div class="ai-messages" id="aiMessagesContainer">
+            <div class="ai-welcome">
+                <div class="welcome-icon">◆</div>
+                <p class="welcome-msg">Hello! I'm your AI teaching assistant. Ask me for insights on student
+                    performance, quiz creation ideas, or teaching strategies.</p>
+            </div>
+        </div>
+
+        <div class="ai-input-area">
+            <textarea class="ai-input" id="aiInputField" placeholder="Ask for teaching insights..." rows="2"></textarea>
+            <button class="ai-send" onclick="sendAIMsg()">→</button>
+        </div>
+    </aside>
+
+    <!-- AI FLOAT BUTTON (Visible when panel closed) -->
+    <button class="ai-float" id="aiFloat" onclick="openAI()">
+        <span>🤖</span>
+    </button>
+
+    <!-- Mobile Overlay -->
+    <div class="dash-overlay" id="dashOverlay" onclick="closeAllMobile()"></div>
 </div>
 
+<!-- MODALS -->
 <!-- Create Class Modal -->
-<div id="create-class-modal" class="modal">
-    <div class="modal-content">
+<div id="createClassModal" class="modal-overlay">
+    <div class="modal-box">
         <div class="modal-header">
-            <h3>Create New Class</h3>
-            <span class="close" onclick="closeModal('create-class-modal')">&times;</span>
+            <h2 class="modal-title">Create New Class</h2>
+            <button class="modal-close" onclick="closeModal('createClassModal')">×</button>
         </div>
-        <form id="create-class-form" onsubmit="handleCreateClass(event)">
-            <div class="form-group">
-                <label for="class-title">Class Title</label>
-                <input type="text" id="class-title" required placeholder="e.g., Data Structures">
-            </div>
-            <div class="form-group">
-                <label for="class-description">Description</label>
-                <textarea id="class-description" rows="3" placeholder="Brief description of the class"></textarea>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('create-class-modal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Create</button>
-            </div>
-        </form>
+        <div class="modal-body">
+            <form id="createClassForm" onsubmit="createClass(event)">
+                <div class="form-group">
+                    <label for="className" class="form-label">Class Title*</label>
+                    <input type="text" id="className" class="form-input" required
+                        placeholder="e.g., Introduction to Python">
+                </div>
+                <div class="form-group">
+                    <label for="classDescription" class="form-label">Description*</label>
+                    <textarea id="classDescription" class="form-input" rows="4" required
+                        placeholder="Brief description of the class..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('createClassModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Create Class</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Lecture Modal -->
+<div id="uploadLectureModal" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2 class="modal-title">Upload Lecture</h2>
+            <button class="modal-close" onclick="closeModal('uploadLectureModal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div id="uploadClassTitle" class="modal-info"></div>
+            <form id="uploadLectureForm" onsubmit="uploadLecture(event)">
+                <input type="hidden" id="uploadClassId">
+                <div class="form-group">
+                    <label for="lectureFile" class="form-label">Select File*</label>
+                    <input type="file" id="lectureFile" class="form-input" required
+                        accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.mp4,.mp3">
+                    <small class="form-hint">Supported: PDF, PPT, PPTX, DOC, DOCX, TXT, MP4, MP3</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary"
+                        onclick="closeModal('uploadLectureModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Create Quiz Modal -->
+<div id="createQuizModal" class="modal-overlay">
+    <div class="modal-box modal-lg">
+        <div class="modal-header">
+            <h2 class="modal-title">Create Quiz</h2>
+            <button class="modal-close" onclick="closeModal('createQuizModal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div id="quizClassTitle" class="modal-info"></div>
+            <form id="createQuizForm" onsubmit="createQuiz(event)">
+                <input type="hidden" id="quizClassId">
+                <div class="form-group">
+                    <label for="quizTitle" class="form-label">Quiz Title*</label>
+                    <input type="text" id="quizTitle" class="form-input" required
+                        placeholder="e.g., Python Basics Quiz">
+                </div>
+                <div class="form-group">
+                    <label for="quizDescription" class="form-label">Description</label>
+                    <textarea id="quizDescription" class="form-input" rows="2"
+                        placeholder="Optional description..."></textarea>
+                </div>
+                <div class="form-group">
+                    <div class="form-header">
+                        <label class="form-label">Questions*</label>
+                        <button type="button" class="btn-add" onclick="addQuestion()">+ Add Question</button>
+                    </div>
+                    <div id="questionsContainer"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal('createQuizModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Create Quiz</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
 <script>
-let currentClasses = [];
+    // State
+    let currentView = 'dashboard';
+    let currentAIMode = 'expert';
+    let aiOpen = false;
+    let questionCount = 0;
 
-async function loadClasses() {
-    try {
-        const response = await fetch('/api/teacher/classes');
-        currentClasses = await response.json();
-        
-        const grid = document.getElementById('classes-grid');
-        
-        if (currentClasses.length === 0) {
-            grid.innerHTML = '<div class="empty-state"><p>No classes yet. Create your first class!</p></div>';
-            return;
-        }
-        
-        grid.innerHTML = currentClasses.map(cls => `
-            <div class="class-card">
-                <h3>${cls.title}</h3>
-                <p>${cls.description || 'No description'}</p>
-                <div class="card-actions">
-                    <a href="/class/${cls.id}" class="btn btn-primary btn-sm">Open Class</a>
-                    <button onclick="startLiveClass(${cls.id})" class="btn btn-live btn-sm">Start Live Class</button>
-                    <button class="btn btn-secondary btn-sm" onclick="showUploadModal(${cls.id})">Upload Lecture</button>
-                    <button class="btn btn-secondary btn-sm" onclick="showCreateQuizModal(${cls.id})">Create Quiz</button>
-                </div>
-            </div>
-        `).join('');
-        
-        // Populate class filter
-        const filter = document.getElementById('class-filter');
-        filter.innerHTML = '<option value="">All Classes</option>' + 
-            currentClasses.map(cls => `<option value="${cls.id}">${cls.title}</option>`).join('');
-        
-    } catch (error) {
-        console.error('Error loading classes:', error);
-    }
-}
+    // View Navigation
+    function switchView(viewName) {
+        document.querySelectorAll('.dash-view').forEach(v => v.style.display = 'none');
+        document.getElementById(viewName + 'View').style.display = 'flex';
 
-async function loadInterventions() {
-    try {
-        const response = await fetch('/api/teacher/interventions');
-        const interventions = await response.json();
-        
-        const container = document.getElementById('interventions-container');
-        
-        if (interventions.length === 0) {
-            container.innerHTML = '<div class="empty-state"><p>✅ Great! No urgent student alerts at this time.</p></div>';
-            return;
-        }
-        
-        // Group by alert type
-        const byType = {
-            'low_performance': [],
-            'knowledge_gap': [],
-            'disengaged': []
-        };
-        
-        interventions.forEach(alert => {
-            byType[alert.alert_type].push(alert);
+        document.querySelectorAll('.nav-menu-item').forEach(link => {
+            link.classList.remove('active');
         });
-        
-        const alertLabels = {
-            'low_performance': { icon: '📉', label: 'Low Performance', color: '#ef4444' },
-            'knowledge_gap': { icon: '🎯', label: 'Knowledge Gaps', color: '#f59e0b' },
-            'disengaged': { icon: '⏰', label: 'Disengaged Students', color: '#6b7280' }
-        };
-        
-        container.innerHTML = Object.entries(byType)
-            .filter(([type, alerts]) => alerts.length > 0)
-            .map(([type, alerts]) => {
-                const info = alertLabels[type];
-                return `
-                    <div style="margin-bottom: 30px;">
-                        <h3 style="color: ${info.color}; margin-bottom: 15px;">${info.icon} ${info.label} (${alerts.length})</h3>
-                        <div class="cards-grid">
-                            ${alerts.map(alert => `
-                                <div class="class-card" style="border-left: 4px solid ${info.color};">
-                                    <div style="display: flex; justify-content: space-between; align-items: start;">
-                                        <h3>${alert.student_name}</h3>
-                                        <span class="badge badge-warning">${alert.class_name}</span>
-                                    </div>
-                                    <p style="margin: 10px 0; color: var(--text-muted);">${alert.message}</p>
-                                    <p style="font-size: 12px; color: var(--text-muted);">
-                                        Alert created: ${new Date(alert.created_at).toLocaleDateString()}
-                                    </p>
-                                    <div class="card-actions">
-                                        <button class="btn btn-primary btn-sm" onclick="resolveIntervention(${alert.id})">Mark Resolved</button>
-                                    </div>
-                                </div>
-                            `).join('')}
+        event.target.closest('.nav-menu-item')?.classList.add('active');
+
+        currentView = viewName;
+
+        if (viewName === 'students') loadStudents();
+    }
+
+    // Mobile
+    function toggleMobileSidebar() {
+        document.getElementById('dashSidebar').classList.toggle('mobile-show');
+        document.getElementById('dashOverlay').classList.add('show');
+    }
+
+    function toggleAI() {
+        if (aiOpen) closeAI();
+        else openAI();
+    }
+
+    function closeAllMobile() {
+        document.getElementById('dashSidebar').classList.remove('mobile-show');
+        document.getElementById('dashOverlay').classList.remove('show');
+    }
+
+    // AI Panel
+    function openAI() {
+        document.getElementById('dashAIPanel').classList.add('open');
+        document.getElementById('dashCenter').classList.add('ai-active');
+        document.getElementById('aiFloat').style.display = 'none';
+        aiOpen = true;
+    }
+
+    function closeAI() {
+        document.getElementById('dashAIPanel').classList.remove('open');
+        document.getElementById('dashCenter').classList.remove('ai-active');
+        document.getElementById('aiFloat').style.display = 'flex';
+        aiOpen = false;
+    }
+
+    function switchAIMode(mode) {
+        currentAIMode = mode;
+        document.querySelectorAll('.mode-tab').forEach(tab => tab.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+
+    function sendAIMsg() {
+        const input = document.getElementById('aiInputField');
+        const msg = input.value.trim();
+        if (!msg) return;
+
+        const container = document.getElementById('aiMessagesContainer');
+        const welcome = container.querySelector('.ai-welcome');
+        if (welcome) welcome.remove();
+
+        // User message
+        const userDiv = document.createElement('div');
+        userDiv.className = 'ai-msg user-msg';
+        userDiv.innerHTML = `<div class="msg-avatar">👤</div><div class="msg-text">${escapeHtml(msg)}</div>`;
+        container.appendChild(userDiv);
+
+        input.value = '';
+        container.scrollTop = container.scrollHeight;
+
+        // AI Response
+        fetch('/api/chatbot', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: msg, mode: currentAIMode })
+        })
+            .then(res => res.json())
+            .then(data => {
+                const aiDiv = document.createElement('div');
+                aiDiv.className = 'ai-msg ai-msg-bot';
+                aiDiv.innerHTML = `<div class="msg-avatar">🤖</div><div class="msg-text">${data.response || data.answer}</div>`;
+                container.appendChild(aiDiv);
+                container.scrollTop = container.scrollHeight;
+            })
+            .catch(err => console.error('AI error:', err));
+    }
+
+    document.getElementById('aiInputField')?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendAIMsg();
+        }
+    });
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Modals
+    function showCreateClassModal() {
+        document.getElementById('createClassModal').style.display = 'flex';
+    }
+
+    function showUploadLectureModal(classId, classTitle) {
+        document.getElementById('uploadClassId').value = classId;
+        document.getElementById('uploadClassTitle').textContent = 'Class: ' + classTitle;
+        document.getElementById('uploadLectureModal').style.display = 'flex';
+    }
+
+    function showCreateQuizModal(classId, classTitle) {
+        document.getElementById('quizClassId').value = classId;
+        document.getElementById('quizClassTitle').textContent = 'Class: ' + classTitle;
+        document.getElementById('questionsContainer').innerHTML = '';
+        questionCount = 0;
+        addQuestion();
+        document.getElementById('createQuizModal').style.display = 'flex';
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    // Create Class
+    async function createClass(event) {
+        event.preventDefault();
+        const title = document.getElementById('className').value;
+        const description = document.getElementById('classDescription').value;
+
+        try {
+            const response = await fetch('/api/create_class', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, description })
+            });
+
+            if (response.ok) {
+                alert('Class created successfully!');
+                closeModal('createClassModal');
+                location.reload();
+            } else {
+                const data = await response.json();
+                alert(data.error || 'Failed to create class');
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    }
+
+    // Upload Lecture
+    async function uploadLecture(event) {
+        event.preventDefault();
+        const classId = document.getElementById('uploadClassId').value;
+        const file = document.getElementById('lectureFile').files[0];
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('class_id', classId);
+
+        try {
+            const response = await fetch('/api/upload_lecture', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                alert('Lecture uploaded successfully!');
+                closeModal('uploadLectureModal');
+                document.getElementById('uploadLectureForm').reset();
+            } else {
+                const data = await response.json();
+                alert(data.error || 'Failed to upload lecture');
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    }
+
+    // Quiz Management
+    function addQuestion() {
+        questionCount++;
+        const container = document.getElementById('questionsContainer');
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'question-block';
+        questionDiv.innerHTML = `
+        <div class="question-header">
+            <strong class="question-num">Question ${questionCount}</strong>
+            <button type="button" class="btn-remove" onclick="this.closest('.question-block').remove()">Remove</button>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Question Text*</label>
+            <input type="text" class="form-input question-text" required placeholder="Enter your question...">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Options (4 required)*</label>
+            <input type="text" class="form-input question-option" required placeholder="Option 1">
+            <input type="text" class="form-input question-option" required placeholder="Option 2" style="margin-top: 8px;">
+            <input type="text" class="form-input question-option" required placeholder="Option 3" style="margin-top: 8px;">
+            <input type="text" class="form-input question-option" required placeholder="Option 4" style="margin-top: 8px;">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Correct Answer (0-3)*</label>
+            <select class="form-input question-correct" required>
+                <option value="0">Option 1</option>
+                <option value="1">Option 2</option>
+                <option value="2">Option 3</option>
+                <option value="3">Option 4</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Explanation (Optional)</label>
+            <textarea class="form-input question-explanation" rows="2" placeholder="Explain why this is correct..."></textarea>
+        </div>
+    `;
+        container.appendChild(questionDiv);
+    }
+
+    async function createQuiz(event) {
+        event.preventDefault();
+        const classId = document.getElementById('quizClassId').value;
+        const title = document.getElementById('quizTitle').value;
+        const description = document.getElementById('quizDescription').value;
+
+        const questionBlocks = document.querySelectorAll('.question-block');
+        const questions = [];
+
+        questionBlocks.forEach(block => {
+            const options = Array.from(block.querySelectorAll('.question-option')).map(o => o.value);
+            questions.push({
+                question: block.querySelector('.question-text').value,
+                options: options,
+                correct: parseInt(block.querySelector('.question-correct').value),
+                explanation: block.querySelector('.question-explanation').value
+            });
+        });
+
+        if (questions.length === 0) {
+            alert('Please add at least one question');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/create_quiz', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ class_id: classId, title, description, questions })
+            });
+
+            if (response.ok) {
+                alert('Quiz created successfully!');
+                closeModal('createQuizModal');
+                document.getElementById('createQuizForm').reset();
+            } else {
+                const data = await response.json();
+                alert(data.error || 'Failed to create quiz');
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    }
+
+    // Analytics
+    async function loadClassAnalytics(classId) {
+        if (!classId) {
+            document.getElementById('analyticsData').innerHTML = '';
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/analytics?class_id=${classId}`);
+            const metrics = await response.json();
+
+            const container = document.getElementById('analyticsData');
+            if (metrics.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p class="empty-text">No student data yet</p></div>';
+                return;
+            }
+
+            let html = '<div class="analytics-grid">';
+            metrics.forEach(metric => {
+                html += `
+                <div class="analytics-card">
+                    <h4 class="analytics-name">${metric.student_name}</h4>
+                    <div class="analytics-stats">
+                        <div class="analytics-stat">
+                            <span class="stat-label">Avg Score:</span>
+                            <span class="stat-value">${metric.score_avg?.toFixed(1) || 'N/A'}%</span>
+                        </div>
+                        <div class="analytics-stat">
+                            <span class="stat-label">Avg Time:</span>
+                            <span class="stat-value">${metric.avg_time || 0}s</span>
+                        </div>
+                        <div class="analytics-stat">
+                            <span class="stat-label">Rating:</span>
+                            <span class="stat-value">${metric.rating?.toFixed(1) || 'N/A'}</span>
                         </div>
                     </div>
-                `;
-            }).join('');
-    } catch (error) {
-        console.error('Error loading interventions:', error);
-        document.getElementById('interventions-container').innerHTML = 
-            '<div class="empty-state"><p>Unable to load interventions. Please try again later.</p></div>';
-    }
-}
-
-async function resolveIntervention(interventionId) {
-    try {
-        await fetch(`/api/teacher/resolve-intervention/${interventionId}`, { method: 'POST' });
-        loadInterventions();
-    } catch (error) {
-        console.error('Error resolving intervention:', error);
-    }
-}
-
-function showSection(section) {
-    document.querySelectorAll('.dashboard-section').forEach(s => s.classList.add('hidden'));
-    document.querySelectorAll('.nav-menu li').forEach(li => li.classList.remove('active'));
-    
-    if (section === 'classes') {
-        document.getElementById('classes-section').classList.remove('hidden');
-        document.querySelectorAll('.nav-menu li')[0].classList.add('active');
-        loadClasses();
-    } else if (section === 'interventions') {
-        document.getElementById('interventions-section').classList.remove('hidden');
-        document.querySelectorAll('.nav-menu li')[1].classList.add('active');
-        loadInterventions();
-    } else if (section === 'analytics') {
-        document.getElementById('analytics-section').classList.remove('hidden');
-        document.querySelectorAll('.nav-menu li')[2].classList.add('active');
-        loadAnalytics();
-    } else if (section === 'feedback') {
-        document.getElementById('feedback-section').classList.remove('hidden');
-        document.querySelectorAll('.nav-menu li')[3].classList.add('active');
-        loadFeedback();
-    }
-}
-
-function showCreateClassModal() {
-    document.getElementById('create-class-modal').style.display = 'flex';
-}
-
-function closeModal(modalId) {
-    document.getElementById(modalId).style.display = 'none';
-}
-
-async function handleCreateClass(event) {
-    event.preventDefault();
-    
-    const title = document.getElementById('class-title').value;
-    const description = document.getElementById('class-description').value;
-    
-    try {
-        const response = await fetch('/api/create_class', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title, description })
-        });
-        
-        if (response.ok) {
-            closeModal('create-class-modal');
-            document.getElementById('create-class-form').reset();
-            loadClasses();
-        }
-    } catch (error) {
-        console.error('Error creating class:', error);
-    }
-}
-
-function showUploadModal(classId) {
-    const modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.id = 'upload-modal';
-    modal.style.display = 'flex';
-    modal.innerHTML = `
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Upload Lecture</h3>
-                <span class="close" onclick="document.getElementById('upload-modal').remove()">&times;</span>
-            </div>
-            <form id="upload-form" onsubmit="handleUpload(event, ${classId})">
-                <div class="form-group">
-                    <label for="lecture-file">Select File (PDF, Video, etc.)</label>
-                    <input type="file" id="lecture-file" required>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('upload-modal').remove()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Upload</button>
-                </div>
-            </form>
-        </div>
-    `;
-    document.body.appendChild(modal);
-}
-
-async function handleUpload(event, classId) {
-    event.preventDefault();
-    
-    const fileInput = document.getElementById('lecture-file');
-    const file = fileInput.files[0];
-    
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('class_id', classId);
-    
-    try {
-        const response = await fetch('/api/upload_lecture', {
-            method: 'POST',
-            body: formData
-        });
-        
-        if (response.ok) {
-            document.getElementById('upload-modal').remove();
-            alert('Lecture uploaded successfully!');
-        }
-    } catch (error) {
-        console.error('Error uploading:', error);
-    }
-}
-
-function showCreateQuizModal(classId) {
-    const modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.id = 'quiz-modal';
-    modal.style.display = 'flex';
-    modal.innerHTML = `
-        <div class="modal-content" style="max-width: 600px;">
-            <div class="modal-header">
-                <h3>Create Quiz</h3>
-                <span class="close" onclick="document.getElementById('quiz-modal').remove()">&times;</span>
-            </div>
-            <form id="quiz-form" onsubmit="handleCreateQuiz(event, ${classId})">
-                <div class="form-group">
-                    <label for="quiz-title">Quiz Title</label>
-                    <input type="text" id="quiz-title" required>
-                </div>
-                <div id="questions-container">
-                    <div class="question-block">
-                        <h4>Question 1</h4>
-                        <input type="text" class="question-text" placeholder="Question" required>
-                        <input type="text" class="option" placeholder="Option 1" required>
-                        <input type="text" class="option" placeholder="Option 2" required>
-                        <input type="text" class="option" placeholder="Option 3" required>
-                        <input type="text" class="option" placeholder="Option 4" required>
-                        <select class="correct-option" required>
-                            <option value="">Select correct option</option>
-                            <option value="0">Option 1</option>
-                            <option value="1">Option 2</option>
-                            <option value="2">Option 3</option>
-                            <option value="3">Option 4</option>
-                        </select>
-                    </div>
-                </div>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="addQuestion()">+ Add Question</button>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('quiz-modal').remove()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Create Quiz</button>
-                </div>
-            </form>
-        </div>
-    `;
-    document.body.appendChild(modal);
-}
-
-let questionCount = 1;
-function addQuestion() {
-    questionCount++;
-    const container = document.getElementById('questions-container');
-    const questionBlock = document.createElement('div');
-    questionBlock.className = 'question-block';
-    questionBlock.innerHTML = `
-        <h4>Question ${questionCount}</h4>
-        <input type="text" class="question-text" placeholder="Question" required>
-        <input type="text" class="option" placeholder="Option 1" required>
-        <input type="text" class="option" placeholder="Option 2" required>
-        <input type="text" class="option" placeholder="Option 3" required>
-        <input type="text" class="option" placeholder="Option 4" required>
-        <select class="correct-option" required>
-            <option value="">Select correct option</option>
-            <option value="0">Option 1</option>
-            <option value="1">Option 2</option>
-            <option value="2">Option 3</option>
-            <option value="3">Option 4</option>
-        </select>
-    `;
-    container.appendChild(questionBlock);
-}
-
-async function handleCreateQuiz(event, classId) {
-    event.preventDefault();
-    
-    const title = document.getElementById('quiz-title').value;
-    const questionBlocks = document.querySelectorAll('.question-block');
-    
-    const questions = Array.from(questionBlocks).map(block => {
-        const questionText = block.querySelector('.question-text').value;
-        const options = Array.from(block.querySelectorAll('.option')).map(o => o.value);
-        const correct = parseInt(block.querySelector('.correct-option').value);
-        
-        return { question: questionText, options, correct };
-    });
-    
-    try {
-        const response = await fetch('/api/create_quiz', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ class_id: classId, title, questions })
-        });
-        
-        if (response.ok) {
-            document.getElementById('quiz-modal').remove();
-            alert('Quiz created successfully!');
-        }
-    } catch (error) {
-        console.error('Error creating quiz:', error);
-    }
-}
-
-async function loadAnalytics() {
-    const classId = document.getElementById('class-filter').value;
-    const url = classId ? `/api/analytics?class_id=${classId}` : '/api/analytics';
-    
-    try {
-        const response = await fetch(url);
-        const analytics = await response.json();
-        
-        const container = document.getElementById('analytics-table');
-        
-        if (analytics.length === 0) {
-            container.innerHTML = '<div class="empty-state"><p>No analytics data yet.</p></div>';
-            return;
-        }
-        
-        container.innerHTML = `
-            <table class="analytics-table">
-                <thead>
-                    <tr>
-                        <th>Student Name</th>
-                        <th>Class</th>
-                        <th>Avg Score (%)</th>
-                        <th>Avg Time (s)</th>
-                        <th>Pace Score</th>
-                        <th>Rating</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${analytics.map(a => `
-                        <tr>
-                            <td>${a.student_name}</td>
-                            <td>${a.class_name || '-'}</td>
-                            <td>${a.score_avg}%</td>
-                            <td>${a.avg_time}s</td>
-                            <td>${a.pace_score}</td>
-                            <td><span class="rating-badge">${a.rating}/10</span></td>
-                            <td>${a.pace_score < 4.5 ? '<span class="badge badge-warning">Needs Help</span>' : '<span class="badge badge-success">On Track</span>'}</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        `;
-    } catch (error) {
-        console.error('Error loading analytics:', error);
-    }
-}
-
-async function loadFeedback() {
-    try {
-        const response = await fetch('/api/feedback/all');
-        const feedbacks = await response.json();
-        
-        const container = document.getElementById('feedback-container');
-        
-        if (feedbacks.length === 0) {
-            container.innerHTML = '<div class="empty-state"><p>No feedback received yet.</p></div>';
-            return;
-        }
-        
-        container.innerHTML = feedbacks.map(feedback => {
-            const stars = '★'.repeat(feedback.rating) + '☆'.repeat(5 - feedback.rating);
-            const date = new Date(feedback.created_at).toLocaleDateString();
-            
-            return `
-                <div class="feedback-card" style="background: var(--surface); padding: 20px; border-radius: 8px; border: 1px solid var(--border);">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <strong>${feedback.student_name}</strong>
-                        <span style="color: #fbbf24; font-size: 18px;">${stars}</span>
-                    </div>
-                    ${feedback.message ? `<p style="color: var(--text-muted); margin: 10px 0;">${feedback.message}</p>` : ''}
-                    <small style="color: var(--text-muted);">${date}</small>
                 </div>
             `;
-        }).join('');
-    } catch (error) {
-        console.error('Error loading feedback:', error);
-        document.getElementById('feedback-container').innerHTML = '<div class="empty-state"><p>Failed to load feedback.</p></div>';
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        } catch (error) {
+            console.error('Error loading analytics:', error);
+        }
     }
-}
 
-// Load classes on page load
-loadClasses();
+    // Students
+    async function loadStudents() {
+        try {
+            const response = await fetch('/api/teacher/students');
+            const students = await response.json();
+
+            const container = document.getElementById('studentsListContainer');
+            if (students.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p class="empty-text">No students enrolled yet</p></div>';
+                return;
+            }
+
+            let html = '';
+            students.forEach(student => {
+                html += `
+                <div class="student-card">
+                    <div class="student-avatar">${student.name[0]}</div>
+                    <h4 class="student-name">${student.name}</h4>
+                    <p class="student-email">${student.email}</p>
+                    <p class="student-meta">Quizzes taken: ${student.quizzes_taken || 0}</p>
+                </div>
+            `;
+            });
+            container.innerHTML = html;
+        } catch (error) {
+            console.error('Error loading students:', error);
+        }
+    }
+
+
+    // Load Stats
+    window.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const classes = {{ classes | tojson
+        }};
+    let totalStudents = 0;
+    let totalLectures = 0;
+
+    classes.forEach(c => {
+        totalStudents += c.student_count || 0;
+        totalLectures += c.lecture_count || 0;
+    });
+
+    document.getElementById('totalStudents').textContent = totalStudents;
+    document.getElementById('totalLectures').textContent = totalLectures;
+        } catch (error) {
+        console.error('Error loading stats:', error);
+    }
+    });
+
 </script>
-{% endblock %}
 
+<style>
+    /* ============================================
+   UNIFIED DASHBOARD STYLES - TEACHER VERSION
+   (Matches student dashboard structure exactly)
+   ============================================ */
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        user-select: none;
+    }
+
+    input,
+    textarea,
+    .ai-input {
+        user-select: text;
+    }
+
+    .dashboard-app {
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+        background: #0a0e1a;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    /* ============================================
+   LEFT SIDEBAR - FIXED (UNIFIED)
+   ============================================ */
+
+    .dash-sidebar {
+        width: 220px;
+        background: #111827;
+        border-right: 1px solid rgba(75, 85, 99, 0.3);
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+    }
+
+    .sidebar-brand-area {
+        padding: 24px 20px;
+        border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .brand-logo-img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .brand-title-text {
+        font-size: 18px;
+        font-weight: 700;
+        color: #60a5fa;
+    }
+
+    .brand-role-badge {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 12px;
+        border-radius: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .brand-role-badge.teacher {
+        color: #f59e0b;
+        background: rgba(245, 158, 11, 0.1);
+    }
+
+    .sidebar-nav-menu {
+        flex: 1;
+        padding: 16px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        overflow-y: auto;
+    }
+
+    .nav-menu-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        border-radius: 10px;
+        color: #9ca3af;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    .nav-menu-item:hover {
+        background: rgba(96, 165, 250, 0.1);
+        color: #e5e7eb;
+        box-shadow: 0 0 12px rgba(96, 165, 250, 0.15);
+    }
+
+    .nav-menu-item.active {
+        background: rgba(96, 165, 250, 0.15);
+        color: #60a5fa;
+        box-shadow: 0 0 16px rgba(96, 165, 250, 0.2);
+    }
+
+    .item-icon {
+        font-size: 22px;
+        width: 28px;
+        text-align: center;
+    }
+
+    .sidebar-user-profile {
+        padding: 16px 12px;
+        border-top: 1px solid rgba(75, 85, 99, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ec4899, #8b5cf6);
+        color: white;
+        font-size: 18px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .user-avatar.teacher {
+        background: linear-gradient(135deg, #f59e0b, #ef4444);
+    }
+
+    .user-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .user-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #e5e7eb;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .user-email {
+        font-size: 12px;
+        color: #6b7280;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .sidebar-logout-area {
+        padding: 16px 12px;
+        border-top: 1px solid rgba(75, 85, 99, 0.3);
+    }
+
+    .logout-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 14px;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 10px;
+        color: #ef4444;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    .logout-button:hover {
+        background: rgba(239, 68, 68, 0.2);
+        box-shadow: 0 0 12px rgba(239, 68, 68, 0.2);
+    }
+
+    .logout-ico {
+        font-size: 18px;
+    }
+
+    /* ============================================
+   CENTER CONTENT - ADAPTIVE (UNIFIED)
+   ============================================ */
+
+    .dash-center {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transition: margin-right 0.3s ease;
+    }
+
+    .dash-center.ai-active {
+        margin-right: 380px;
+    }
+
+    .dash-mobile-head {
+        display: none;
+    }
+
+    .dash-view {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .dash-view-head {
+        padding: 32px 40px 24px;
+        border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+        background: #111827;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .view-main-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #e5e7eb;
+        margin-bottom: 4px;
+    }
+
+    .view-sub-text {
+        font-size: 15px;
+        color: #9ca3af;
+    }
+
+    .dash-view-body {
+        flex: 1;
+        padding: 32px 40px;
+        overflow-y: auto;
+        background: #0a0e1a;
+    }
+
+    .view-section {
+        margin-bottom: 32px;
+    }
+
+    .section-label {
+        font-size: 18px;
+        font-weight: 600;
+        color: #e5e7eb;
+        margin-bottom: 16px;
+    }
+
+    /* Quick Actions Grid */
+    .quick-act-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    .quick-act-box {
+        background: #111827;
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        border-radius: 12px;
+        padding: 24px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+    }
+
+    .quick-act-box:hover {
+        border-color: rgba(96, 165, 250, 0.5);
+        box-shadow: 0 4px 20px rgba(96, 165, 250, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .qact-icon {
+        font-size: 40px;
+        margin-bottom: 12px;
+    }
+
+    .qact-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #e5e7eb;
+        margin-bottom: 6px;
+    }
+
+    .qact-text {
+        font-size: 14px;
+        color: #9ca3af;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    .stat-card {
+        background: #111827;
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        border-radius: 12px;
+        padding: 24px;
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 36px;
+        font-weight: 700;
+        color: #60a5fa;
+        margin-bottom: 8px;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Class Grid */
+    .class-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 24px;
+    }
+
+    .class-card {
+        background: #111827;
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        border-radius: 12px;
+        padding: 24px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.2s;
+    }
+
+    .class-card:hover {
+        border-color: rgba(96, 165, 250, 0.5);
+        box-shadow: 0 4px 20px rgba(96, 165, 250, 0.1);
+    }
+
+    .card-border-glow {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #60a5fa, #8b5cf6);
+    }
+
+    .card-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #e5e7eb;
+        margin-bottom: 8px;
+    }
+
+    .card-desc {
+        font-size: 14px;
+        color: #9ca3af;
+        margin-bottom: 16px;
+        line-height: 1.5;
+    }
+
+    .card-meta {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+    }
+
+    .meta-item {
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+    .card-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .btn-card {
+        flex: 1;
+        min-width: 80px;
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+    }
+
+    .btn-card.primary {
+        background: #60a5fa;
+        color: white;
+    }
+
+    .btn-card.primary:hover {
+        background: #3b82f6;
+    }
+
+    .btn-card.secondary {
+        background: rgba(96, 165, 250, 0.1);
+        color: #60a5fa;
+        border: 1px solid rgba(96, 165, 250, 0.3);
+    }
+
+    .btn-card.secondary:hover {
+        background: rgba(96, 165, 250, 0.2);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .empty-icon {
+        font-size: 64px;
+        margin-bottom: 16px;
+        opacity: 0.3;
+    }
+
+    .empty-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #e5e7eb;
+        margin-bottom: 8px;
+    }
+
+    .empty-text {
+        font-size: 15px;
+        color: #9ca3af;
+        margin-bottom: 24px;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        padding: 12px 24px;
+        background: #60a5fa;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+        background: #3b82f6;
+    }
+
+    .btn-secondary {
+        padding: 12px 24px;
+        background: transparent;
+        color: #9ca3af;
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+        border-color: rgba(96, 165, 250, 0.5);
+        color: #60a5fa;
+    }
+
+    /* Select Container */
+    .select-container {
+        margin-bottom: 24px;
+    }
+
+    .select-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #e5e7eb;
+        margin-bottom: 8px;
+    }
+
+    .select-input {
+        width: 100%;
+        max-width: 400px;
+        padding: 12px 16px;
+        background: #111827;
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        border-radius: 8px;
+        color: #e5e7eb;
+        font-size: 14px;
+    }
+
+    /* Analytics */
+    .analytics-container {
+        margin-top: 24px;
+    }
+
+    .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    .analytics-card {
+        background: #111827;
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        border-radius: 12px;
+        padding: 20px;
+    }
+
+    .analytics-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: #e5e7eb;
+        margin-bottom: 16px;
+    }
+
+    .analytics-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .analytics-stat {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .analytics-stat .stat-label {
+        font-size: 13px;
+        color: #9ca3af;
+        text-transform: none;
+    }
+
+    .analytics-stat .stat-value {
+        font-size: 16px;
+        font-weight: 600;
+        color: #60a5fa;
+    }
+
+    /* Students Grid */
+    .students-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .student-card {
+        background: #111827;
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        border-radius: 12px;
+        padding: 24px;
+        text-align: center;
+    }
+
+    .student-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #60a5fa, #8b5cf6);
+        color: white;
+        font-size: 24px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+    }
+
+    .student-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: #e5e7eb;
+        margin-bottom: 4px;
+    }
+
+    .student-email {
+        font-size: 13px;
+        color: #6b7280;
+        margin-bottom: 8px;
+    }
+
+    .student-meta {
+        font-size: 13px;
+        color: #9ca3af;
+    }
+
+    /* ============================================
+   RIGHT AI PANEL (UNIFIED)
+   ============================================ */
+
+    .dash-ai {
+        position: fixed;
+        right: -380px;
+        top: 0;
+        width: 380px;
+        height: 100vh;
+        background: #111827;
+        border-left: 1px solid rgba(75, 85, 99, 0.3);
+        display: flex;
+        flex-direction: column;
+        transition: right 0.3s ease;
+        z-index: 100;
+    }
+
+    .dash-ai.open {
+        right: 0;
+    }
+
+    .ai-header {
+        padding: 20px;
+        border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .ai-brand {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .ai-name {
+        font-size: 18px;
+        font-weight: 700;
+        color: #60a5fa;
+    }
+
+    .ai-tag {
+        font-size: 11px;
+        color: #6b7280;
+    }
+
+    .ai-close {
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .ai-close:hover {
+        background: rgba(239, 68, 68, 0.2);
+    }
+
+    .ai-modes {
+        display: flex;
+        gap: 8px;
+        padding: 16px;
+        border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+    }
+
+    .mode-tab {
+        flex: 1;
+        padding: 10px;
+        background: transparent;
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        border-radius: 8px;
+        color: #9ca3af;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .mode-tab.active {
+        background: rgba(96, 165, 250, 0.1);
+        border-color: rgba(96, 165, 250, 0.5);
+        color: #60a5fa;
+    }
+
+    .ai-messages {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+    }
+
+    .ai-welcome {
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .welcome-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+        opacity: 0.3;
+    }
+
+    .welcome-msg {
+        font-size: 14px;
+        color: #9ca3af;
+        line-height: 1.6;
+    }
+
+    .ai-msg {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .msg-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #1f2937;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 18px;
+    }
+
+    .msg-text {
+        flex: 1;
+        padding: 12px 16px;
+        background: #1f2937;
+        border-radius: 12px;
+        color: #e5e7eb;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .ai-msg.user-msg .msg-text {
+        background: rgba(96, 165, 250, 0.1);
+        border: 1px solid rgba(96, 165, 250, 0.3);
+    }
+
+    .ai-input-area {
+        padding: 16px;
+        border-top: 1px solid rgba(75, 85, 99, 0.3);
+        display: flex;
+        gap: 8px;
+    }
+
+    .ai-input {
+        flex: 1;
+        padding: 12px;
+        background: #1f2937;
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        border-radius: 8px;
+        color: #e5e7eb;
+        font-size: 14px;
+        resize: none;
+    }
+
+    .ai-send {
+        width: 48px;
+        height: 48px;
+        background: #60a5fa;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .ai-send:hover {
+        background: #3b82f6;
+    }
+
+    .ai-float {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        width: 60px;
+        height: 60px;
+        background: #60a5fa;
+        border: none;
+        border-radius: 50%;
+        color: white;
+        font-size: 28px;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 4px 20px rgba(96, 165, 250, 0.3);
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .ai-float:hover {
+        transform: scale(1.1);
+    }
+
+    /* ============================================
+   MODALS (UNIFIED)
+   ============================================ */
+
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        z-index: 200;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .modal-box {
+        background: #111827;
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        border-radius: 16px;
+        max-width: 600px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-box.modal-lg {
+        max-width: 900px;
+    }
+
+    .modal-header {
+        padding: 24px;
+        border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #e5e7eb;
+    }
+
+    .modal-close {
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        border-radius: 8px;
+        font-size: 24px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .modal-close:hover {
+        background: rgba(239, 68, 68, 0.2);
+    }
+
+    .modal-body {
+        padding: 24px;
+    }
+
+    .modal-info {
+        font-size: 14px;
+        color: #60a5fa;
+        margin-bottom: 16px;
+    }
+
+    .modal-footer {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        margin-top: 24px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #e5e7eb;
+        margin-bottom: 8px;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 12px 16px;
+        background: #1f2937;
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        border-radius: 8px;
+        color: #e5e7eb;
+        font-size: 14px;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: rgba(96, 165, 250, 0.5);
+    }
+
+    .form-hint {
+        display: block;
+        margin-top: 6px;
+        font-size: 12px;
+        color: #6b7280;
+    }
+
+    .form-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .btn-add {
+        padding: 8px 16px;
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        border-radius: 8px;
+        color: #10b981;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-add:hover {
+        background: rgba(16, 185, 129, 0.2);
+    }
+
+    .question-block {
+        background: #1f2937;
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+    }
+
+    .question-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .question-num {
+        font-size: 15px;
+        font-weight: 700;
+        color: #60a5fa;
+    }
+
+    .btn-remove {
+        padding: 6px 12px;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 6px;
+        color: #ef4444;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-remove:hover {
+        background: rgba(239, 68, 68, 0.2);
+    }
+
+    /* ============================================
+   MOBILE RESPONSIVE
+   ============================================ */
+
+    .dash-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 90;
+    }
+
+    .dash-overlay.show {
+        display: block;
+    }
+
+    @media (max-width: 768px) {
+        .dash-sidebar {
+            position: fixed;
+            left: -220px;
+            top: 0;
+            height: 100vh;
+            z-index: 100;
+            transition: left 0.3s ease;
+        }
+
+        .dash-sidebar.mobile-show {
+            left: 0;
+        }
+
+        .dash-mobile-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: #111827;
+            border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+        }
+
+        .mob-sidebar-btn,
+        .mob-ai-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(96, 165, 250, 0.1);
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            border-radius: 8px;
+            color: #60a5fa;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .mob-brand-text {
+            font-size: 16px;
+            font-weight: 700;
+            color: #e5e7eb;
+        }
+
+        .dash-view-head {
+            padding: 20px;
+        }
+
+        .dash-view-body {
+            padding: 20px;
+        }
+
+        .class-grid,
+        .quick-act-grid,
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .dash-ai {
+            width: 100%;
+            right: -100%;
+        }
+
+        .dash-center.ai-active {
+            margin-right: 0;
+        }
+    }
+</style>
+{% endblock %}

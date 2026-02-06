@@ -1,0 +1,382 @@
+/* ============================================================================
+   STUDENT DASHBOARD UI POLISH
+   Enhanced card-based design for Quick Actions and Active Classes
+   ============================================================================ */
+
+/* Quick Actions Section - Premium Card Design */
+.action-card {
+    background: var(--surface);
+    border: 2px solid var(--border-primary);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-8);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Subtle gradient overlay on hover */
+.action-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(79, 124, 255, 0.05), rgba(138, 99, 255, 0.05));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 0;
+}
+
+.action-card:hover::before {
+    opacity: 1;
+}
+
+.action-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(79, 124, 255, 0.15);
+    border-color: var(--primary);
+}
+
+.action-card:active {
+    transform: translateY(-4px);
+}
+
+/* Large, prominent icons */
+.action-icon {
+    font-size: 4rem;
+    line-height: 1;
+    margin-bottom: var(--space-2);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    position: relative;
+    z-index: 1;
+}
+
+.action-card h3 {
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+    margin: 0;
+    color: var(--text-primary);
+    position: relative;
+    z-index: 1;
+}
+
+.action-card p {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+    position: relative;
+    z-index: 1;
+}
+
+/* Responsive Grid for Quick Actions */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-6);
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+    .card-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 767px) {
+    .card-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .action-icon {
+        font-size: 3.5rem;
+    }
+}
+
+/* Active Classes - Enhanced Class Cards */
+.class-card {
+    background: var(--surface);
+    border: 2px solid var(--border-primary);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-6);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.class-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--primary), var(--accent));
+    opacity: 0.8;
+}
+
+.class-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(79, 124, 255, 0.12);
+    border-color: var(--primary-light);
+}
+
+.class-header {
+    flex: 1;
+}
+
+.class-title {
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+    margin: 0 0 var(--space-2) 0;
+    color: var(--text-primary);
+    line-height: 1.3;
+}
+
+.class-teacher {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.class-teacher::before {
+    content: '👤';
+    opacity: 0.7;
+}
+
+.class-actions {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+}
+
+.class-actions .btn {
+    flex: 1;
+    justify-content: center;
+    font-weight: var(--font-medium);
+}
+
+/* Section Spacing & Alignment */
+.content-section {
+    margin-bottom: var(--space-10);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--border-secondary);
+}
+
+.section-title {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* Empty State Styling */
+.empty-state {
+    text-align: center;
+    padding: var(--space-12) var(--space-8);
+    background: var(--surface);
+    border: 2px dashed var(--border-primary);
+    border-radius: var(--radius-2xl);
+    color: var(--text-secondary);
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: var(--space-4);
+    opacity: 0.5;
+}
+
+.empty-state-title {
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
+    margin: 0 0 var(--space-2) 0;
+}
+
+.empty-state-description {
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+    margin: 0 0 var(--space-6) 0;
+}
+
+/* Loading Skeleton Polish */
+.loading-skeleton {
+    padding: var(--space-12);
+    text-align: center;
+    color: var(--text-tertiary);
+    font-size: var(--text-base);
+    background: var(--surface);
+    border: 2px dashed var(--border-secondary);
+    border-radius: var(--radius-2xl);
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Button Enhancements */
+.btn-full {
+    width: 100%;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border: none;
+    color: white;
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--radius-lg);
+    font-weight: var(--font-semibold);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(79, 124, 255, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(79, 124, 255, 0.4);
+}
+
+.btn-secondary {
+    background: var(--surface);
+    border: 1px solid var(--border-primary);
+    color: var(--text-primary);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-lg);
+    font-weight: var(--font-medium);
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background: var(--surface-hover);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/* Dark Theme Adjustments */
+[data-theme="dark"] .action-card,
+[data-theme="dark"] .class-card {
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .action-card:hover,
+[data-theme="dark"] .class-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 8px 20px rgba(79, 124, 255, 0.25);
+}
+
+[data-theme="dark"] .action-icon {
+    filter: drop-shadow(0 2px 6px rgba(255, 255, 255, 0.2));
+}
+
+/* Futuristic Theme Adjustments */
+[data-theme="futuristic"] .action-card,
+[data-theme="futuristic"] .class-card {
+    border-color: var(--neural-400);
+    background: linear-gradient(135deg, rgba(19, 19, 38, 0.9), rgba(28, 28, 48, 0.9));
+    box-shadow: 0 0 20px rgba(79, 124, 255, 0.1);
+}
+
+[data-theme="futuristic"] .action-card:hover,
+[data-theme="futuristic"] .class-card:hover {
+    border-color: var(--cyber-cyan);
+    box-shadow: 0 0 30px rgba(0, 245, 255, 0.3);
+}
+
+[data-theme="futuristic"] .action-icon {
+    filter: drop-shadow(0 0 10px rgba(0, 245, 255, 0.5));
+}
+
+/* Ensure Clean Spacing */
+.page-header {
+    margin-bottom: var(--space-8);
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: var(--font-bold);
+    margin: 0 0 var(--space-2) 0;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.page-subtitle {
+    font-size: var(--text-lg);
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Tablet Optimizations */
+@media (max-width: 1024px) {
+    .action-card {
+        padding: var(--space-6);
+    }
+
+    .class-card {
+        padding: var(--space-5);
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-3);
+    }
+}
+
+/* Mobile Optimizations */
+@media (max-width: 767px) {
+    .page-title {
+        font-size: 2rem;
+    }
+
+    .section-title {
+        font-size: var(--text-xl);
+    }
+
+    .action-card {
+        padding: var(--space-5);
+    }
+
+    .class-card {
+        padding: var(--space-4);
+    }
+
+    .class-actions {
+        flex-direction: column;
+    }
+
+    .class-actions .btn {
+        width: 100%;
+    }
+}

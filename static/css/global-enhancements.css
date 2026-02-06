@@ -1,0 +1,175 @@
+/* ===========================================================================
+   GLOBAL UI/UX ENHANCEMENTS
+   - Disable inadvertent text selection
+   - Responsive breakpoints (desktop, tablet, mobile)
+   - Professional spacing & alignment
+   - Typography consistency
+   =========================================================================== */
+
+/* Disable Inadvertent Text Selection (Task 3) */
+*:not(input):not(textarea):not([contenteditable="true"]):not(.ai-message-content):not(.lecture-info):not(p):not(h1):not(h2):not(h3) {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Explicitly allow selection for content areas */
+.ai-message-content,
+.lecture-info,
+.quiz-card p,
+.class-description,
+article,
+.content-text,
+.history-preview,
+.history-prompt {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
+/* Responsive Breakpoints (Task 5) */
+@media (max-width: 1024px) {
+    .three-zone-layout {
+        grid-template-columns: auto 1fr;
+    }
+
+    .right-zone {
+        position: fixed;
+        right: 0;
+        top: 0;
+        height: 100vh;
+        z-index: var(--z-modal);
+        transform: translateX(100%);
+        transition: transform var(--transition-base);
+    }
+
+    .right-zone:not(.collapsed) {
+        transform: translateX(0);
+    }
+
+    .decision-surface {
+        grid-template-columns: 1fr;
+    }
+
+    .card-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .three-zone-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .left-zone {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        z-index: var(--z-modal);
+        transform: translateX(-100%);
+        transition: transform var(--transition-base);
+    }
+
+    .left-zone:not(.collapsed) {
+        transform: translateX(0);
+    }
+
+    .card-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .page-title {
+        font-size: 1.75rem !important;
+    }
+
+    .section-title {
+        font-size: 1.25rem !important;
+    }
+
+    .decision-surface {
+        grid-template-columns: 1fr !important;
+    }
+
+    .class-meta {
+        flex-direction: column;
+        gap: var(--space-2) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title {
+        font-size: 1.5rem !important;
+    }
+
+    .nav-label {
+        display: none;
+    }
+
+    .left-zone {
+        width: 60px !important;
+    }
+
+    .left-zone:not(.collapsed) {
+        width: 280px !important;
+    }
+}
+
+/* Professional Spacing & Alignment (Task 7) */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-6);
+}
+
+.page-header {
+    margin-bottom: var(--space-8);
+}
+
+.content-section {
+    margin-bottom: var(--space-8);
+}
+
+.card-grid {
+    gap: var(--space-6);
+}
+
+/* Typography Normalization */
+h1.page-title {
+    font-size: 2rem;
+    font-weight: var(--font-bold);
+    line-height: 1.2;
+}
+
+h2.section-title {
+    font-size: 1.5rem;
+    font-weight: var(--font-semibold);
+    line-height: 1.3;
+}
+
+h3 {
+    font-size: 1.25rem;
+    font-weight: var(--font-semibold);
+}
+
+/* Ensure consistent button sizing */
+.btn {
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--text-base);
+    font-weight: var(--font-medium);
+}
+
+.btn-sm {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+}
+
+/* No horizontal scroll */
+html,
+body {
+    overflow-x: hidden;
+    max-width: 100vw;
+}

@@ -1,0 +1,432 @@
+/* ============================================
+   FUTURISTIC MODE ENHANCEMENTS
+   Neon glows, glassmorphism, animated gradients
+   ONLY applied when [data-theme="futuristic"]
+   ============================================ */
+
+/* ============================================
+   GLASSMORPHISM PANELS
+   ============================================ */
+
+[data-theme="futuristic"] .metric-card,
+[data-theme="futuristic"] .feature-card,
+[data-theme="futuristic"] .settings-content,
+[data-theme="futuristic"] .stat-card,
+[data-theme="futuristic"] .list-item {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+}
+
+/* ============================================
+   ANIMATED GRADIENT BACKGROUNDS
+   ============================================ */
+
+[data-theme="futuristic"] .hero-section,
+[data-theme="futuristic"] .dashboard-header {
+    background: linear-gradient(135deg,
+            rgba(96, 165, 250, 0.1) 0%,
+            rgba(167, 139, 250, 0.1) 50%,
+            rgba(236, 72, 153, 0.1) 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 15s ease infinite;
+}
+
+@keyframes gradientShift {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+/* ============================================
+   SUBTLE PARTICLE EFFECTS
+   ============================================ */
+
+[data-theme="futuristic"] body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+        radial-gradient(circle at 20% 50%, rgba(96, 165, 250, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(167, 139, 250, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+    animation: particleFloat 20s ease-in-out infinite;
+}
+
+@keyframes particleFloat {
+
+    0%,
+    100% {
+        opacity: 0.3;
+        transform: translateY(0);
+    }
+
+    50% {
+        opacity: 0.6;
+        transform: translateY(-20px);
+    }
+}
+
+/* ============================================
+   CARD HOVER GLOW
+   ============================================ */
+
+[data-theme="futuristic"] .metric-card:hover,
+[data-theme="futuristic"] .feature-card:hover,
+[data-theme="futuristic"] .stat-card:hover {
+    border-color: var(--card-hover-border);
+    box-shadow: var(--card-hover-shadow), var(--card-glow);
+}
+
+/* ============================================
+   SIDEBAR & PANEL GLOWS
+   ============================================ */
+
+[data-theme="futuristic"] .sidebar,
+[data-theme="futuristic"] .left-zone {
+    border-right: 1px solid var(--sidebar-border);
+    box-shadow: var(--sidebar-shadow);
+}
+
+[data-theme="futuristic"] #ai-panel,
+[data-theme="futuristic"] #classAI,
+[data-theme="futuristic"] .right-zone {
+    border-left: 1px solid var(--panel-border);
+    box-shadow: var(--panel-shadow);
+}
+
+/* ============================================
+   PROGRESS BARS WITH PULSE
+   ============================================ */
+
+[data-theme="futuristic"] .progress-bar {
+    animation: progressPulse 2s ease-in-out infinite;
+}
+
+@keyframes progressPulse {
+
+    0%,
+    100% {
+        box-shadow: var(--progress-glow);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(96, 165, 250, 0.8);
+    }
+}
+
+/* ============================================
+   LOADING STATES WITH GLOW
+   ============================================ */
+
+[data-theme="futuristic"] .loading,
+[data-theme="futuristic"] .skeleton {
+    background: linear-gradient(90deg,
+            rgba(96, 165, 250, 0.1) 0%,
+            rgba(96, 165, 250, 0.2) 50%,
+            rgba(96, 165, 250, 0.1) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* ============================================
+   NOTIFICATION TOASTS WITH GLOW
+   ============================================ */
+
+[data-theme="futuristic"] .toast {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), var(--glow-primary);
+}
+
+/* ============================================
+   BUTTON ACTIVE STATE GLOW
+   ============================================ */
+
+[data-theme="futuristic"] button:active,
+[data-theme="futuristic"] .btn:active {
+    box-shadow: 0 0 30px rgba(96, 165, 250, 0.8) inset;
+}
+
+/* ============================================
+   CYBERPUNK ACCENTS
+   ============================================ */
+
+[data-theme="futuristic"] .accent-line {
+    height: 2px;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            var(--primary) 50%,
+            transparent 100%);
+    box-shadow: var(--glow-primary);
+}
+
+/* ============================================
+   REDUCE MOTION SUPPORT
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    [data-theme="futuristic"] * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    [data-theme="futuristic"] body::before {
+        animation: none;
+    }
+}
+
+/* ============================================
+   PERFORMANCE DASHBOARD CHARTS
+   Chart.js styling and containers
+   ============================================ */
+
+.performance-dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: var(--space-6);
+    margin-top: var(--space-8);
+}
+
+.chart-container {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    position: relative;
+    box-shadow: var(--card-shadow);
+}
+
+[data-theme="futuristic"] .chart-container {
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+}
+
+.chart-header {
+    margin-bottom: var(--space-5);
+}
+
+.chart-title {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
+    margin-bottom: var(--space-1);
+}
+
+.chart-subtitle {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+}
+
+.chart-canvas {
+    position: relative;
+    height: 300px;
+}
+
+/* Chart legend styling */
+.chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-primary);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: var(--radius-sm);
+}
+
+/* Responsive charts */
+@media (max-width: 768px) {
+    .performance-dashboard {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-canvas {
+        height: 250px;
+    }
+}
+
+/* ============================================
+   LOADING SKELETONS
+   Shimmer effects while data loads
+   ============================================ */
+
+.skeleton {
+    background: linear-gradient(90deg,
+            var(--bg-tertiary) 0%,
+            var(--bg-elevated) 50%,
+            var(--bg-tertiary) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: var(--radius-md);
+}
+
+.skeleton-text {
+    height: 16px;
+    margin-bottom: var(--space-2);
+}
+
+.skeleton-title {
+    height: 24px;
+    width: 60%;
+    margin-bottom: var(--space-3);
+}
+
+.skeleton-card {
+    height: 200px;
+    border-radius: var(--radius-xl);
+}
+
+.skeleton-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-full);
+}
+
+/* ============================================
+   SMOOTH SCROLL
+   ============================================ */
+
+html {
+    scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+}
+
+/* ============================================
+   ERROR BOUNDARIES
+   Graceful error handling UI
+   ============================================ */
+
+.error-boundary {
+    padding: var(--space-10) var(--space-5);
+    text-align: center;
+    background: var(--bg-secondary);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: var(--radius-xl);
+    margin: var(--space-5);
+}
+
+.error-boundary-icon {
+    font-size: var(--text-5xl);
+    margin-bottom: var(--space-4);
+}
+
+.error-boundary-title {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+}
+
+.error-boundary-message {
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+    margin-bottom: var(--space-6);
+}
+
+.error-boundary-action {
+    padding: var(--space-3) var(--space-6);
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    font-size: var(--text-base);
+    font-weight: var(--font-medium);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.error-boundary-action:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* ============================================
+   EMPTY STATES
+   Custom graphics for empty sections
+   ============================================ */
+
+.empty-state {
+    padding: var(--space-16) var(--space-5);
+    text-align: center;
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: var(--space-5);
+    opacity: 0.5;
+}
+
+.empty-state-title {
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+}
+
+.empty-state-description {
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+    margin-bottom: var(--space-6);
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.empty-state-action {
+    padding: var(--space-3) var(--space-6);
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    font-size: var(--text-base);
+    font-weight: var(--font-medium);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.empty-state-action:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+[data-theme="futuristic"] .empty-state-action:hover {
+    box-shadow: var(--shadow-md), var(--glow-primary);
+}

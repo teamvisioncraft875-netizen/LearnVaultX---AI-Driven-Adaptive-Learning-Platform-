@@ -1,0 +1,919 @@
+{% extends "base.html" %}
+
+{% block title %}Live Class: {{ class_title }} - LearnVaultX{% endblock %}
+
+{% block content %}
+<!-- LIVE CLASS - PROFESSIONAL 3-PANE IDE LAYOUT -->
+<div class="live-class-container">
+
+    <!-- LEFT SIDEBAR - Fixed Navigation -->
+    <aside class="live-sidebar">
+        <div class="live-sidebar-header">
+            <div class="live-brand">
+                <span class="live-brand-text">LearnVaultX</span>
+            </div>
+        </div>
+
+        <nav class="live-nav">
+            <a href="/student/dashboard" class="live-nav-item live-nav-exit">
+                <span class="live-nav-icon">←</span>
+                <span class="live-nav-label">Exit Class</span>
+            </a>
+
+            <div class="live-nav-divider"></div>
+
+            <button class="live-nav-item" onclick="switchTab('overview')">
+                <span class="live-nav-icon">📊</span>
+                <span class="live-nav-label">Overview</span>
+            </button>
+
+            <button class="live-nav-item" onclick="switchTab('lectures')">
+                <span class="live-nav-icon">📚</span>
+                <span class="live-nav-label">Lectures</span>
+            </button>
+
+            <button class="live-nav-item" onclick="switchTab('quizzes')">
+                <span class="live-nav-icon">📝</span>
+                <span class="live-nav-label">Quizzes</span>
+            </button>
+
+            <button class="live-nav-item" onclick="switchTab('resources')">
+                <span class="live-nav-icon">📎</span>
+                <span class="live-nav-label">Resources</span>
+            </button>
+        </nav>
+
+        <div class="live-sidebar-footer">
+            <div class="live-user-info">
+                <div class="live-user-avatar">{{ user_data.name[0] if user_data.name else 'U' }}</div>
+                <div class="live-user-details">
+                    <div class="live-user-name">{{ user_data.name }}</div>
+                    <div class="live-user-role">{{ 'Teacher' if is_teacher else 'Student' }}</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- CENTER PANEL - Live Video Stage -->
+    <main class="live-center">
+        <!-- Class Header -->
+        <header class="live-header">
+            <div class="live-header-content">
+                <div class="live-class-info">
+                    <h1 class="live-class-title">{{ class_title }}</h1>
+                    <div class="live-class-meta">
+                        <span class="live-instructor">{{ instructor_name if instructor_name else 'Instructor' }}</span>
+                        <span class="live-indicator">
+                            <span class="live-dot"></span>
+                            LIVE
+                        </span>
+                    </div>
+                </div>
+                <button class="live-ai-toggle" onclick="window.panelManager.toggle('ai')" data-panel="ai"
+                    title="Toggle AI Assistant">
+                    <span>🤖</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Video Container -->
+        <div class="live-video-container">
+            <div id="meet" class="live-video"></div>
+        </div>
+
+        <!-- Tabs Below Video -->
+        <div class="live-tabs">
+            <div class="live-tabs-header">
+                <button class="live-tab active" data-tab="chat" onclick="switchLiveTab('chat')">
+                    <span class="live-tab-icon">💬</span>
+                    Chat
+                </button>
+                <button class="live-tab" data-tab="participants" onclick="switchLiveTab('participants')">
+                    <span class="live-tab-icon">👥</span>
+                    Participants
+                </button>
+                <button class="live-tab" data-tab="notes" onclick="switchLiveTab('notes')">
+                    <span class="live-tab-icon">📝</span>
+                    Notes
+                </button>
+            </div>
+
+            <div class="live-tabs-content">
+                <!-- Chat Tab -->
+                <div class="live-tab-pane active" id="tab-chat">
+                    <div class="live-chat-messages" id="live-chat-messages">
+                        <div class="live-chat-welcome">Class chat will appear here</div>
+                    </div>
+                    <div class="live-chat-input">
+                        <input type="text" id="chat-input" placeholder="Type a message..." />
+                        <button class="live-chat-send" onclick="sendClassMessage()">Send</button>
+                    </div>
+                </div>
+
+                <!-- Participants Tab -->
+                <div class="live-tab-pane" id="tab-participants">
+                    <div class="live-participants-list">
+                        <div class="live-participant">
+                            <div class="live-participant-avatar">{{ user_data.name[0] if user_data.name else 'U' }}
+                            </div>
+                            <div class="live-participant-info">
+                                <div class="live-participant-name">{{ user_data.name }} (You)</div>
+                                <div class="live-participant-status">Active</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes Tab -->
+                <div class="live-tab-pane" id="tab-notes">
+                    <textarea class="live-notes-editor" placeholder="Take notes during the class..."
+                        id="class-notes"></textarea>
+                    <button class="live-notes-save" onclick="saveNotes()">Save Notes</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- RIGHT PANEL - AI Assistant (Toggleable) -->
+    <aside class="live-ai-panel" id="ai-panel">
+        <div class="live-ai-header">
+            <div class="live-ai-title">
+                <span class="live-ai-icon">🤖</span>
+                KyKnoX AI
+            </div>
+            <button class="live-ai-close" onclick="window.panelManager.close('ai')">×</button>
+        </div>
+
+        <div class="live-ai-status">
+            <span class="live-ai-status-icon">👂</span>
+            Listening to the class
+        </div>
+
+        <div class="live-ai-modes">
+            <button class="live-ai-mode active" data-mode="socratic">Socratic</button>
+            <button class="live-ai-mode" data-mode="expert">Expert</button>
+            <button class="live-ai-mode" data-mode="coach">Coach</button>
+        </div>
+
+        <div class="live-ai-messages" id="ai-messages">
+            <div class="live-ai-welcome">
+                <p>I'm here to help you understand the class better. Ask me anything!</p>
+            </div>
+        </div>
+
+        <div class="live-ai-input-container">
+            <textarea id="ai-input" class="live-ai-input" placeholder="Ask AI about the class..." rows="2"></textarea>
+            <button class="live-ai-send" onclick="sendAIMessage()">
+                <span>➤</span>
+            </button>
+        </div>
+    </aside>
+</div>
+
+<!-- Jitsi Meet API -->
+<script src='https://meet.jit.si/external_api.js'></script>
+
+<script>
+    // Initialize Jitsi Meet
+    const domain = 'meet.jit.si';
+    const options = {
+        roomName: '{{ room_name }}',
+        width: '100%',
+        height: '100%',
+        parentNode: document.querySelector('#meet'),
+        userInfo: {
+            email: '{{ user_data.email }}',
+            displayName: '{{ user_data.name }}'
+        },
+        configOverwrite: {
+            startWithAudioMuted: true,
+            startWithVideoMuted: false,
+            prejoinPageEnabled: false
+        },
+        interfaceConfigOverwrite: {
+            TOOLBAR_BUTTONS: [
+                'microphone', 'camera', 'desktop', 'fullscreen',
+                'hangup', 'chat', 'raisehand', 'tileview'
+            ],
+            SHOW_JITSI_WATERMARK: false,
+            SHOW_WATERMARK_FOR_GUESTS: false,
+            DISABLE_VIDEO_BACKGROUND: false
+        }
+    };
+
+    const api = new JitsiMeetExternalAPI(domain, options);
+
+    // Handle meeting end
+    api.addEventListeners({
+        videoConferenceLeft: function () {
+            window.location.href = '/student/dashboard';
+        },
+        readyToClose: function () {
+            window.location.href = '/student/dashboard';
+        }
+    });
+
+    // Tab Switching
+    function switchLiveTab(tabName) {
+        // Remove active from all tabs and panes
+        document.querySelectorAll('.live-tab').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.live-tab-pane').forEach(pane => pane.classList.remove('active'));
+
+        // Add active to selected
+        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+        document.getElementById(`tab-${tabName}`).classList.add('active');
+    }
+
+    // AI Mode Switching
+    document.querySelectorAll('.live-ai-mode').forEach(btn => {
+        btn.addEventListener('click', function () {
+            document.querySelectorAll('.live-ai-mode').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+
+    // Send AI Message
+    async function sendAIMessage() {
+        const input = document.getElementById('ai-input');
+        const message = input.value.trim();
+        if (!message) return;
+
+        const container = document.getElementById('ai-messages');
+
+        // Add user message
+        const userMsg = document.createElement('div');
+        userMsg.className = 'live-ai-message live-ai-message-user';
+        userMsg.textContent = message;
+        container.appendChild(userMsg);
+
+        input.value = '';
+        container.scrollTop = container.scrollHeight;
+
+        // Simulate AI response
+        setTimeout(() => {
+            const aiMsg = document.createElement('div');
+            aiMsg.className = 'live-ai-message live-ai-message-bot';
+            aiMsg.textContent = "I'm processing that in the context of the current class discussion...";
+            container.appendChild(aiMsg);
+            container.scrollTop = container.scrollHeight;
+        }, 1000);
+    }
+
+    // Send Class Chat Message
+    function sendClassMessage() {
+        const input = document.getElementById('chat-input');
+        const message = input.value.trim();
+        if (!message) return;
+
+        const container = document.getElementById('live-chat-messages');
+
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'live-chat-message live-chat-message-own';
+        msgDiv.innerHTML = `
+            <div class="live-chat-message-author">You</div>
+            <div class="live-chat-message-text">${message}</div>
+        `;
+        container.appendChild(msgDiv);
+
+        input.value = '';
+        container.scrollTop = container.scrollHeight;
+    }
+
+    // Save Notes
+    function saveNotes() {
+        const notes = document.getElementById('class-notes').value;
+        localStorage.setItem(`notes_{{ room_name }}`, notes);
+        window.notify?.success('Notes saved!');
+    }
+
+    // Load saved notes
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedNotes = localStorage.getItem(`notes_{{ room_name }}`);
+        if (savedNotes) {
+            document.getElementById('class-notes').value = savedNotes;
+        }
+    });
+
+    // Enter to send
+    document.getElementById('ai-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendAIMessage();
+        }
+    });
+
+    document.getElementById('chat-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            sendClassMessage();
+        }
+    });
+</script>
+
+<style>
+    /* Reset for live class */
+    body,
+    html {
+        height: 100%;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Live Class Container - 3-Pane Layout */
+    .live-class-container {
+        display: grid;
+        grid-template-columns: 200px 1fr;
+        grid-template-rows: 1fr;
+        height: 100vh;
+        background: var(--bg-primary);
+        overflow: hidden;
+    }
+
+    /* LEFT SIDEBAR */
+    .live-sidebar {
+        background: var(--bg-secondary);
+        border-right: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    .live-sidebar-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .live-brand-text {
+        font-size: 16px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #60a5fa, #a78bfa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .live-nav {
+        flex: 1;
+        padding: 16px 12px;
+    }
+
+    .live-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        margin-bottom: 4px;
+        border-radius: 10px;
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        width: 100%;
+        text-align: left;
+        text-decoration: none;
+    }
+
+    .live-nav-item:hover {
+        background: var(--bg-tertiary);
+        color: var(--text-primary);
+    }
+
+    .live-nav-exit {
+        color: #ef4444;
+    }
+
+    .live-nav-exit:hover {
+        background: rgba(239, 68, 68, 0.1);
+    }
+
+    .live-nav-icon {
+        font-size: 18px;
+    }
+
+    .live-nav-divider {
+        height: 1px;
+        background: var(--border-color);
+        margin: 12px 0;
+    }
+
+    .live-sidebar-footer {
+        padding: 16px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .live-user-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .live-user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ec4899, #8b5cf6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    .live-user-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .live-user-role {
+        font-size: 12px;
+        color: var(--text-tertiary);
+    }
+
+    /* CENTER PANEL */
+    .live-center {
+        display: flex;
+        flex-direction: column;
+        background: var(--bg-primary);
+        overflow: visible;
+        min-width: 0;
+        position: relative;
+    }
+
+    .live-header {
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border-color);
+        padding: 16px 24px;
+    }
+
+    .live-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .live-class-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 4px 0;
+    }
+
+    .live-class-meta {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 14px;
+    }
+
+    .live-instructor {
+        color: var(--text-secondary);
+    }
+
+    .live-indicator {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #ef4444;
+        font-weight: 600;
+        font-size: 12px;
+    }
+
+    .live-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #ef4444;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+    }
+
+    .live-ai-toggle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: none;
+        background: linear-gradient(135deg, #60a5fa, #a78bfa);
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .live-ai-toggle:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 12px rgba(96, 165, 250, 0.4);
+    }
+
+    /* Video Container */
+    .live-video-container {
+        flex: 1 1 auto;
+        background: #0a0e1a;
+        position: relative;
+        overflow: visible;
+        min-height: 300px;
+        z-index: 10;
+    }
+
+    .live-video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .live-video iframe {
+        width: 100% !important;
+        height: 100% !important;
+        border: none;
+    }
+
+    /* Tabs */
+    .live-tabs {
+        background: var(--bg-secondary);
+        border-top: 1px solid var(--border-color);
+        height: 220px;
+        min-height: 220px;
+        max-height: 220px;
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+    }
+
+    .live-tabs-header {
+        display: flex;
+        gap: 4px;
+        padding: 12px 16px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .live-tab {
+        padding: 10px 20px;
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid transparent;
+        color: var(--text-secondary);
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .live-tab:hover {
+        color: var(--text-primary);
+    }
+
+    .live-tab.active {
+        color: var(--primary);
+        border-bottom-color: var(--primary);
+    }
+
+    .live-tabs-content {
+        flex: 1;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .live-tab-pane {
+        display: none;
+        height: 100%;
+        padding: 16px;
+        overflow-y: auto;
+    }
+
+    .live-tab-pane.active {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Chat */
+    .live-chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        margin-bottom: 12px;
+    }
+
+    .live-chat-welcome {
+        text-align: center;
+        color: var(--text-tertiary);
+        padding: 40px 20px;
+        font-size: 14px;
+    }
+
+    .live-chat-message {
+        margin-bottom: 12px;
+        padding: 12px;
+        border-radius: 10px;
+        background: var(--bg-tertiary);
+    }
+
+    .live-chat-message-author {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 4px;
+    }
+
+    .live-chat-message-text {
+        font-size: 14px;
+        color: var(--text-secondary);
+    }
+
+    .live-chat-message-own {
+        background: linear-gradient(135deg, rgba(96, 165, 250, 0.1), rgba(167, 139, 250, 0.1));
+        border-left: 3px solid var(--primary);
+    }
+
+    .live-chat-input {
+        display: flex;
+        gap: 8px;
+    }
+
+    .live-chat-input input {
+        flex: 1;
+        padding: 10px 16px;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        color: var(--text-primary);
+        font-size: 14px;
+    }
+
+    .live-chat-send {
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #ec4899, #8b5cf6);
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    /* Participants */
+    .live-participants-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .live-participant {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: var(--bg-tertiary);
+        border-radius: 10px;
+    }
+
+    .live-participant-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ec4899, #8b5cf6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+    }
+
+    .live-participant-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .live-participant-status {
+        font-size: 12px;
+        color: #10b981;
+    }
+
+    /* Notes */
+    .live-notes-editor {
+        flex: 1;
+        padding: 16px;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        color: var(--text-primary);
+        font-size: 14px;
+        font-family: inherit;
+        resize: none;
+        margin-bottom: 12px;
+    }
+
+    .live-notes-save {
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #ec4899, #8b5cf6);
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    /* RIGHT PANEL - AI */
+    .live-ai-panel {
+        position: fixed;
+        right: -400px;
+        top: 0;
+        bottom: 0;
+        width: 400px;
+        background: var(--bg-secondary);
+        border-left: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+        transition: right 0.3s ease;
+        z-index: 1000;
+    }
+
+    .live-ai-panel.active {
+        right: 0;
+    }
+
+    .live-ai-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .live-ai-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .live-ai-close {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: none;
+        background: var(--bg-tertiary);
+        color: var(--text-secondary);
+        font-size: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .live-ai-close:hover {
+        background: var(--bg-primary);
+        color: var(--text-primary);
+    }
+
+    .live-ai-status {
+        padding: 12px 20px;
+        background: rgba(96, 165, 250, 0.1);
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--text-secondary);
+    }
+
+    .live-ai-modes {
+        display: flex;
+        gap: 8px;
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .live-ai-mode {
+        flex: 1;
+        padding: 8px 12px;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        color: var(--text-secondary);
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .live-ai-mode.active {
+        background: linear-gradient(135deg, #ec4899, #8b5cf6);
+        border-color: transparent;
+        color: white;
+    }
+
+    .live-ai-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px 20px;
+    }
+
+    .live-ai-welcome {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-tertiary);
+        font-size: 14px;
+    }
+
+    .live-ai-message {
+        margin-bottom: 12px;
+        padding: 12px 16px;
+        border-radius: 12px;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .live-ai-message-user {
+        background: linear-gradient(135deg, rgba(96, 165, 250, 0.1), rgba(167, 139, 250, 0.1));
+        color: var(--text-primary);
+        margin-left: 20px;
+    }
+
+    .live-ai-message-bot {
+        background: var(--bg-tertiary);
+        color: var(--text-secondary);
+        margin-right: 20px;
+    }
+
+    .live-ai-input-container {
+        padding: 16px 20px;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        gap: 8px;
+    }
+
+    .live-ai-input {
+        flex: 1;
+        padding: 12px 16px;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        color: var(--text-primary);
+        font-size: 14px;
+        font-family: inherit;
+        resize: none;
+    }
+
+    .live-ai-send {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: none;
+        background: linear-gradient(135deg, #ec4899, #8b5cf6);
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .live-ai-send:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 12px rgba(236, 72, 153, 0.4);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .live-class-container {
+            grid-template-columns: 1fr;
+        }
+
+        .live-sidebar {
+            position: fixed;
+            left: -240px;
+            top: 0;
+            bottom: 0;
+            z-index: 999;
+            transition: left 0.3s ease;
+        }
+
+        .live-sidebar.active {
+            left: 0;
+        }
+
+        .live-ai-panel {
+            width: 100%;
+            right: -100%;
+        }
+    }
+</style>
+{% endblock %}

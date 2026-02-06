@@ -1,0 +1,293 @@
+/* ============================================
+   HOMEPAGE SPACING FIXES
+   Fixes: Hero centering, reduced spacing, tighter layout
+   ============================================ */
+
+/* Hero Section - Let hero-exact-clone.css handle alignment */
+/* Removed conflicting centering rules to fix layout */
+
+/* Hero CTA - Closer to Description */
+.hero-cta {
+    margin-top: 24px !important;
+    /* Further reduced for tighter spacing */
+}
+
+.hero-description {
+    margin-bottom: 0 !important;
+    /* Remove bottom margin to reduce gap */
+}
+
+/* Remove button margin to prevent stacking */
+.btn-hero-primary,
+.btn-hero-secondary {
+    margin-top: 0 !important;
+    /* Prevent stacked margins with container */
+}
+
+/* Metrics Section - Tighter Spacing */
+.metrics-section {
+    padding: 80px 32px;
+    /* Reduced from 120px */
+}
+
+.metrics-grid {
+    gap: 24px !important;
+    /* CRITICAL: Override any other gap values */
+}
+
+.metric-card {
+    padding: 24px;
+    /* Reduced from 32px */
+}
+
+/* Features Section - Tighter Spacing */
+.features-section {
+    padding: 80px 32px;
+    /* Reduced from 120px */
+}
+
+.section-header {
+    margin-bottom: 48px;
+    /* Reduced from 64px */
+}
+
+.features-grid {
+    gap: 24px !important;
+    /* CRITICAL: Override any other gap values */
+}
+
+.feature-card {
+    padding: 24px;
+    /* Reduced from 32px */
+}
+
+/* Story Section - Tighter Spacing */
+.story-section {
+    padding: 80px 32px;
+    /* Reduced from 120px */
+}
+
+.story-section .section-title {
+    margin-bottom: 48px;
+    /* Reduced from 64px */
+}
+
+/* Capabilities Section - Tighter Spacing */
+.capabilities-section {
+    padding: 60px 32px;
+    /* Reduced for tighter layout */
+}
+
+/* CTA Section - Tighter Spacing */
+.cta-section {
+    padding: 80px 32px;
+    /* Reduced from 120px */
+}
+
+/* Footer Section - Tighter Spacing */
+.footer-section {
+    padding: 60px 32px 40px;
+    /* Reduced spacing */
+}
+
+/* FAQ Section - Better Spacing */
+.faq-section {
+    margin-bottom: 48px;
+    /* Reduced from excessive spacing */
+}
+
+.faq-list {
+    gap: 16px;
+    /* Tighter spacing between FAQ items */
+}
+
+/* Navigation - Larger Links with Background */
+.hero-nav {
+    background: rgba(10, 14, 39, 0.8) !important;
+    /* Dark background for readability when scrolling */
+    backdrop-filter: blur(10px) !important;
+    padding: 16px 32px !important;
+    border-bottom: 1px solid rgba(103, 232, 249, 0.1) !important;
+}
+
+.hero-nav-link {
+    font-size: 16px;
+    /* Increased from smaller size */
+    font-weight: 500;
+}
+
+.hero-nav-cta {
+    font-size: 16px;
+    /* Increased for better visibility */
+    padding: 12px 24px;
+    /* Better sizing */
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+
+    .hero-section,
+    .metrics-section,
+    .features-section,
+    .story-section,
+    .cta-section {
+        padding: 60px 24px;
+        /* Even tighter on mobile */
+    }
+
+    .metrics-grid,
+    .features-grid {
+        gap: 20px;
+    }
+
+    .metric-card,
+    .feature-card {
+        padding: 20px;
+    }
+}
+
+/* ============================================
+   DASHBOARD SPACING FIXES
+   Fixes: Logo sizing, top bar padding, card spacing
+   ============================================ */
+
+/* Sidebar Logo Fix */
+.sidebar-logo,
+.sidebar-brand-logo {
+    max-width: 180px !important;
+    /* Prevent oversizing */
+    height: auto !important;
+    object-fit: contain !important;
+}
+
+.sidebar-brand {
+    padding: 20px 16px !important;
+    /* Proper padding */
+}
+
+/* Top Bar Spacing */
+.dashboard-header,
+.top-bar {
+    padding: 24px !important;
+    /* Proper padding from edges */
+}
+
+.welcome-section,
+.dashboard-welcome {
+    padding: 24px !important;
+}
+
+/* Card Spacing - Consistent Gaps */
+.dashboard-grid,
+.stats-grid,
+.classes-grid,
+.quick-actions-grid {
+    gap: 24px !important;
+    /* Consistent spacing */
+}
+
+.dashboard-section,
+.content-section {
+    margin-bottom: 24px !important;
+    /* Consistent vertical spacing */
+}
+
+.section-header,
+.dashboard-section-header {
+    margin-bottom: 16px !important;
+    /* Reduced gap between header and content */
+}
+
+/* Card Padding - Normalized */
+.stat-card,
+.class-card,
+.action-card,
+.dashboard-card {
+    padding: 20px !important;
+    /* Standard padding */
+}
+
+/* Remove FAB Overlaps on Dashboards */
+.settings-fab,
+.ai-bot-fab {
+    z-index: 999;
+    /* Ensure they don't overlap content */
+}
+
+/* Fix Logout Button Theme */
+.logout-btn,
+button[onclick*="logout"],
+a[href*="logout"] {
+    background: linear-gradient(135deg, #1E40AF, #1E3A8A) !important;
+    border: 1.5px solid rgba(103, 232, 249, 0.3) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 0 20px rgba(103, 232, 249, 0.3) !important;
+}
+
+.logout-btn:hover,
+button[onclick*="logout"]:hover,
+a[href*="logout"]:hover {
+    background: linear-gradient(135deg, #2563EB, #1E40AF) !important;
+    box-shadow: 0 0 30px rgba(103, 232, 249, 0.5) !important;
+}
+
+/* Prevent Nested Scrollbars */
+.dashboard-container {
+    overflow-x: hidden !important;
+}
+
+.sidebar {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+.main-content {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+/* Hide scrollbar for cleaner UI */
+.sidebar::-webkit-scrollbar,
+.main-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+.main-content::-webkit-scrollbar-thumb {
+    background: rgba(103, 232, 249, 0.2);
+    border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover,
+.main-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(103, 232, 249, 0.4);
+}
+
+/* ============================================
+   GLOBAL OVERFLOW PREVENTION
+   ============================================ */
+
+body {
+    overflow-x: hidden !important;
+}
+
+.homepage,
+.dashboard-container,
+.auth-page-container {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+}
+
+/* Ensure all sections don't overflow */
+section,
+.section-container {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Prevent grid overflow */
+.metrics-grid,
+.features-grid,
+.dashboard-grid {
+    max-width: 100%;
+}

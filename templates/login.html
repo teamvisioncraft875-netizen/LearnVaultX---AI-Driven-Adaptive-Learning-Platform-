@@ -3,73 +3,128 @@
 {% block title %}Login - LearnVaultX{% endblock %}
 
 {% block content %}
-<div class="auth-container">
-    <div class="auth-card">
-        <div class="auth-header">
-            <h1>Welcome Back</h1>
-            <p>Login to your LearnVaultX account</p>
+<div class="auth-page-container">
+    <!-- Left Panel - Branding with Fixed Readability -->
+    <div class="auth-branding-panel">
+        <div class="auth-branding-content">
+            <div class="auth-logo-container">
+                <div class="auth-logo-box">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LearnVaultX">
+                </div>
+                <h1 class="auth-brand-name">LearnVaultX</h1>
+            </div>
+
+            <p class="auth-tagline">
+                AI-powered adaptive learning that understands you
+            </p>
+
+            <div class="auth-features">
+                <div class="auth-feature-item">
+                    <span class="checkmark">✓</span>
+                    <span>Personalized learning paths</span>
+                </div>
+                <div class="auth-feature-item">
+                    <span class="checkmark">✓</span>
+                    <span>Real-time progress tracking</span>
+                </div>
+                <div class="auth-feature-item">
+                    <span class="checkmark">✓</span>
+                    <span>AI-powered tutoring</span>
+                </div>
+            </div>
         </div>
-        
-        <form id="login-form" onsubmit="handleLogin(event)">
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" required placeholder="Enter your email">
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required placeholder="Enter your password">
-            </div>
-            
-            <div class="forgot-password-link">
-                <a href="/forgot-password">Forgot Password?</a>
-            </div>
-            
-            <div class="error-message" id="error-message"></div>
-            
-            <button type="submit" class="btn btn-primary btn-full">Login</button>
-        </form>
-        
-        <div class="auth-footer">
-            <p>Don't have an account? <a href="/register">Register here</a></p>
+    </div>
+
+    <!-- Right Panel - Login Form with Proper Sizing -->
+    <div class="auth-form-panel">
+        <!-- Background decoration -->
+        <div class="auth-form-decoration"></div>
+
+        <div class="auth-form-container">
+            <h2 class="auth-form-title">Welcome back</h2>
+            <p class="auth-form-subtitle">Sign in to continue your learning journey</p>
+
+            {% if error %}
+            <div class="auth-alert auth-alert-error show">{{ error }}</div>
+            {% endif %}
+
+            <div id="error-message" class="auth-alert auth-alert-error"></div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="auth-form-group">
+                    <label class="auth-form-label" for="email">Email</label>
+                    <input type="email" name="email" id="email" required autocomplete="email" class="auth-form-input"
+                        placeholder="Enter your email">
+                </div>
+
+                <div class="auth-form-group">
+                    <label class="auth-form-label" for="password">Password</label>
+                    <input type="password" name="password" id="password" required autocomplete="current-password"
+                        class="auth-form-input" placeholder="Enter your password">
+                </div>
+
+                <button type="submit" class="auth-submit-btn" id="submitBtn">
+                    Sign In
+                </button>
+
+                <p class="auth-footer-text">
+                    Don't have an account? <a href="/register" class="auth-footer-link">Sign up</a>
+                </p>
+            </form>
         </div>
     </div>
 </div>
 
 <script>
-async function handleLogin(event) {
-    event.preventDefault();
-    
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const errorMsg = document.getElementById('error-message');
-    
-    try {
-        const response = await fetch('/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email, password })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-            if (data.role === 'teacher') {
-                window.location.href = '/teacher/dashboard';
-            } else {
-                window.location.href = '/student/dashboard';
-            }
-        } else {
-            errorMsg.textContent = data.error || 'Login failed';
-            errorMsg.style.display = 'block';
-        }
-    } catch (error) {
-        errorMsg.textContent = 'Network error. Please try again.';
-        errorMsg.style.display = 'block';
-    }
-}
-</script>
-{% endblock %}
+    async function handleLogin(event) {
+        event.preventDefault();
 
+        const errorDiv = document.getElementById('error-message');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Get form data
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        // Disable button and show loading
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Signing In...';
+        errorDiv.classList.remove('show');
+
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Login successful - redirect based on role
+                window.location.href = data.redirect;
+            } else {
+                // Show error
+                errorDiv.textContent = data.error || 'Login failed';
+                errorDiv.classList.add('show');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Sign In';
+            }
+        } catch (error) {
+            errorDiv.textContent = 'Network error. Please try again.';
+            errorDiv.classList.add('show');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Sign In';
+        }
+    }
+</script>
+
+<style>
+    /* Add auth page body class for FAB hiding */
+    body {
+        overflow-x: hidden;
+    }
+</style>
+{% endblock %}

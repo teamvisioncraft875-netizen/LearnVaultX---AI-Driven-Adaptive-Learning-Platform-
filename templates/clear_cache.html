@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Cache & Test Theme - LearnVaultX</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card {
+            background: #1e293b;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            color: #60a5fa;
+        }
+
+        ol,
+        ul {
+            margin-left: 24px;
+            margin-bottom: 16px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        code {
+            background: #0f172a;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            color: #22d3ee;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            margin: 10px 10px 10px 0;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            padding: 16px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 16px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .color-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .color-box {
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 0.875rem;
+        }
+
+        .midnight-blue {
+            background: #0a0e27;
+            border: 2px solid #60a5fa;
+        }
+
+        .electric-blue {
+            background: #60a5fa;
+            color: #0a0e27;
+        }
+
+        .violet {
+            background: #a78bfa;
+            color: #0a0e27;
+        }
+
+        .cyan {
+            background: #06b6d4;
+            color: #0a0e27;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🚀 LearnVaultX Theme Fix</h1>
+
+        <div class="warning">
+            <strong>⚠️ Browser Cache Issue Detected</strong><br>
+            Your browser is loading old CSS files. Follow the steps below to fix this.
+        </div>
+
+        <div class="card">
+            <h2>Step 1: Clear Browser Cache</h2>
+            <p>Choose your browser:</p>
+            <ul>
+                <li><strong>Chrome/Edge:</strong> Press <code>Ctrl + Shift + Delete</code> → Select "Cached images and
+                    files" → Click "Clear data"</li>
+                <li><strong>Firefox:</strong> Press <code>Ctrl + Shift + Delete</code> → Select "Cache" → Click "Clear
+                    Now"</li>
+                <li><strong>Safari:</strong> Press <code>Cmd + Option + E</code> to empty cache</li>
+            </ul>
+            <p><strong>OR</strong> use a Hard Refresh:</p>
+            <ul>
+                <li><strong>Windows:</strong> <code>Ctrl + F5</code> or <code>Ctrl + Shift + R</code></li>
+                <li><strong>Mac:</strong> <code>Cmd + Shift + R</code></li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>Step 2: Verify Midnight Blue Theme</h2>
+            <p>After clearing cache, the Futuristic theme should show these colors:</p>
+            <div class="color-preview">
+                <div class="color-box midnight-blue">
+                    <strong>Midnight Blue</strong><br>
+                    #0a0e27<br>
+                    (Background)
+                </div>
+                <div class="color-box electric-blue">
+                    <strong>Electric Blue</strong><br>
+                    #60a5fa<br>
+                    (Primary)
+                </div>
+                <div class="color-box violet">
+                    <strong>Violet</strong><br>
+                    #a78bfa<br>
+                    (Secondary)
+                </div>
+                <div class="color-box cyan">
+                    <strong>Cyan</strong><br>
+                    #06b6d4<br>
+                    (Accent)
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Step 3: Test the Application</h2>
+            <ol>
+                <li>Click the button below to go to the homepage</li>
+                <li>Look for the theme toggle button (✨ icon) in the bottom-right corner</li>
+                <li>Verify the background is <strong>midnight blue (#0a0e27)</strong>, NOT purple</li>
+                <li>Check that cards have a subtle glow effect</li>
+                <li>Test theme switching: Futuristic → Dark → Light</li>
+            </ol>
+            <a href="/" class="btn">🏠 Go to Homepage</a>
+            <a href="/student/dashboard" class="btn">📊 Student Dashboard</a>
+        </div>
+
+        <div class="success">
+            <strong>✅ What You Should See:</strong><br>
+            • Deep midnight blue background (NOT purple)<br>
+            • Neon blue/cyan glowing borders on cards<br>
+            • Smooth glassmorphism effect<br>
+            • Electric blue and violet accents<br>
+            • Sharp, readable text (no glow on text)
+        </div>
+
+        <div class="card">
+            <h2>Still Seeing Purple?</h2>
+            <p>If you still see the old purple theme after clearing cache:</p>
+            <ol>
+                <li>Close ALL browser tabs for LearnVaultX</li>
+                <li>Clear cache again using <code>Ctrl + Shift + Delete</code></li>
+                <li>Restart your browser completely</li>
+                <li>Open a new tab and visit: <a href="/" style="color: #60a5fa;">http://localhost:5000/</a></li>
+            </ol>
+        </div>
+
+        <div class="card">
+            <h2>Technical Details</h2>
+            <p>The new theme system uses:</p>
+            <ul>
+                <li><code>theme-tokens.css</code> - Centralized color variables</li>
+                <li>Midnight blue base: <code>#0a0e27</code>, <code>#131829</code>, <code>#1a1f3a</code></li>
+                <li>Neon accents: Electric blue, violet, cyan</li>
+                <li>Glassmorphism with <code>backdrop-filter: blur(10px)</code></li>
+                <li>Controlled glows on borders and backgrounds only</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Auto-clear localStorage theme to force reload
+        console.log('Current theme in localStorage:', localStorage.getItem('theme'));
+        console.log('Forcing theme to futuristic...');
+        localStorage.setItem('theme', 'futuristic');
+        console.log('✅ Theme set to futuristic. Please refresh the main app.');
+    </script>
+</body>
+
+</html>

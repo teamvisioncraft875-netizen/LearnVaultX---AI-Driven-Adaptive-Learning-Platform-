@@ -1,0 +1,291 @@
+/* ============================================
+   AUTH PAGES REDESIGN - LOGIN & REGISTER
+   Fixes: Readability, Sizing, Contrast, Alignment
+   ============================================ */
+
+/* Container - Full Height Grid */
+.auth-page-container {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--bg-primary);
+}
+
+/* LEFT PANEL - BRANDING WITH FIXED READABILITY */
+.auth-branding-panel {
+    background: linear-gradient(135deg, #1E40AF 0%, #1E3A8A 100%);
+    padding: 64px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Dark overlay for better text contrast */
+.auth-branding-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(10, 14, 39, 0.3) 0%, rgba(10, 14, 39, 0.5) 100%);
+    pointer-events: none;
+}
+
+.auth-branding-content {
+    max-width: 400px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Logo Container */
+.auth-logo-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.auth-logo-box {
+    width: 56px;
+    height: 56px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    padding: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.auth-logo-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.auth-brand-name {
+    font-size: 32px;
+    font-weight: 700;
+    color: #FFFFFF;
+    /* FIXED: Pure white for readability */
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Tagline */
+.auth-tagline {
+    font-size: 20px;
+    line-height: 1.6;
+    margin-bottom: 40px;
+    color: rgba(255, 255, 255, 0.95);
+    /* FIXED: White with high opacity */
+    font-weight: 400;
+}
+
+/* Feature List */
+.auth-features {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.auth-feature-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.9);
+    /* FIXED: White for readability */
+    font-weight: 400;
+}
+
+.auth-feature-item .checkmark {
+    color: #67E8F9;
+    /* FIXED: Cyan checkmark for visibility */
+    font-size: 20px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* RIGHT PANEL - FORM WITH PROPER SIZING */
+.auth-form-panel {
+    padding: 64px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: var(--bg-primary);
+}
+
+/* Background decoration */
+.auth-form-decoration {
+    position: absolute;
+    top: 20%;
+    right: 10%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(30, 64, 175, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    filter: blur(60px);
+    pointer-events: none;
+}
+
+/* Form Container - Properly Centered */
+.auth-form-container {
+    width: 100%;
+    max-width: 420px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Form Header */
+.auth-form-title {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.auth-form-subtitle {
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+    font-size: 16px;
+}
+
+/* Form Elements - PROPER SIZING */
+.auth-form-group {
+    margin-bottom: 20px;
+}
+
+.auth-form-label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+/* FIXED: Standard Input Sizing */
+.auth-form-input,
+.auth-form-select {
+    width: 100%;
+    padding: 12px 16px;
+    /* FIXED: Standard padding (was var(--space-3) which was too large) */
+    border: 1.5px solid rgba(103, 232, 249, 0.3);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    /* FIXED: Lighter background for better contrast */
+    color: var(--text-primary);
+    font-size: 15px;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.auth-form-input:focus,
+.auth-form-select:focus {
+    outline: none;
+    border-color: #67E8F9;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(103, 232, 249, 0.1);
+}
+
+.auth-form-input::placeholder {
+    color: rgba(156, 163, 175, 0.5);
+}
+
+/* FIXED: Standard Button Sizing */
+.auth-submit-btn {
+    width: 100%;
+    padding: 14px 32px;
+    /* FIXED: Standard padding (was too large) */
+    background: linear-gradient(135deg, #1E40AF, #1E3A8A);
+    border: 2px solid #67E8F9;
+    border-radius: 12px;
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 30px rgba(103, 232, 249, 0.4),
+        0 0 60px rgba(103, 232, 249, 0.2);
+    margin-bottom: 16px;
+}
+
+.auth-submit-btn:hover {
+    background: linear-gradient(135deg, #2563EB, #1E40AF);
+    box-shadow: 0 0 40px rgba(103, 232, 249, 0.6),
+        0 0 80px rgba(103, 232, 249, 0.3);
+    transform: translateY(-1px);
+}
+
+.auth-submit-btn:active {
+    transform: translateY(0);
+}
+
+.auth-submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Footer Link */
+.auth-footer-text {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.auth-footer-link {
+    color: #67E8F9;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.auth-footer-link:hover {
+    color: #4DA3FF;
+    text-decoration: underline;
+}
+
+/* Alert Messages */
+.auth-alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    display: none;
+}
+
+.auth-alert.show {
+    display: block;
+}
+
+.auth-alert-error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #FCA5A5;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .auth-page-container {
+        grid-template-columns: 1fr;
+    }
+
+    .auth-branding-panel {
+        display: none;
+    }
+
+    .auth-form-panel {
+        padding: 32px 24px;
+    }
+
+    .auth-form-container {
+        max-width: 100%;
+    }
+}
+
+/* Remove FAB Overlap on Auth Pages */
+body.auth-page .settings-fab,
+body.auth-page .ai-bot-fab {
+    display: none !important;
+}

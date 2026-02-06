@@ -1,0 +1,506 @@
+/* =============================================================================
+   LEARNVAULTX THEME TOKEN SYSTEM
+   Centralized design tokens for three distinct visual modes:
+   - Futuristic: Midnight blue + neon glows + glassmorphism
+   - Dark: Flat + minimal + professional
+   - Light: Clean + bright + subtle shadows
+   ============================================================================= */
+
+/* =============================================================================
+   BASE TOKENS (Theme-Independent)
+   ============================================================================= */
+
+:root {
+    /* === SPACING SCALE === */
+    --space-0: 0;
+    --space-1: 0.25rem;
+    /* 4px */
+    --space-2: 0.5rem;
+    /* 8px */
+    --space-3: 0.75rem;
+    /* 12px */
+    --space-4: 1rem;
+    /* 16px */
+    --space-5: 1.25rem;
+    /* 20px */
+    --space-6: 1.5rem;
+    /* 24px */
+    --space-8: 2rem;
+    /* 32px */
+    --space-10: 2.5rem;
+    /* 40px */
+    --space-12: 3rem;
+    /* 48px */
+    --space-16: 4rem;
+    /* 64px */
+
+    /* === TYPOGRAPHY === */
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+    --text-xs: 0.75rem;
+    /* 12px */
+    --text-sm: 0.875rem;
+    /* 14px */
+    --text-base: 1rem;
+    /* 16px */
+    --text-lg: 1.125rem;
+    /* 18px */
+    --text-xl: 1.25rem;
+    /* 20px */
+    --text-2xl: 1.5rem;
+    /* 24px */
+    --text-3xl: 1.875rem;
+    /* 30px */
+    --text-4xl: 2.25rem;
+    /* 36px */
+    --text-5xl: 3rem;
+    /* 48px */
+
+    --font-normal: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+    --font-extrabold: 800;
+
+    --leading-tight: 1.25;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.75;
+
+    /* === BORDER RADIUS === */
+    --radius-sm: 0.5rem;
+    /* 8px */
+    --radius-md: 0.75rem;
+    /* 12px */
+    --radius-lg: 1rem;
+    /* 16px */
+    --radius-xl: 1.25rem;
+    /* 20px */
+    --radius-2xl: 1.5rem;
+    /* 24px */
+    --radius-full: 9999px;
+
+    /* === TRANSITIONS === */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-all: 300ms ease;
+
+    /* === Z-INDEX SCALE === */
+    --z-base: 1;
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
+
+    /* === LAYOUT DIMENSIONS === */
+    --sidebar-width: 240px;
+    --sidebar-collapsed: 60px;
+    --panel-width: 400px;
+    --header-height: 64px;
+}
+
+/* =============================================================================
+   FUTURISTIC THEME - Midnight Blue + Neon Glows + Glassmorphism
+   ============================================================================= */
+
+[data-theme="futuristic"] {
+    /* === COLOR PALETTE === */
+    /* Backgrounds - Midnight Blue Range */
+    --bg-primary: #0a0e27;
+    --bg-secondary: #131829;
+    --bg-tertiary: #1a1f3a;
+    --bg-elevated: #1e2847;
+    --bg-surface: #1e2337;
+
+    /* Text Colors */
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-tertiary: #94a3b8;
+    --text-muted: #64748b;
+
+    /* Brand Colors - Neon Accents */
+    --primary: #60a5fa;
+    /* Electric Blue */
+    --primary-dark: #3b82f6;
+    --primary-light: #93c5fd;
+    --secondary: #a78bfa;
+    /* Violet */
+    --secondary-dark: #8b5cf6;
+    --secondary-light: #c4b5fd;
+    --accent: #06b6d4;
+    /* Cyan */
+    --accent-dark: #0891b2;
+    --accent-light: #22d3ee;
+
+    /* Semantic Colors */
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --info: #3b82f6;
+
+    /* === BORDERS === */
+    --border-primary: rgba(96, 165, 250, 0.2);
+    --border-secondary: rgba(148, 163, 184, 0.1);
+    --border-focus: var(--primary);
+    --border-glow: rgba(96, 165, 250, 0.3);
+
+    /* === SHADOWS & GLOWS === */
+    /* Standard Shadows */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.6);
+
+    /* Neon Glows */
+    --glow-primary: 0 0 20px rgba(96, 165, 250, 0.4);
+    --glow-primary-strong: 0 0 30px rgba(96, 165, 250, 0.6);
+    --glow-secondary: 0 0 20px rgba(167, 139, 250, 0.4);
+    --glow-secondary-strong: 0 0 30px rgba(167, 139, 250, 0.6);
+    --glow-accent: 0 0 20px rgba(6, 182, 212, 0.4);
+    --glow-success: 0 0 20px rgba(16, 185, 129, 0.4);
+
+    /* Combined Shadow + Glow */
+    --shadow-glow-primary: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 20px rgba(96, 165, 250, 0.3);
+    --shadow-glow-secondary: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 20px rgba(167, 139, 250, 0.3);
+
+    /* === GLASSMORPHISM === */
+    --glass-bg: rgba(26, 31, 58, 0.7);
+    --glass-bg-elevated: rgba(30, 40, 71, 0.8);
+    --glass-border: rgba(96, 165, 250, 0.2);
+    --glass-blur: 10px;
+
+    /* === COMPONENT TOKENS === */
+    /* Cards */
+    --card-bg: var(--glass-bg);
+    --card-border: var(--glass-border);
+    --card-shadow: var(--shadow-md);
+    --card-glow: var(--glow-primary);
+    --card-hover-border: rgba(96, 165, 250, 0.5);
+    --card-hover-shadow: var(--shadow-glow-primary);
+
+    /* Buttons */
+    --btn-primary-bg: linear-gradient(135deg, var(--primary), var(--secondary));
+    --btn-primary-shadow: var(--shadow-md);
+    --btn-primary-glow: var(--glow-primary);
+    --btn-primary-hover-glow: var(--glow-primary-strong);
+
+    --btn-secondary-bg: var(--bg-tertiary);
+    --btn-secondary-border: var(--border-primary);
+    --btn-secondary-hover-bg: var(--bg-elevated);
+    --btn-secondary-hover-border: var(--primary);
+
+    --btn-disabled-opacity: 0.5;
+
+    /* Form Inputs */
+    --input-bg: var(--bg-tertiary);
+    --input-border: var(--border-secondary);
+    --input-focus-border: var(--primary);
+    --input-focus-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+    --input-focus-glow: var(--glow-primary);
+
+    /* Progress Bars */
+    --progress-bg: var(--bg-tertiary);
+    --progress-fill: linear-gradient(90deg, var(--primary), var(--secondary));
+    --progress-glow: var(--glow-primary);
+
+    /* Badges */
+    --badge-primary-bg: rgba(96, 165, 250, 0.15);
+    --badge-primary-color: var(--primary);
+    --badge-success-bg: rgba(16, 185, 129, 0.15);
+    --badge-success-color: var(--success);
+    --badge-warning-bg: rgba(245, 158, 11, 0.15);
+    --badge-warning-color: var(--warning);
+    --badge-error-bg: rgba(239, 68, 68, 0.15);
+    --badge-error-color: var(--error);
+
+    /* Modals */
+    --modal-bg: var(--glass-bg-elevated);
+    --modal-border: var(--glass-border);
+    --modal-shadow: var(--shadow-xl);
+    --modal-backdrop: rgba(0, 0, 0, 0.7);
+
+    /* Sidebar/Panels */
+    --sidebar-bg: var(--bg-secondary);
+    --sidebar-border: rgba(96, 165, 250, 0.2);
+    --sidebar-shadow: 2px 0 20px rgba(96, 165, 250, 0.1);
+
+    --panel-bg: var(--bg-secondary);
+    --panel-border: rgba(167, 139, 250, 0.2);
+    --panel-shadow: -2px 0 20px rgba(167, 139, 250, 0.1);
+}
+
+/* =============================================================================
+   DARK THEME - Flat + Minimal + Professional
+   ============================================================================= */
+
+[data-theme="dark"] {
+    /* === COLOR PALETTE === */
+    /* Backgrounds - Neutral Grays */
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-tertiary: #334155;
+    --bg-elevated: #475569;
+    --bg-surface: #1e293b;
+
+    /* Text Colors */
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-tertiary: #94a3b8;
+    --text-muted: #64748b;
+
+    /* Brand Colors - Muted, Professional */
+    --primary: #3b82f6;
+    --primary-dark: #2563eb;
+    --primary-light: #60a5fa;
+    --secondary: #8b5cf6;
+    --secondary-dark: #7c3aed;
+    --secondary-light: #a78bfa;
+    --accent: #06b6d4;
+    --accent-dark: #0891b2;
+    --accent-light: #22d3ee;
+
+    /* Semantic Colors */
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --info: #3b82f6;
+
+    /* === BORDERS === */
+    --border-primary: rgba(148, 163, 184, 0.15);
+    --border-secondary: rgba(148, 163, 184, 0.08);
+    --border-focus: var(--primary);
+    --border-glow: transparent;
+
+    /* === SHADOWS & GLOWS === */
+    /* Standard Shadows - NO GLOW */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+    /* NO Glows */
+    --glow-primary: none;
+    --glow-primary-strong: none;
+    --glow-secondary: none;
+    --glow-secondary-strong: none;
+    --glow-accent: none;
+    --glow-success: none;
+
+    /* Combined Shadow (no glow) */
+    --shadow-glow-primary: var(--shadow-md);
+    --shadow-glow-secondary: var(--shadow-md);
+
+    /* === GLASSMORPHISM === */
+    --glass-bg: var(--bg-secondary);
+    --glass-bg-elevated: var(--bg-tertiary);
+    --glass-border: var(--border-primary);
+    --glass-blur: 0px;
+
+    /* === COMPONENT TOKENS === */
+    /* Cards */
+    --card-bg: var(--bg-secondary);
+    --card-border: var(--border-primary);
+    --card-shadow: var(--shadow-md);
+    --card-glow: none;
+    --card-hover-border: var(--primary);
+    --card-hover-shadow: var(--shadow-lg);
+
+    /* Buttons */
+    --btn-primary-bg: linear-gradient(135deg, var(--primary), var(--secondary));
+    --btn-primary-shadow: var(--shadow-md);
+    --btn-primary-glow: none;
+    --btn-primary-hover-glow: none;
+
+    --btn-secondary-bg: var(--bg-tertiary);
+    --btn-secondary-border: var(--border-primary);
+    --btn-secondary-hover-bg: var(--bg-elevated);
+    --btn-secondary-hover-border: var(--primary);
+
+    --btn-disabled-opacity: 0.5;
+
+    /* Form Inputs */
+    --input-bg: var(--bg-tertiary);
+    --input-border: var(--border-primary);
+    --input-focus-border: var(--primary);
+    --input-focus-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    --input-focus-glow: none;
+
+    /* Progress Bars */
+    --progress-bg: var(--bg-tertiary);
+    --progress-fill: linear-gradient(90deg, var(--primary), var(--secondary));
+    --progress-glow: none;
+
+    /* Badges */
+    --badge-primary-bg: rgba(59, 130, 246, 0.15);
+    --badge-primary-color: var(--primary);
+    --badge-success-bg: rgba(16, 185, 129, 0.15);
+    --badge-success-color: var(--success);
+    --badge-warning-bg: rgba(245, 158, 11, 0.15);
+    --badge-warning-color: var(--warning);
+    --badge-error-bg: rgba(239, 68, 68, 0.15);
+    --badge-error-color: var(--error);
+
+    /* Modals */
+    --modal-bg: var(--bg-secondary);
+    --modal-border: var(--border-primary);
+    --modal-shadow: var(--shadow-xl);
+    --modal-backdrop: rgba(0, 0, 0, 0.6);
+
+    /* Sidebar/Panels */
+    --sidebar-bg: var(--bg-secondary);
+    --sidebar-border: var(--border-primary);
+    --sidebar-shadow: none;
+
+    --panel-bg: var(--bg-secondary);
+    --panel-border: var(--border-primary);
+    --panel-shadow: none;
+}
+
+/* =============================================================================
+   LIGHT THEME - Clean + Bright + Subtle Shadows
+   ============================================================================= */
+
+[data-theme="light"] {
+    /* === COLOR PALETTE === */
+    /* Backgrounds - White and Light Grays */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8fafc;
+    --bg-tertiary: #f1f5f9;
+    --bg-elevated: #e2e8f0;
+    --bg-surface: #ffffff;
+
+    /* Text Colors */
+    --text-primary: #0f172a;
+    --text-secondary: #334155;
+    --text-tertiary: #64748b;
+    --text-muted: #94a3b8;
+
+    /* Brand Colors */
+    --primary: #0284c7;
+    --primary-dark: #0369a1;
+    --primary-light: #0ea5e9;
+    --secondary: #7c3aed;
+    --secondary-dark: #6d28d9;
+    --secondary-light: #8b5cf6;
+    --accent: #0891b2;
+    --accent-dark: #0e7490;
+    --accent-light: #06b6d4;
+
+    /* Semantic Colors */
+    --success: #059669;
+    --warning: #d97706;
+    --error: #dc2626;
+    --info: #2563eb;
+
+    /* === BORDERS === */
+    --border-primary: rgba(15, 23, 42, 0.1);
+    --border-secondary: rgba(15, 23, 42, 0.05);
+    --border-focus: var(--primary);
+    --border-glow: transparent;
+
+    /* === SHADOWS & GLOWS === */
+    /* Standard Shadows - NO GLOW */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+    /* NO Glows */
+    --glow-primary: none;
+    --glow-primary-strong: none;
+    --glow-secondary: none;
+    --glow-secondary-strong: none;
+    --glow-accent: none;
+    --glow-success: none;
+
+    /* Combined Shadow (no glow) */
+    --shadow-glow-primary: var(--shadow-md);
+    --shadow-glow-secondary: var(--shadow-md);
+
+    /* === GLASSMORPHISM === */
+    --glass-bg: rgba(248, 250, 252, 0.8);
+    --glass-bg-elevated: rgba(241, 245, 249, 0.9);
+    --glass-border: var(--border-primary);
+    --glass-blur: 8px;
+
+    /* === COMPONENT TOKENS === */
+    /* Cards */
+    --card-bg: var(--bg-surface);
+    --card-border: var(--border-primary);
+    --card-shadow: var(--shadow-md);
+    --card-glow: none;
+    --card-hover-border: var(--primary);
+    --card-hover-shadow: var(--shadow-lg);
+
+    /* Buttons */
+    --btn-primary-bg: linear-gradient(135deg, var(--primary), var(--secondary));
+    --btn-primary-shadow: var(--shadow-md);
+    --btn-primary-glow: none;
+    --btn-primary-hover-glow: none;
+
+    --btn-secondary-bg: var(--bg-tertiary);
+    --btn-secondary-border: var(--border-primary);
+    --btn-secondary-hover-bg: var(--bg-elevated);
+    --btn-secondary-hover-border: var(--primary);
+
+    --btn-disabled-opacity: 0.5;
+
+    /* Form Inputs */
+    --input-bg: var(--bg-surface);
+    --input-border: var(--border-primary);
+    --input-focus-border: var(--primary);
+    --input-focus-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+    --input-focus-glow: none;
+
+    /* Progress Bars */
+    --progress-bg: var(--bg-tertiary);
+    --progress-fill: linear-gradient(90deg, var(--primary), var(--secondary));
+    --progress-glow: none;
+
+    /* Badges */
+    --badge-primary-bg: rgba(2, 132, 199, 0.1);
+    --badge-primary-color: var(--primary);
+    --badge-success-bg: rgba(5, 150, 105, 0.1);
+    --badge-success-color: var(--success);
+    --badge-warning-bg: rgba(217, 119, 6, 0.1);
+    --badge-warning-color: var(--warning);
+    --badge-error-bg: rgba(220, 38, 38, 0.1);
+    --badge-error-color: var(--error);
+
+    /* Modals */
+    --modal-bg: var(--bg-surface);
+    --modal-border: var(--border-primary);
+    --modal-shadow: var(--shadow-xl);
+    --modal-backdrop: rgba(0, 0, 0, 0.4);
+
+    /* Sidebar/Panels */
+    --sidebar-bg: var(--bg-secondary);
+    --sidebar-border: var(--border-primary);
+    --sidebar-shadow: var(--shadow-sm);
+
+    --panel-bg: var(--bg-secondary);
+    --panel-border: var(--border-primary);
+    --panel-shadow: var(--shadow-sm);
+}
+
+/* =============================================================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================================================= */
+
+@media (max-width: 640px) {
+    :root {
+        --sidebar-width: 100%;
+        --panel-width: 100%;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+    :root {
+        --sidebar-width: 200px;
+        --panel-width: 320px;
+    }
+}

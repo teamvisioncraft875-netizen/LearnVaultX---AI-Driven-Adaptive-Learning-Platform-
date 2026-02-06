@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+
+{% block title %}LearnVaultX - The Future of Learning{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hero Animations */
+    .hero-glow {
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+        top: -20%;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: -1;
+        animation: pulseGlow 8s infinite alternate;
+    }
+
+    .hero-title {
+        font-size: 4.5rem;
+        font-weight: 800;
+        letter-spacing: -2px;
+        line-height: 1.1;
+        margin-bottom: 24px;
+        background: linear-gradient(180deg, #fff 0%, #94a3b8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .hero-highlight {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Floating Cards */
+    .floating-card {
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+
+    .feature-grid {
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 32px;
+    }
+
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 800;
+        color: white;
+    }
+
+    /* Scroll Indicator */
+    .scroll-indicator {
+        position: absolute;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        animation: bounce 2s infinite;
+        opacity: 0.5;
+    }
+
+    @keyframes bounce {
+
+        0%,
+        20%,
+        50%,
+        80%,
+        100% {
+            transform: translateY(0) translateX(-50%);
+        }
+
+        40% {
+            transform: translateY(-10px) translateX(-50%);
+        }
+
+        60% {
+            transform: translateY(-5px) translateX(-50%);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Navbar (Public) -->
+<nav
+    style="padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; position: absolute; width: 100%; top: 0; z-index: 50;">
+    <div
+        style="font-family: var(--font-heading); font-weight: 800; font-size: 24px; color: white; display: flex; align-items: center; gap: 10px;">
+        <span
+            style="background: var(--primary); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">L</span>
+        LearnVaultX
+    </div>
+    <div style="display: flex; gap: 16px;">
+        <a href="{{ url_for('login') }}" class="btn btn-secondary glass-panel"
+            style="border-radius: 100px; padding: 10px 24px;">Log In</a>
+        <a href="{{ url_for('register') }}" class="btn btn-primary"
+            style="border-radius: 100px; padding: 10px 24px;">Get Started</a>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section
+    style="min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 120px 24px; position: relative; overflow: hidden;">
+    <div class="hero-glow"></div>
+
+    <div class="animate-slide-up" style="max-width: 900px; position: relative; z-index: 10;">
+        <div class="badge badge-secondary mb-4"
+            style="display: inline-block; background: rgba(59, 130, 246, 0.1); color: var(--primary); border-color: rgba(59, 130, 246, 0.2);">
+            ✨ V2.0 Now Live
+        </div>
+        <h1 class="hero-title">
+            Master Any Subject with <br>
+            <span class="hero-highlight">Intelligent AI Tutoring</span>
+        </h1>
+        <p class="text-muted mb-4" style="font-size: 20px; max-width: 600px; margin: 0 auto 40px;">
+            The world's most advanced adaptive learning platform. Real-time feedback, Socratic AI coaching, and live
+            interactive classes.
+        </p>
+
+        <div style="display: flex; gap: 16px; justify-content: center;">
+            <a href="{{ url_for('register') }}" class="btn btn-primary"
+                style="padding: 16px 40px; font-size: 16px; border-radius: 100px;">
+                Start Learning Free
+            </a>
+            <a href="#features" class="btn btn-secondary glass-panel"
+                style="padding: 16px 40px; font-size: 16px; border-radius: 100px;">
+                View Demo
+            </a>
+        </div>
+    </div>
+
+    <!-- Floating Graphic Elements -->
+    <div class="glass-card floating-card"
+        style="position: absolute; top: 20%; left: 10%; width: 280px; padding: 20px; z-index: 1; animation-delay: 0s; opacity: 0.6; transform: rotate(-5deg);">
+        <div class="flex-between mb-3">
+            <span style="font-weight: bold;">Calculus I</span>
+            <span class="badge badge-secondary"
+                style="background: rgba(16, 185, 129, 0.1); color: var(--success); border: none;">98% Match</span>
+        </div>
+        <div style="height: 6px; background: var(--bg-surface); border-radius: 4px; overflow: hidden;">
+            <div style="width: 75%; height: 100%; background: var(--success);"></div>
+        </div>
+    </div>
+
+    <div class="glass-card floating-card"
+        style="position: absolute; bottom: 20%; right: 10%; width: 300px; padding: 20px; z-index: 1; animation-delay: 1.5s; opacity: 0.6; transform: rotate(5deg);">
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <div
+                style="width: 40px; height: 40px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                🤖</div>
+            <div>
+                <div style="font-size: 12px; color: var(--text-tertiary);">KyKnoX AI</div>
+                <div style="font-size: 14px; font-weight: 500;">Great job! Try this quiz next.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="scroll-indicator">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            style="color: var(--text-tertiary);">
+            <path d="M7 13l5 5 5-5M7 6l5 5 5-5" />
+        </svg>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" style="padding: 100px 24px; position: relative;">
+    <div class="container" style="max-width: 1200px; margin: 0 auto;">
+        <div class="text-center mb-4 animate-slide-up delay-100">
+            <h2 style="font-size: 36px; margin-bottom: 16px;">Everything you need to excel</h2>
+            <p class="text-muted" style="max-width: 600px; margin: 0 auto;">Our platform combines cognitive science with
+                state-of-the-art AI.</p>
+        </div>
+
+        <div class="cards-grid feature-grid mt-4">
+            <div class="glass-card animate-slide-up delay-100" style="padding: 40px; text-align: center;">
+                <div style="font-size: 48px; margin-bottom: 24px;">🧠</div>
+                <h3 style="margin-bottom: 12px;">Adaptive Learning</h3>
+                <p class="text-muted">No two brains are alike. Our engine adapts the curriculum in real-time to fit your
+                    unique learning style.</p>
+            </div>
+
+            <div class="glass-card animate-slide-up delay-200"
+                style="padding: 40px; text-align: center; border-color: var(--primary);">
+                <div style="font-size: 48px; margin-bottom: 24px;">🤖</div>
+                <h3 style="margin-bottom: 12px; color: var(--primary);">KyKnoX AI Tutor</h3>
+                <p class="text-muted">Stuck on a problem using Socratic methods? KyKnoX guides you to the solution
+                    without giving it away.</p>
+            </div>
+
+            <div class="glass-card animate-slide-up delay-300" style="padding: 40px; text-align: center;">
+                <div style="font-size: 48px; margin-bottom: 24px;">🔴</div>
+                <h3 style="margin-bottom: 12px;">Live Interactive Classes</h3>
+                <p class="text-muted">Join real-time video sessions with expert instructors. Raise your hand, ask
+                    questions, and collaborate.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Complete Footer -->
+<footer style="border-top: 1px solid var(--glass-border); background: var(--bg-surface); padding: 80px 24px 40px;">
+    <div class="container" style="max-width: 1200px; margin: 0 auto;">
+        <!-- Footer Grid -->
+        <div
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 48px; margin-bottom: 60px;">
+            <!-- About Section -->
+            <div>
+                <h3
+                    style="font-family: var(--font-heading); font-weight: 800; font-size: 24px; margin-bottom: 16px; background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    LearnVaultX</h3>
+                <p class="text-muted" style="line-height: 1.8; margin-bottom: 24px;">
+                    The future of education powered by AI. Personalized learning paths, real-time adaptation, and expert
+                    guidance - all in one platform.
+                </p>
+                <!-- Social Links -->
+                <div style="display: flex; gap: 12px;">
+                    <a href="#" class="glass-card"
+                        style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 18px; transition: all 0.2s;">🐦</a>
+                    <a href="#" class="glass-card"
+                        style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 18px; transition: all 0.2s;">💼</a>
+                    <a href="#" class="glass-card"
+                        style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 18px; transition: all 0.2s;">📧</a>
+                    <a href="#" class="glass-card"
+                        style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 18px; transition: all 0.2s;">🌐</a>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div>
+                <h4 style="font-weight: 600; margin-bottom: 20px; color: var(--text-main);">Quick Links</h4>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    <li style="margin-bottom: 12px;"><a href="#features"
+                            style="color: var(--text-secondary); text-decoration: none; transition: color 0.2s;">Features</a>
+                    </li>
+                    <li style="margin-bottom: 12px;"><a href="/login"
+                            style="color: var(--text-secondary); text-decoration: none; transition: color 0.2s;">Login</a>
+                    </li>
+                    <li style="margin-bottom: 12px;"><a href="/register"
+                            style="color: var(--text-secondary); text-decoration: none; transition: color 0.2s;">Sign
+                            Up</a></li>
+                    <li style="margin-bottom: 12px;"><a href="#"
+                            style="color: var(--text-secondary); text-decoration: none; transition: color 0.2s;">Pricing</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Resources -->
+            <div>
+                <h4 style="font-weight: 600; margin-bottom: 20px; color: var(--text-main);">Resources</h4>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    <li style="margin-bottom: 12px;"><a href="#"
+                            style="color: var(--text-secondary); text-decoration: none; transition: color 0.2s;">Documentation</a>
+                    </li>
+                    <li style="margin-bottom: 12px;"><a href="#"
+                            style="color: var(--text-secondary); text-decoration: none; transition: color 0.2s;">API
+                            Reference</a></li>
+                    <li style="margin-bottom: 12px;"><a href="#"
+                            style="color: var(--text-secondary); text-decoration: none; transition: color 0.2s;">Help
+                            Center</a></li>
+                    <li style="margin-bottom: 12px;"><a href="#"
+                            style="color: var(--text-secondary); text-decoration: none; transition: color 0.2s;">Community</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Company -->
+            <div>
+                <h4 style="font-weight: 600; margin-bottom: 20px; color: var(--text-main);">Company</h4>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    <li style="margin-bottom: 12px;"><a href="#"
+                            style="color: var(--text-secondary); text-decoration: none; transition: color 0.2s;">About
+                            Us</a></li>
+                    <li style="margin-bottom: 12px;"><a href="#"
+                            style="color: var(--text-secondary); text-decoration: none; transition: color 0.2s;">Careers</a>
+                    </li>
+                    <li style="margin-bottom: 12px;"><a href="#"
+                            style="color: var(--text-secondary); text-decoration: none; transition: color 0.2s;">Blog</a>
+                    </li>
+                    <li style="margin-bottom: 12px;"><a href="#"
+                            style="color: var(--text-secondary); text-decoration: none; transition: color 0.2s;">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="glass-card" style="padding: 32px; margin-bottom: 48px;">
+            <h3 style="font-weight: 700; margin-bottom: 24px; text-align: center;">Frequently Asked Questions</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+                <div>
+                    <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--primary);">What is
+                        KyKnoX AI?</h4>
+                    <p class="text-muted" style="font-size: 14px; line-height: 1.6;">KyKnoX is your personal AI tutor
+                        that adapts to your learning style and guides you through concepts using proven pedagogical
+                        methods.</p>
+                </div>
+                <div>
+                    <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--primary);">How does
+                        adaptive learning work?</h4>
+                    <p class="text-muted" style="font-size: 14px; line-height: 1.6;">Our AI analyzes your performance in
+                        real-time and adjusts the difficulty, pacing, and content to match your unique needs.</p>
+                </div>
+                <div>
+                    <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--primary);">Can I join
+                        live classes?</h4>
+                    <p class="text-muted" style="font-size: 14px; line-height: 1.6;">Yes! Teachers can host live
+                        interactive sessions with video, screen sharing, and real-time collaboration tools.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div
+            style="border-top: 1px solid var(--glass-border); padding-top: 32px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div style="color: var(--text-tertiary); font-size: 14px;">
+                © 2026 LearnVaultX Inc. All rights reserved.
+            </div>
+            <div style="display: flex; gap: 24px; font-size: 14px;">
+                <a href="#" style="color: var(--text-tertiary); text-decoration: none;">Privacy Policy</a>
+                <a href="#" style="color: var(--text-tertiary); text-decoration: none;">Terms of Service</a>
+                <a href="#" style="color: var(--text-tertiary); text-decoration: none;">Cookie Policy</a>
+            </div>
+        </div>
+    </div>
+</footer>
+{% endblock %}

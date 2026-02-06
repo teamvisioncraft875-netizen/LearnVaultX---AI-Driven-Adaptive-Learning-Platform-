@@ -1,304 +1,1324 @@
 {% extends "base.html" %}
 
-{% block title %}Class - LearnVaultX{% endblock %}
-
-{% block extra_js %}
-<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-{% endblock %}
+{% block title %}{{ class_info.title }} - LearnVaultX{% endblock %}
 
 {% block content %}
-<div class="class-view">
-    <header class="class-header">
-        <div class="header-left">
-            <a href="javascript:history.back()" class="back-btn">← Back</a>
-            <h1 id="class-title">Class</h1>
+<!-- CLASS VIEW - PROFESSIONAL 3-PANE LAYOUT -->
+<div class="class-view-app">
+    <!-- LEFT SIDEBAR - FIXED -->
+    <aside class="class-sidebar" id="classSidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LearnVaultX" class="brand-icon">
+                <span class="brand-name">LearnVaultX</span>
+            </div>
         </div>
-        <div class="header-right">
-            <button class="btn btn-secondary btn-sm" onclick="showSection('lectures')">Lectures</button>
-            <button class="btn btn-secondary btn-sm" onclick="showSection('quizzes')">Quizzes</button>
-            <button class="btn btn-secondary btn-sm" onclick="showSection('chat')">Chat</button>
+
+        <nav class="sidebar-nav">
+            <a href="/{{ session.role }}/dashboard" class="nav-item">
+                <span class="nav-icon">←</span>
+                <span class="nav-label">Back to Dashboard</span>
+            </a>
+            <a href="#" class="nav-item active" onclick="switchTab('overview'); return false;">
+                <span class="nav-icon">📋</span>
+                <span class="nav-label">Overview</span>
+            </a>
+            <a href="#" class="nav-item" onclick="switchTab('lectures'); return false;">
+                <span class="nav-icon">📚</span>
+                <span class="nav-label">Lectures</span>
+            </a>
+            <a href="#" class="nav-item" onclick="switchTab('quizzes'); return false;">
+                <span class="nav-icon">📝</span>
+                <span class="nav-label">Quizzes</span>
+            </a>
+            {% if session.role == 'teacher' %}
+            <a href="#" class="nav-item" onclick="switchTab('students'); return false;">
+                <span class="nav-icon">👥</span>
+                <span class="nav-label">Students</span>
+            </a>
+            {% endif %}
+        </nav>
+
+        <div class="sidebar-user">
+            <div class="user-avatar">{{ session.name[0]|upper }}</div>
+            <div class="user-info">
+                <div class="user-name">{{ session.name }}</div>
+                <div class="user-role">{{ session.role|title }}</div>
+            </div>
         </div>
-    </header>
-    
-    <div class="class-content">
-        <!-- Lectures Section -->
-        <section id="lectures-section" class="content-section">
-            <h2>Lecture Materials</h2>
-            <div id="lectures-list" class="list-container">
-                <!-- Lectures will be loaded here -->
-            </div>
-        </section>
-        
-        <!-- Quizzes Section -->
-        <section id="quizzes-section" class="content-section hidden">
-            <h2>Quizzes</h2>
-            <div id="quizzes-list" class="list-container">
-                <!-- Quizzes will be loaded here -->
-            </div>
-        </section>
-        
-        <!-- Chat Section -->
-        <section id="chat-section" class="content-section hidden">
-            <h2>Class Discussion</h2>
-            <div class="chat-container">
-                <div class="chat-messages" id="chat-messages">
-                    <!-- Messages will appear here -->
+    </aside>
+
+    <!-- CENTER CONTENT - ADAPTIVE -->
+    <main class="class-center" id="classCenter">
+        <!-- Mobile Header -->
+        <div class="mobile-header">
+            <button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
+            <span class="mobile-title">{{ class_info.title }}</span>
+            <button class="mobile-ai-toggle" onclick="toggleAI()">🤖</button>
+        </div>
+
+        <!-- Class Header -->
+        <div class="class-header">
+            <h1 class="class-title">{{ class_info.title }}</h1>
+            <p class="class-meta">
+                <span>Instructor: {{ class_info.teacher_name }}</span>
+                {% if session.role == 'student' %}
+                <span class="separator">•</span>
+                <span>Progress: {{ progress|round|int }}%</span>
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Live Class Banner -->
+        {% if session.role == 'teacher' %}
+        {% if active_session %}
+        <div class="live-banner active">
+            <div class="live-info">
+                <span class="live-badge">LIVE</span>
+                <div class="live-text">
+                    <strong>Class in Session</strong>
+                    <span>Started at {{ active_session.started_at }}</span>
                 </div>
-                <div class="chat-input-container">
-                    <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="handleChatKeyPress(event)">
-                    <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+            </div>
+            <div class="live-actions">
+                <a href="/live/{{ active_session.room_name }}" class="btn btn-success">Resume</a>
+                <button onclick="endLiveSession('{{ active_session.room_name }}')" class="btn btn-danger">End
+                    Class</button>
+            </div>
+        </div>
+        {% else %}
+        <div class="live-banner">
+            <div class="live-info">
+                <span class="live-icon">🎥</span>
+                <div class="live-text">
+                    <strong>Live Class</strong>
+                    <span>Start a video session for your students</span>
                 </div>
             </div>
-        </section>
-        
-        <!-- Quiz Taking Section -->
-        <section id="quiz-taking-section" class="content-section hidden">
-            <div id="quiz-container">
-                <!-- Quiz will be loaded here -->
+            <button onclick="startLiveSession('{{ class_id }}')" class="btn btn-primary">Start Live Class</button>
+        </div>
+        {% endif %}
+        {% elif active_session %}
+        <div class="live-banner active">
+            <div class="live-info">
+                <span class="live-badge">LIVE</span>
+                <div class="live-text">
+                    <strong>Live Class in Progress!</strong>
+                    <span>Join your teacher and classmates now</span>
+                </div>
             </div>
-        </section>
-    </div>
+            <a href="/live/{{ active_session.room_name }}" class="btn btn-primary btn-lg">Join Now</a>
+        </div>
+        {% endif %}
+
+        <!-- Tab Content -->
+        <div class="tab-container">
+            <!-- Overview Tab -->
+            <div class="tab-content active" id="overview-content">
+                <div class="content-section">
+                    <h2 class="section-title">Class Overview</h2>
+                    <div class="card-grid">
+                        <div class="content-card">
+                            <div class="card-icon">📚</div>
+                            <h3 class="card-title">Learning Path</h3>
+                            <p class="card-description">Follow the structured path designed by your instructor</p>
+                            <button class="btn btn-primary btn-sm">Start Learning</button>
+                        </div>
+                        <div class="content-card">
+                            <div class="card-icon">📊</div>
+                            <h3 class="card-title">My Progress</h3>
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: {{ progress or 0 }}%"></div>
+                                </div>
+                                <p class="progress-text">{{ progress or 0 }}% Complete</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lectures Tab -->
+            <div class="tab-content" id="lectures-content">
+                <div class="content-section">
+                    <h2 class="section-title">Lectures</h2>
+                    {% if lectures %}
+                    <div class="lecture-list">
+                        {% for lecture in lectures %}
+                        <div class="lecture-item">
+                            <div class="lecture-icon">📚</div>
+                            <div class="lecture-info">
+                                <h3 class="lecture-title">{{ lecture.filename }}</h3>
+                                <p class="lecture-meta">Uploaded {{ lecture.uploaded_at }} • {{ (lecture.file_size /
+                                    1024)|round|int }} KB</p>
+                            </div>
+                            <a href="{{ url_for('static', filename='uploads/' + lecture.filename) }}"
+                                download="{{ lecture.filename }}" class="btn btn-primary btn-sm">Download</a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <div class="empty-icon">📚</div>
+                        <h3 class="empty-title">No lectures yet</h3>
+                        <p class="empty-description">Lectures will appear here when added by your instructor</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quizzes Tab -->
+            <div class="tab-content" id="quizzes-content">
+                <div class="content-section">
+                    <h2 class="section-title">Quizzes</h2>
+                    {% if quizzes %}
+                    <div class="quiz-grid">
+                        {% for quiz in quizzes %}
+                        <div class="quiz-card" onclick="window.location.href='/quiz/{{ quiz.id }}'">
+                            <div class="quiz-icon">📝</div>
+                            <h3 class="quiz-title">{{ quiz.title }}</h3>
+                            <p class="quiz-meta">{{ quiz.question_count }} questions</p>
+                            <button class="btn btn-primary btn-sm">Start Quiz</button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <h3 class="empty-title">No quizzes yet</h3>
+                        <p class="empty-description">Quizzes will appear here when added by your instructor</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Students Tab (Teacher Only) -->
+            {% if session.role == 'teacher' %}
+            <div class="tab-content" id="students-content">
+                <div class="content-section">
+                    <h2 class="section-title">Enrolled Students</h2>
+                    <div class="students-list" id="studentsList">
+                        <div class="loading">Loading students...</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <!-- RIGHT AI PANEL - TOGGLEABLE -->
+    <aside class="class-ai-panel" id="classAI">
+        <div class="ai-header">
+            <h3 class="ai-title">AI Tutor</h3>
+            <button class="ai-close" onclick="toggleAI()">✕</button>
+        </div>
+
+        <div class="ai-modes">
+            <button class="mode-btn active" onclick="switchMode('socratic')">Socratic</button>
+            <button class="mode-btn" onclick="switchMode('expert')">Expert</button>
+            <button class="mode-btn" onclick="switchMode('coach')">Coach</button>
+        </div>
+
+        <div class="ai-chat" id="aiChat">
+            <div class="ai-message bot">
+                <div class="message-avatar">🤖</div>
+                <div class="message-content">I'm here to help you with {{ class_info.title }}. What would you like to
+                    learn about?</div>
+            </div>
+        </div>
+
+        <div class="ai-input-container">
+            <textarea class="ai-input" id="aiInput" placeholder="Ask about this class..." rows="2"></textarea>
+            <button class="ai-send" onclick="sendMessage()">→</button>
+        </div>
+    </aside>
+
+    <!-- AI Float Button -->
+    <button class="ai-float-btn" id="aiFloatBtn" onclick="toggleAI()">
+        <span>🤖</span>
+    </button>
+
+    <!-- Overlay for mobile -->
+    <div class="overlay" id="overlay" onclick="closeAll()"></div>
 </div>
 
 <script>
-const classId = {{ class_id }};
-let socket;
-let currentQuiz = null;
-let quizStartTime = null;
+    let currentMode = 'socratic';
 
-// Initialize Socket.IO
-function initSocket() {
-    socket = io();
-    
-    socket.on('connect', () => {
-        socket.emit('join', { class_id: classId });
-    });
-    
-    socket.on('message', (data) => {
-        displayMessage(data);
-    });
-    
-    socket.on('status', (data) => {
-        displayStatus(data);
-    });
-}
+    function toggleSidebar() {
+        document.getElementById('classSidebar').classList.toggle('active');
+        document.getElementById('overlay').classList.toggle('active');
+    }
 
-async function loadLectures() {
-    try {
-        const response = await fetch(`/api/class/${classId}/lectures`);
-        const lectures = await response.json();
-        
-        const container = document.getElementById('lectures-list');
-        
-        if (lectures.length === 0) {
-            container.innerHTML = '<div class="empty-state"><p>No lectures available yet.</p></div>';
-            return;
+    function toggleAI() {
+        const aiPanel = document.getElementById('classAI');
+        const floatBtn = document.getElementById('aiFloatBtn');
+        const center = document.getElementById('classCenter');
+
+        aiPanel.classList.toggle('active');
+        floatBtn.classList.toggle('hidden');
+
+        if (window.innerWidth > 1024) {
+            center.classList.toggle('ai-open');
+        } else {
+            document.getElementById('overlay').classList.toggle('active');
         }
-        
-        container.innerHTML = lectures.map(lecture => `
-            <div class="lecture-item">
-                <div class="lecture-icon">📄</div>
-                <div class="lecture-info">
-                    <h4>${lecture.filename}</h4>
-                    <p class="text-muted">Uploaded: ${new Date(lecture.uploaded_at).toLocaleDateString()}</p>
-                </div>
-                <div class="lecture-actions">
-                    <a href="/${lecture.filepath}" class="btn btn-primary btn-sm" download>Download</a>
-                    <a href="/${lecture.filepath}" class="btn btn-secondary btn-sm" target="_blank">View</a>
-                </div>
-            </div>
-        `).join('');
-    } catch (error) {
-        console.error('Error loading lectures:', error);
     }
-}
 
-async function loadQuizzes() {
-    try {
-        const response = await fetch(`/api/class/${classId}/quizzes`);
-        const quizzes = await response.json();
-        
-        const container = document.getElementById('quizzes-list');
-        
-        if (quizzes.length === 0) {
-            container.innerHTML = '<div class="empty-state"><p>No quizzes available yet.</p></div>';
-            return;
+    function closeAll() {
+        document.getElementById('classSidebar').classList.remove('active');
+        document.getElementById('classAI').classList.remove('active');
+        document.getElementById('overlay').classList.remove('active');
+        document.getElementById('aiFloatBtn').classList.remove('hidden');
+        document.getElementById('classCenter').classList.remove('ai-open');
+    }
+
+    function switchTab(tabName) {
+        // Update nav items
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        event.target.closest('.nav-item').classList.add('active');
+
+        // Update content
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        document.getElementById(tabName + '-content').classList.add('active');
+
+        // Load students if teacher
+        if (tabName === 'students' && '{{ session.role }}' === 'teacher') {
+            loadStudents();
         }
-        
-        container.innerHTML = quizzes.map(quiz => `
-            <div class="quiz-item">
-                <div class="quiz-icon">📝</div>
-                <div class="quiz-info">
-                    <h4>${quiz.title}</h4>
-                    <p class="text-muted">Created: ${new Date(quiz.created_at).toLocaleDateString()}</p>
-                </div>
-                <div class="quiz-actions">
-                    <button class="btn btn-primary btn-sm" onclick="startQuiz(${quiz.id})">Take Quiz</button>
-                </div>
-            </div>
-        `).join('');
-    } catch (error) {
-        console.error('Error loading quizzes:', error);
     }
-}
 
-async function loadChatHistory() {
-    try {
-        const response = await fetch(`/api/class/${classId}/messages`);
-        const messages = await response.json();
-        
-        const container = document.getElementById('chat-messages');
-        container.innerHTML = messages.map(msg => `
-            <div class="chat-message">
-                <strong>${msg.user_name}:</strong>
-                <span>${msg.message}</span>
-                <span class="timestamp">${new Date(msg.timestamp).toLocaleTimeString()}</span>
-            </div>
-        `).join('');
-        
-        container.scrollTop = container.scrollHeight;
-    } catch (error) {
-        console.error('Error loading chat history:', error);
+    function switchMode(mode) {
+        currentMode = mode;
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
     }
-}
 
-function displayMessage(data) {
-    const container = document.getElementById('chat-messages');
-    const msgDiv = document.createElement('div');
-    msgDiv.className = 'chat-message';
-    msgDiv.innerHTML = `
-        <strong>${data.user}:</strong>
-        <span>${data.message}</span>
-        <span class="timestamp">${data.timestamp}</span>
+    async function sendMessage() {
+        const input = document.getElementById('aiInput');
+        const message = input.value.trim();
+        if (!message) return;
+
+        const chat = document.getElementById('aiChat');
+
+        // Add user message
+        const userMsg = document.createElement('div');
+        userMsg.className = 'ai-message user';
+        userMsg.innerHTML = `
+        <div class="message-avatar">👤</div>
+        <div class="message-content">${escapeHtml(message)}</div>
     `;
-    container.appendChild(msgDiv);
-    container.scrollTop = container.scrollHeight;
-}
-
-function displayStatus(data) {
-    const container = document.getElementById('chat-messages');
-    const statusDiv = document.createElement('div');
-    statusDiv.className = 'chat-status';
-    statusDiv.textContent = data.msg;
-    container.appendChild(statusDiv);
-    container.scrollTop = container.scrollHeight;
-}
-
-function sendMessage() {
-    const input = document.getElementById('chat-input');
-    const message = input.value.trim();
-    
-    if (message) {
-        socket.emit('message', {
-            class_id: classId,
-            message: message
-        });
+        chat.appendChild(userMsg);
         input.value = '';
-    }
-}
+        chat.scrollTop = chat.scrollHeight;
 
-function handleChatKeyPress(event) {
-    if (event.key === 'Enter') {
-        sendMessage();
-    }
-}
+        // Add loading
+        const loadingMsg = document.createElement('div');
+        loadingMsg.className = 'ai-message bot';
+        loadingMsg.id = 'loading';
+        loadingMsg.innerHTML = `
+        <div class="message-avatar">🤖</div>
+        <div class="message-content">Thinking...</div>
+    `;
+        chat.appendChild(loadingMsg);
+        chat.scrollTop = chat.scrollHeight;
 
-async function startQuiz(quizId) {
-    try {
-        const response = await fetch(`/api/quiz/${quizId}`);
-        currentQuiz = await response.json();
-        quizStartTime = Date.now();
-        
-        showSection('quiz-taking');
-        
-        const container = document.getElementById('quiz-container');
-        container.innerHTML = `
-            <div class="quiz-header">
-                <h2>${currentQuiz.title}</h2>
-                <p>Total Questions: ${currentQuiz.questions.length}</p>
-            </div>
-            <form id="quiz-form" onsubmit="submitQuiz(event, ${quizId})">
-                ${currentQuiz.questions.map((q, idx) => `
-                    <div class="quiz-question">
-                        <h4>Question ${idx + 1}</h4>
-                        <p>${q.question_text}</p>
-                        <div class="quiz-options">
-                            ${q.options.map((opt, optIdx) => `
-                                <label class="quiz-option">
-                                    <input type="radio" name="q${q.id}" value="${optIdx}" required>
-                                    <span>${opt}</span>
-                                </label>
-                            `).join('')}
-                        </div>
-                    </div>
-                `).join('')}
-                <div class="quiz-actions">
-                    <button type="button" class="btn btn-secondary" onclick="showSection('quizzes')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Submit Quiz</button>
-                </div>
-            </form>
+        try {
+            const response = await fetch('/api/chatbot', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: message, mode: currentMode })
+            });
+            const data = await response.json();
+
+            document.getElementById('loading').remove();
+
+            const botMsg = document.createElement('div');
+            botMsg.className = 'ai-message bot';
+            botMsg.innerHTML = `
+            <div class="message-avatar">🤖</div>
+            <div class="message-content">${data.response || data.answer || 'Error'}</div>
         `;
-    } catch (error) {
-        console.error('Error starting quiz:', error);
+            chat.appendChild(botMsg);
+            chat.scrollTop = chat.scrollHeight;
+        } catch (error) {
+            document.getElementById('loading').remove();
+            console.error('AI error:', error);
+        }
     }
-}
 
-async function submitQuiz(event, quizId) {
-    event.preventDefault();
-    
-    const formData = new FormData(event.target);
-    const answers = {};
-    
-    currentQuiz.questions.forEach(q => {
-        const answer = formData.get(`q${q.id}`);
-        if (answer !== null) {
-            answers[q.id] = parseInt(answer);
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Enter key to send
+    document.addEventListener('DOMContentLoaded', () => {
+        const input = document.getElementById('aiInput');
+        if (input) {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
         }
     });
-    
-    const duration = Math.floor((Date.now() - quizStartTime) / 1000);
-    
-    try {
-        const response = await fetch('/api/submit_quiz', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                quiz_id: quizId,
-                answers: answers,
-                duration: duration
-            })
-        });
-        
-        const result = await response.json();
-        
-        alert(`Quiz submitted!\nScore: ${result.score}/${result.total} (${result.percentage}%)`);
-        showSection('quizzes');
-        
-    } catch (error) {
-        console.error('Error submitting quiz:', error);
-    }
-}
 
-function showSection(section) {
-    document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
-    
-    if (section === 'lectures') {
-        document.getElementById('lectures-section').classList.remove('hidden');
-        loadLectures();
-    } else if (section === 'quizzes') {
-        document.getElementById('quizzes-section').classList.remove('hidden');
-        loadQuizzes();
-    } else if (section === 'chat') {
-        document.getElementById('chat-section').classList.remove('hidden');
-        loadChatHistory();
-    } else if (section === 'quiz-taking') {
-        document.getElementById('quiz-taking-section').classList.remove('hidden');
+    // Live class functions
+    async function startLiveSession(classId) {
+        if (!confirm('Start a new live class session?')) return;
+        try {
+            const response = await fetch('/api/live/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ class_id: classId })
+            });
+            const data = await response.json();
+            if (data.room_name) {
+                window.location.href = '/live/' + data.room_name;
+            } else {
+                alert('Error: ' + (data.message || data.error));
+            }
+        } catch (error) {
+            console.error('Error starting live class:', error);
+            alert('Failed to start live class');
+        }
     }
-}
 
-// Initialize
-initSocket();
-loadLectures();
+    async function endLiveSession(roomName) {
+        if (!confirm('Are you sure you want to end this live class?')) return;
+        try {
+            const response = await fetch('/api/live/end', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ room_name: roomName })
+            });
+            const data = await response.json();
+            if (data.message) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        } catch (error) {
+            console.error('Error ending live class:', error);
+            alert('Failed to end live class');
+        }
+    }
+
+    // Load students for teacher
+    async function loadStudents() {
+        const container = document.getElementById('studentsList');
+        if (!container) return;
+
+        try {
+            const response = await fetch('/api/teacher/students');
+            const students = await response.json();
+
+            if (students.length === 0) {
+                container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">👥</div>
+                    <h3 class="empty-title">No students yet</h3>
+                    <p class="empty-description">Students will appear here when they enroll</p>
+                </div>
+            `;
+            } else {
+                container.innerHTML = students.map(student => `
+                <div class="student-card">
+                    <div class="student-avatar">${student.name[0]}</div>
+                    <div class="student-info">
+                        <h4 class="student-name">${student.name}</h4>
+                        <p class="student-email">${student.email}</p>
+                        <p class="student-meta">Quizzes taken: ${student.quizzes_taken || 0}</p>
+                    </div>
+                </div>
+            `).join('');
+            }
+        } catch (error) {
+            console.error('Error loading students:', error);
+            container.innerHTML = '<div class="error">Failed to load students</div>';
+        }
+    }
 </script>
-{% endblock %}
 
+<style>
+    /* ============================================
+   CLASS VIEW - PROFESSIONAL 3-PANE LAYOUT
+   ============================================ */
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        user-select: none;
+    }
+
+    input,
+    textarea,
+    .ai-input {
+        user-select: text;
+    }
+
+    .class-view-app {
+        display: flex;
+        height: 100vh;
+        background: #0a0e1a;
+        color: #e5e7eb;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+        overflow: hidden;
+    }
+
+    /* ============================================
+   LEFT SIDEBAR
+   ============================================ */
+
+    .class-sidebar {
+        width: 260px;
+        background: #111827;
+        border-right: 1px solid rgba(75, 85, 99, 0.3);
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar-header {
+        padding: 20px 16px;
+        border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+    }
+
+    .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .brand-icon {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+    }
+
+    .brand-name {
+        font-size: 18px;
+        font-weight: 700;
+        color: #e5e7eb;
+    }
+
+    .sidebar-nav {
+        flex: 1;
+        padding: 16px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        overflow-y: auto;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        color: #9ca3af;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    .nav-item:hover {
+        background: rgba(96, 165, 250, 0.1);
+        color: #e5e7eb;
+        box-shadow: 0 0 12px rgba(96, 165, 250, 0.15);
+    }
+
+    .nav-item.active {
+        background: rgba(96, 165, 250, 0.15);
+        color: #60a5fa;
+        box-shadow: 0 0 16px rgba(96, 165, 250, 0.2);
+    }
+
+    .nav-icon {
+        font-size: 20px;
+        width: 24px;
+        text-align: center;
+    }
+
+    .sidebar-user {
+        padding: 16px;
+        border-top: 1px solid rgba(75, 85, 99, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ec4899, #8b5cf6);
+        color: white;
+        font-size: 18px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .user-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .user-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #e5e7eb;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .user-role {
+        font-size: 12px;
+        color: #6b7280;
+    }
+
+    /* ============================================
+   CENTER CONTENT
+   ============================================ */
+
+    .class-center {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transition: margin-right 0.3s ease;
+    }
+
+    .class-center.ai-open {
+        margin-right: 380px;
+    }
+
+    .mobile-header {
+        display: none;
+        padding: 16px;
+        background: #111827;
+        border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .mobile-toggle,
+    .mobile-ai-toggle {
+        background: transparent;
+        border: none;
+        color: #e5e7eb;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 8px;
+    }
+
+    .mobile-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #e5e7eb;
+    }
+
+    .class-header {
+        padding: 32px 40px 24px;
+        background: #111827;
+        border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+    }
+
+    .class-title {
+        font-size: 32px;
+        font-weight: 700;
+        color: #e5e7eb;
+        margin-bottom: 8px;
+    }
+
+    .class-meta {
+        font-size: 14px;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .separator {
+        color: #4b5563;
+    }
+
+    /* Live Banner */
+    .live-banner {
+        margin: 24px 40px;
+        padding: 20px 24px;
+        background: #1f2937;
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.3s;
+    }
+
+    .live-banner.active {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+        border-color: #10b981;
+    }
+
+    .live-info {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .live-badge {
+        background: #ef4444;
+        color: white;
+        font-weight: 700;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+        }
+
+        50% {
+            box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+        }
+    }
+
+    .live-icon {
+        font-size: 32px;
+    }
+
+    .live-text strong {
+        display: block;
+        font-size: 16px;
+        color: #e5e7eb;
+        margin-bottom: 4px;
+    }
+
+    .live-text span {
+        font-size: 13px;
+        color: #9ca3af;
+    }
+
+    .live-actions {
+        display: flex;
+        gap: 12px;
+    }
+
+    /* Tab Container */
+    .tab-container {
+        flex: 1;
+        overflow-y: auto;
+        padding: 24px 40px 40px;
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .content-section {
+        max-width: 1200px;
+    }
+
+    .section-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #e5e7eb;
+        margin-bottom: 24px;
+    }
+
+    /* Cards */
+    .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 24px;
+    }
+
+    .content-card {
+        background: #1f2937;
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        border-radius: 14px;
+        padding: 24px;
+        transition: all 0.3s;
+    }
+
+    .content-card:hover {
+        border-color: #60a5fa;
+        box-shadow: 0 8px 24px rgba(96, 165, 250, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .card-icon {
+        font-size: 40px;
+        margin-bottom: 16px;
+    }
+
+    .card-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #e5e7eb;
+        margin-bottom: 8px;
+    }
+
+    .card-description {
+        font-size: 14px;
+        color: #9ca3af;
+        margin-bottom: 16px;
+        line-height: 1.5;
+    }
+
+    .progress-container {
+        margin-top: 16px;
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: #374151;
+        border-radius: 20px;
+        overflow: hidden;
+        margin-bottom: 8px;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #ec4899, #8b5cf6);
+        border-radius: 20px;
+        transition: width 0.5s ease;
+    }
+
+    .progress-text {
+        font-size: 13px;
+        color: #9ca3af;
+    }
+
+    /* Lectures */
+    .lecture-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .lecture-item {
+        background: #1f2937;
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        border-radius: 14px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        transition: all 0.3s;
+    }
+
+    .lecture-item:hover {
+        border-color: #60a5fa;
+        box-shadow: 0 4px 16px rgba(96, 165, 250, 0.1);
+    }
+
+    .lecture-icon {
+        font-size: 32px;
+    }
+
+    .lecture-info {
+        flex: 1;
+    }
+
+    .lecture-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #e5e7eb;
+        margin-bottom: 4px;
+    }
+
+    .lecture-meta {
+        font-size: 13px;
+        color: #9ca3af;
+    }
+
+    /* Quizzes */
+    .quiz-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    .quiz-card {
+        background: #1f2937;
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        border-radius: 14px;
+        padding: 24px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .quiz-card:hover {
+        border-color: #60a5fa;
+        box-shadow: 0 8px 24px rgba(96, 165, 250, 0.15);
+        transform: translateY(-4px);
+    }
+
+    .quiz-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+    }
+
+    .quiz-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #e5e7eb;
+        margin-bottom: 8px;
+    }
+
+    .quiz-meta {
+        font-size: 14px;
+        color: #9ca3af;
+        margin-bottom: 16px;
+    }
+
+    /* Students */
+    .students-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .student-card {
+        background: #1f2937;
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        border-radius: 14px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .student-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ec4899, #8b5cf6);
+        color: white;
+        font-size: 20px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .student-info {
+        flex: 1;
+    }
+
+    .student-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: #e5e7eb;
+        margin-bottom: 4px;
+    }
+
+    .student-email {
+        font-size: 13px;
+        color: #9ca3af;
+        margin-bottom: 4px;
+    }
+
+    .student-meta {
+        font-size: 12px;
+        color: #6b7280;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .empty-icon {
+        font-size: 64px;
+        margin-bottom: 16px;
+        opacity: 0.5;
+    }
+
+    .empty-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #e5e7eb;
+        margin-bottom: 8px;
+    }
+
+    .empty-description {
+        font-size: 14px;
+        color: #9ca3af;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #ec4899, #8b5cf6);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        box-shadow: 0 8px 24px rgba(236, 72, 153, 0.4);
+        transform: translateY(-2px);
+    }
+
+    .btn-success {
+        background: #10b981;
+        color: white;
+    }
+
+    .btn-success:hover {
+        background: #059669;
+        box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-danger {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #dc2626;
+        box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-sm {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+
+    .btn-lg {
+        padding: 14px 28px;
+        font-size: 16px;
+    }
+
+    /* ============================================
+   RIGHT AI PANEL
+   ============================================ */
+
+    .class-ai-panel {
+        width: 380px;
+        background: #111827;
+        border-left: 1px solid rgba(75, 85, 99, 0.3);
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        right: 0;
+        top: 0;
+        height: 100vh;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        z-index: 100;
+    }
+
+    .class-ai-panel.active {
+        transform: translateX(0);
+    }
+
+    .ai-header {
+        padding: 20px;
+        border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .ai-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #e5e7eb;
+    }
+
+    .ai-close {
+        background: transparent;
+        border: none;
+        color: #9ca3af;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 4px;
+        transition: color 0.2s;
+    }
+
+    .ai-close:hover {
+        color: #e5e7eb;
+    }
+
+    .ai-modes {
+        padding: 16px 20px;
+        border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+        display: flex;
+        gap: 8px;
+    }
+
+    .mode-btn {
+        flex: 1;
+        padding: 8px 12px;
+        background: transparent;
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        border-radius: 8px;
+        color: #9ca3af;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .mode-btn:hover {
+        border-color: #60a5fa;
+        color: #e5e7eb;
+    }
+
+    .mode-btn.active {
+        background: rgba(96, 165, 250, 0.15);
+        border-color: #60a5fa;
+        color: #60a5fa;
+    }
+
+    .ai-chat {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .ai-message {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .ai-message.user {
+        flex-direction: row-reverse;
+    }
+
+    .message-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #1f2937;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .message-content {
+        background: #1f2937;
+        padding: 12px 16px;
+        border-radius: 12px;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #e5e7eb;
+        max-width: 80%;
+    }
+
+    .ai-message.user .message-content {
+        background: linear-gradient(135deg, #ec4899, #8b5cf6);
+    }
+
+    .ai-input-container {
+        padding: 16px 20px;
+        border-top: 1px solid rgba(75, 85, 99, 0.3);
+        display: flex;
+        gap: 12px;
+    }
+
+    .ai-input {
+        flex: 1;
+        background: #1f2937;
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        border-radius: 10px;
+        padding: 12px;
+        color: #e5e7eb;
+        font-size: 14px;
+        resize: none;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+    .ai-input:focus {
+        border-color: #60a5fa;
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+    }
+
+    .ai-send {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #ec4899, #8b5cf6);
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+        transition: all 0.3s;
+        flex-shrink: 0;
+    }
+
+    .ai-send:hover {
+        box-shadow: 0 4px 16px rgba(236, 72, 153, 0.4);
+        transform: scale(1.05);
+    }
+
+    /* AI Float Button */
+    .ai-float-btn {
+        position: fixed;
+        bottom: 32px;
+        right: 32px;
+        width: 56px;
+        height: 56px;
+        background: linear-gradient(135deg, #ec4899, #8b5cf6);
+        border: none;
+        border-radius: 50%;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        box-shadow: 0 8px 24px rgba(236, 72, 153, 0.4);
+        transition: all 0.3s;
+        z-index: 90;
+    }
+
+    .ai-float-btn:hover {
+        box-shadow: 0 12px 32px rgba(236, 72, 153, 0.5);
+        transform: scale(1.1);
+    }
+
+    .ai-float-btn.hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    /* Overlay */
+    .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        z-index: 80;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+    }
+
+    .overlay.active {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    /* ============================================
+   RESPONSIVE
+   ============================================ */
+
+    @media (max-width: 1024px) {
+        .class-sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            z-index: 100;
+            transform: translateX(-100%);
+        }
+
+        .class-sidebar.active {
+            transform: translateX(0);
+        }
+
+        .mobile-header {
+            display: flex;
+        }
+
+        .class-center.ai-open {
+            margin-right: 0;
+        }
+
+        .class-ai-panel {
+            width: 100%;
+        }
+
+        .ai-float-btn {
+            bottom: 24px;
+            right: 24px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .class-header {
+            padding: 24px 20px 16px;
+        }
+
+        .class-title {
+            font-size: 24px;
+        }
+
+        .tab-container {
+            padding: 20px;
+        }
+
+        .live-banner {
+            margin: 16px 20px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .card-grid,
+        .quiz-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}

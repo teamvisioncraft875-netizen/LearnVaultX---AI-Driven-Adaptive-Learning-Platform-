@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz History - LearnVaultX{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/analytics.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="analytics-container">
+    <!-- Header -->
+    <div class="analytics-header">
+        <h1 class="analytics-title">📝 Quiz History</h1>
+        <p class="analytics-subtitle">View all your quiz attempts and performance</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-container">
+        <div class="filter-group">
+            <label class="filter-label">Filter by Class</label>
+            <select class="filter-select" id="class-filter">
+                <option value="">All Classes</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label class="filter-label">Sort By</label>
+            <select class="filter-select" id="sort-filter">
+                <option value="date">Date (Newest First)</option>
+                <option value="score">Score (Highest First)</option>
+                <option value="time">Time Taken</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label class="filter-label">Difficulty</label>
+            <select class="filter-select" id="difficulty-filter">
+                <option value="">All Difficulties</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Quiz History Table -->
+    <div class="quiz-table-container">
+        <table class="quiz-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Quiz Title</th>
+                    <th>Class</th>
+                    <th>Score</th>
+                    <th>Questions</th>
+                    <th>Correct</th>
+                    <th>Wrong</th>
+                    <th>Accuracy</th>
+                    <th>Time Taken</th>
+                    <th>Date</th>
+                    <th>Difficulty</th>
+                </tr>
+            </thead>
+            <tbody id="quiz-history-tbody">
+                <tr>
+                    <td colspan="11" style="text-align: center; padding: var(--space-6);">
+                        <div class="loading-skeleton" style="height: 40px;"></div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div
+        style="display: flex; justify-content: center; align-items: center; gap: var(--space-3); margin-top: var(--space-4);">
+        <button class="btn btn-secondary btn-sm" id="prev-btn" disabled>← Previous</button>
+        <span id="page-info" style="color: var(--text-secondary);">Page 1 of 1</span>
+        <button class="btn btn-secondary btn-sm" id="next-btn" disabled>Next →</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentPage = 1;
+    let totalPages = 1;
+    let allAttempts = [];
+    let filteredAttempts = [];
+
+    // Load quiz history
+    async function loadQuizHistory() {
+        try {
+            const classFilter = document.getElementById('class-filter').value;
+            const sortBy = document.getElementById('sort-filter').value;
+
+            const params = new URLSearchParams({
+                sort: sortBy,
+                page: currentPage,
+                per_page: 10
+            });
+
+            if (classFilter) {
+                params.append('class_id', classFilter);
+            }
+
+            const response = await fetch(`/api/student/quiz-history?${params}`);
+            const data = await response.json();
+
+            console.log('Quiz history data:', data);
+
+            allAttempts = data.attempts;
+            totalPages = data.total_pages;
+
+            applyFilters();
+            displayQuizHistory();
+            updatePagination();
+
+        } catch (error) {
+            console.error('Error loading quiz history:', error);
+        }
+    }
+
+    function applyFilters() {
+        const difficultyFilter = document.getElementById('difficulty-filter').value;
+
+        filteredAttempts = allAttempts;
+
+        if (difficultyFilter) {
+            filteredAttempts = filteredAttempts.filter(a =>
+                a.difficulty.toLowerCase() === difficultyFilter
+            );
+        }
+    }
+
+    function displayQuizHistory() {
+        const tbody = document.getElementById('quiz-history-tbody');
+
+        if (filteredAttempts.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="11" style="text-align: center; padding: var(--space-6); color: var(--text-secondary);">
+                        No quiz attempts found. Start taking quizzes to see your history!
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = filteredAttempts.map((attempt, index) => {
+            const scoreClass = attempt.score_percent >= 80 ? 'high' : attempt.score_percent >= 60 ? 'medium' : 'low';
+            const accuracy = ((attempt.correct_answers / attempt.total_questions) * 100).toFixed(1);
+            const date = new Date(attempt.submitted_at);
+            const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            return `
+                <tr>
+                    <td>${(currentPage - 1) * 10 + index + 1}</td>
+                    <td style="font-weight: 500;">${attempt.quiz_title}</td>
+                    <td>${attempt.class_name}</td>
+                    <td>
+                        <span class="score-badge ${scoreClass}">
+                            ${attempt.score_percent}%
+                        </span>
+                    </td>
+                    <td>${attempt.total_questions}</td>
+                    <td style="color: var(--accent-success);">${attempt.correct_answers}</td>
+                    <td style="color: var(--accent-danger);">${attempt.wrong_answers}</td>
+                    <td>${accuracy}%</td>
+                    <td>${attempt.time_taken_minutes} min</td>
+                    <td style="font-size: var(--text-sm);">${formattedDate}</td>
+                    <td>
+                        <span class="difficulty-badge ${attempt.difficulty.toLowerCase()}">
+                            ${attempt.difficulty}
+                        </span>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function updatePagination() {
+        document.getElementById('page-info').textContent = `Page ${currentPage} of ${totalPages}`;
+        document.getElementById('prev-btn').disabled = currentPage === 1;
+        document.getElementById('next-btn').disabled = currentPage === totalPages;
+    }
+
+    // Event listeners
+    document.getElementById('class-filter').addEventListener('change', () => {
+        currentPage = 1;
+        loadQuizHistory();
+    });
+
+    document.getElementById('sort-filter').addEventListener('change', () => {
+        currentPage = 1;
+        loadQuizHistory();
+    });
+
+    document.getElementById('difficulty-filter').addEventListener('change', () => {
+        applyFilters();
+        displayQuizHistory();
+    });
+
+    document.getElementById('prev-btn').addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            loadQuizHistory();
+        }
+    });
+
+    document.getElementById('next-btn').addEventListener('click', () => {
+        if (currentPage < totalPages) {
+            currentPage++;
+            loadQuizHistory();
+        }
+    });
+
+    // Load class options
+    async function loadClassOptions() {
+        try {
+            const response = await fetch('/api/student/analytics');
+            const data = await response.json();
+
+            const classFilter = document.getElementById('class-filter');
+            const classes = new Set();
+
+            data.quiz_attempts.forEach(attempt => {
+                classes.add(JSON.stringify({ id: attempt.class_id, name: attempt.class_name }));
+            });
+
+            Array.from(classes).forEach(classStr => {
+                const cls = JSON.parse(classStr);
+                const option = document.createElement('option');
+                option.value = cls.id;
+                option.textContent = cls.name;
+                classFilter.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error loading class options:', error);
+        }
+    }
+
+    // Load on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        loadClassOptions();
+        loadQuizHistory();
+    });
+</script>
+{% endblock %}

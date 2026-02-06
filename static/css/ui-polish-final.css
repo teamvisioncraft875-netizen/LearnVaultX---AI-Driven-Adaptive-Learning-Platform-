@@ -1,0 +1,636 @@
+/* ============================================================================
+   LEARNVAULTX UI/UX POLISH & FUTURISTIC MODE ENHANCEMENT
+   Final polish layer for premium feel
+   ============================================================================ */
+
+/* ============================================================================
+   1️⃣ ENHANCED FUTURISTIC MODE (Dark Mode + Controlled Energy)
+   ============================================================================ */
+
+[data-theme="futuristic"] {
+    /* Base Colors - DO NOT CHANGE (Same as Dark Mode) */
+    --bg-primary: #0B1220;
+    --bg-secondary: #0F172A;
+    --bg-tertiary: #111C33;
+
+    --text-primary: #E5E7EB;
+    --text-secondary: #94A3B8;
+    --text-tertiary: #64748B;
+
+    /* Futuristic Accent Colors (Subtle Neon) */
+    --fx-accent-blue: #38BDF8;
+    --fx-accent-cyan: #22D3EE;
+    --fx-accent-violet: #818CF8;
+    --fx-accent-glow: rgba(56, 189, 248, 0.25);
+
+    /* Borders & Glows */
+    --fx-border: rgba(56, 189, 248, 0.35);
+    --fx-border-subtle: rgba(56, 189, 248, 0.15);
+    --fx-glow-soft: 0 0 24px rgba(56, 189, 248, 0.18);
+    --fx-glow-strong: 0 0 40px rgba(56, 189, 248, 0.30);
+
+    /* Override theme variables */
+    --primary: #38BDF8;
+    --primary-hover: #22D3EE;
+    --primary-light: rgba(56, 189, 248, 0.1);
+
+    --surface: var(--bg-secondary);
+    --surface-hover: var(--bg-tertiary);
+
+    --border-primary: var(--fx-border-subtle);
+    --border-secondary: var(--fx-border);
+}
+
+/* Futuristic Cards with Subtle Glow */
+[data-theme="futuristic"] .card,
+[data-theme="futuristic"] .action-card,
+[data-theme="futuristic"] .class-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--fx-border);
+    box-shadow: var(--fx-glow-soft);
+}
+
+[data-theme="futuristic"] .action-card:hover,
+[data-theme="futuristic"] .class-card:hover {
+    border-color: var(--fx-accent-cyan);
+    box-shadow: var(--fx-glow-strong);
+}
+
+/* Futuristic Buttons */
+[data-theme="futuristic"] .btn-primary {
+    background: linear-gradient(135deg, #38BDF8, #818CF8);
+    color: #020617;
+    border: none;
+    box-shadow: var(--fx-glow-soft);
+}
+
+[data-theme="futuristic"] .btn-primary:hover {
+    box-shadow: var(--fx-glow-strong);
+    transform: translateY(-2px);
+}
+
+/* Futuristic Active States */
+[data-theme="futuristic"] .nav-item.active,
+[data-theme="futuristic"] .mode-btn.active {
+    color: var(--fx-accent-blue);
+    text-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+    border-color: var(--fx-border);
+}
+
+/* ============================================================================
+   2️⃣ KYKNOX AI PANEL - PIXEL-PERFECT REDESIGN
+   ============================================================================ */
+
+/* Panel Container */
+.kyknox-panel,
+.right-zone#ai-panel {
+    width: 360px;
+    height: 100vh;
+    background: linear-gradient(180deg, #0F172A, #0B1220);
+    border-left: 1px solid rgba(56, 189, 248, 0.25);
+    box-shadow: -12px 0 40px rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header Section */
+.ai-panel-header,
+.kyknox-header {
+    height: 64px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+    flex-shrink: 0;
+}
+
+.ai-panel-title,
+.kyknox-title-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.ai-branding {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ai-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+}
+
+.ai-title-text,
+.kyknox-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #E5E7EB;
+    margin: 0;
+}
+
+.ai-tagline,
+.kyknox-subtitle {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.ai-panel-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ai-panel-close:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(56, 189, 248, 0.4);
+    color: #38BDF8;
+}
+
+/* Voice Controls */
+.voice-control-bar {
+    display: flex;
+    gap: 8px;
+    padding: 8px 16px;
+    border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+}
+
+.voice-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.voice-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(56, 189, 248, 0.3);
+}
+
+.voice-btn.enabled {
+    color: #38BDF8;
+    border-color: rgba(56, 189, 248, 0.3);
+}
+
+/* Mode Switcher */
+.ai-mode-switcher,
+.kyknox-modes {
+    display: flex;
+    gap: 8px;
+    padding: 8px 16px;
+    border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+}
+
+.ai-mode-btn,
+.mode-btn {
+    flex: 1;
+    height: 32px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ai-mode-btn:hover,
+.mode-btn:hover {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(56, 189, 248, 0.2);
+}
+
+.ai-mode-btn.active,
+.mode-btn.active {
+    color: #38BDF8;
+    border-color: rgba(56, 189, 248, 0.35);
+    background: rgba(56, 189, 248, 0.08);
+    box-shadow: inset 0 0 12px rgba(56, 189, 248, 0.15);
+}
+
+/* Chat Area */
+.ai-chat-area,
+.kyknox-chat {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* AI Welcome Message */
+.ai-welcome {
+    text-align: center;
+    padding: var(--space-8);
+    opacity: 0.8;
+}
+
+.ai-welcome-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-4);
+}
+
+.ai-welcome h3 {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    margin-bottom: var(--space-2);
+    color: var(--text-primary);
+}
+
+.ai-welcome p {
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+}
+
+/* AI Messages */
+.ai-message {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    animation: aiFade 220ms ease-out;
+}
+
+@keyframes aiFade {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ai-message-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(56, 189, 248, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 16px;
+}
+
+.ai-message.bot .ai-message-avatar {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(129, 140, 248, 0.2));
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.ai-message.user .ai-message-avatar {
+    background: linear-gradient(135deg, #38BDF8, #818CF8);
+    color: #020617;
+}
+
+.ai-message-content {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+.ai-message.bot .ai-message-content {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(56, 189, 248, 0.15);
+    color: #E5E7EB;
+}
+
+.ai-message.user .ai-message-content {
+    background: linear-gradient(135deg, #38BDF8, #818CF8);
+    color: #020617;
+    font-weight: 500;
+}
+
+/* Input Area */
+.ai-input-area,
+.kyknox-input {
+    padding: 12px 16px;
+    border-top: 1px solid rgba(56, 189, 248, 0.2);
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.ai-input-wrapper {
+    flex: 1;
+    display: flex;
+    gap: 8px;
+}
+
+.ai-input,
+.kyknox-input input {
+    flex: 1;
+    height: 40px;
+    background: #020617;
+    border-radius: 10px;
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    color: #E5E7EB;
+    padding: 0 12px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.ai-input:focus,
+.kyknox-input input:focus {
+    outline: none;
+    border-color: rgba(56, 189, 248, 0.5);
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+}
+
+.ai-input-btn,
+.send-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #38BDF8, #818CF8);
+    border: none;
+    color: #020617;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.ai-input-btn:hover,
+.send-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+}
+
+.ai-input-btn:active,
+.send-btn:active {
+    transform: scale(0.95);
+}
+
+/* ============================================================================
+   3️⃣ GLOBAL UI IMPROVEMENTS
+   ============================================================================ */
+
+/* Premium Button Feel */
+.btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+}
+
+.btn:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Card Hover Lift */
+.card,
+.action-card,
+.class-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover,
+.action-card:hover,
+.class-card:hover {
+    transform: translateY(-4px);
+}
+
+/* Smooth Transitions for All Interactive Elements */
+button,
+a,
+input,
+textarea,
+select {
+    transition: all 0.2s ease;
+}
+
+/* Focus States */
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+/* ============================================================================
+   4️⃣ MICRO-ANIMATIONS
+   ============================================================================ */
+
+/* Fade In Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Slide In Animation */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Scale In Animation */
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.scale-in {
+    animation: scaleIn 0.2s ease-out;
+}
+
+/* Pulse Animation for Loading */
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ============================================================================
+   5️⃣ RESPONSIVE ADJUSTMENTS
+   ============================================================================ */
+
+@media (max-width: 1024px) {
+
+    .kyknox-panel,
+    .right-zone#ai-panel {
+        width: 320px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .kyknox-panel,
+    .right-zone#ai-panel {
+        width: 100%;
+        max-width: 100vw;
+    }
+
+    .ai-panel-header {
+        height: 56px;
+        padding: 12px;
+    }
+
+    .ai-mode-switcher {
+        padding: 6px 12px;
+    }
+
+    .ai-mode-btn {
+        font-size: 11px;
+        height: 28px;
+    }
+}
+
+/* ============================================================================
+   6️⃣ ACCESSIBILITY ENHANCEMENTS
+   ============================================================================ */
+
+/* Keyboard Focus Indicators */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    .ai-message.bot .ai-message-content {
+        border-width: 2px;
+    }
+
+    .btn {
+        border: 2px solid currentColor;
+    }
+}
+
+/* ============================================================================
+   7️⃣ POLISH FIXES
+   ============================================================================ */
+
+/* Ensure Smooth Scrolling */
+.ai-chat-area,
+.kyknox-chat {
+    scroll-behavior: smooth;
+}
+
+/* Hide Scrollbar but Keep Functionality */
+.ai-chat-area::-webkit-scrollbar,
+.kyknox-chat::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ai-chat-area::-webkit-scrollbar-track,
+.kyknox-chat::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.ai-chat-area::-webkit-scrollbar-thumb,
+.kyknox-chat::-webkit-scrollbar-thumb {
+    background: rgba(56, 189, 248, 0.2);
+    border-radius: 3px;
+}
+
+.ai-chat-area::-webkit-scrollbar-thumb:hover,
+.kyknox-chat::-webkit-scrollbar-thumb:hover {
+    background: rgba(56, 189, 248, 0.3);
+}
+
+/* Prevent Text Selection on Buttons */
+.btn,
+.ai-mode-btn,
+.mode-btn {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Smooth Color Transitions */
+* {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-duration: 0.2s;
+    transition-timing-function: ease;
+}
+
+/* Override for animations */
+*[class*="animate"],
+*[class*="transition"] {
+    transition-property: all;
+}

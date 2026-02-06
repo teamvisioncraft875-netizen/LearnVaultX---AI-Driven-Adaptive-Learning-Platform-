@@ -1,409 +1,139 @@
 """
-Seed script to populate database with demo data for testing and hackathon demo
+Seed the database with test data for demonstration
 """
-
 import sqlite3
-import json
-from werkzeug.security import generate_password_hash
+import hashlib
+from datetime import datetime
+
+def hash_password(password):
+    """Hash password using SHA-256"""
+    return hashlib.sha256(password.encode()).hexdigest()
 
 def seed_database():
-    # Connect to database
-    db = sqlite3.connect('education.db')
-    cursor = db.cursor()
+    """Populate database with test data"""
+    conn = sqlite3.connect('learnvaultx.db')
+    c = conn.cursor()
     
-    print("[SEED] Seeding database with demo data...")
+    print("🌱 Seeding database with test data...")
     
-    # Clear existing data (in reverse order to respect foreign key constraints)
-    print("Clearing existing data...")
-    tables = [
-        'ai_context_sessions', 'teacher_interventions', 'topic_mastery', 'learning_paths',
-        'recommendations', 'knowledge_gaps', 'question_topics', 'topics',
-        'messages', 'quiz_submissions', 'quiz_questions', 'quizzes', 'lectures',
-        'enrollments', 'classes', 'users'
-    ]
+    # Check if students already have classes
+    c.execute('SELECT COUNT(*) FROM classes WHERE teacher_id = 2')
+    existing_classes = c.fetchone()[0]
     
-    for table in tables:
-        try:
-            cursor.execute(f'DELETE FROM {table}')
-        except:
-            pass  # Table might not exist
+    if existing_classes > 0:
+        print(f"✅ Database already has {existing_classes} class(es). Skipping seed.")
+        conn.close()
+        return
     
-    db.commit()
-    print("[OK] Cleared existing data")
-    
-    # Create users (teachers and students)
-    print("Creating users...")
-    
-    users = [
-        # Teachers
-        ('Dr. Sarah Johnson', 'teacher1@edu.com', 'password123', 'teacher'),
-        ('Prof. Michael Chen', 'teacher2@edu.com', 'password123', 'teacher'),
+    try:
+        # Create sample classes for teacher
+        classes_data = [
+            ('Introduction to Python Programming', 'Learn Python from scratch - variables, loops, functions, and OOP', 2),
+            ('Web Development with Flask', 'Build modern web applications using Flask framework', 2),
+            ('Data Structures and Algorithms', 'Master fundamental CS concepts and problem-solving techniques', 2),
+        ]
         
-        # Students
-        ('Alice Smith', 'student1@edu.com', 'password123', 'student'),
-        ('Bob Wilson', 'student2@edu.com', 'password123', 'student'),
-        ('Charlie Brown', 'student3@edu.com', 'password123', 'student'),
-        ('Diana Prince', 'student4@edu.com', 'password123', 'student'),
-        ('Ethan Hunt', 'student5@edu.com', 'password123', 'student'),
-    ]
-    
-    for name, email, password, role in users:
-        password_hash = generate_password_hash(password)
-        cursor.execute(
-            'INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)',
-            (name, email, password_hash, role)
-        )
-    
-    db.commit()
-    print(f"[OK] Created {len(users)} users")
-    
-    # Create classes
-    print("Creating classes...")
-    
-    classes = [
-        (1, 'Data Structures and Algorithms', 'Learn fundamental data structures and algorithms for efficient problem solving'),
-        (1, 'Web Development Fundamentals', 'Master HTML, CSS, JavaScript and modern web development'),
-        (2, 'Artificial Intelligence', 'Introduction to AI, machine learning, and neural networks'),
-    ]
-    
-    for teacher_id, title, description in classes:
-        cursor.execute(
-            'INSERT INTO classes (teacher_id, title, description) VALUES (?, ?, ?)',
-            (teacher_id, title, description)
-        )
-    
-    db.commit()
-    print(f"[OK] Created {len(classes)} classes")
-    
-    # Enroll students in classes
-    print("Enrolling students...")
-    
-    enrollments = [
-        (3, 1), (3, 2),  # Alice in DSA and Web Dev
-        (4, 1), (4, 3),  # Bob in DSA and AI
-        (5, 1), (5, 2), (5, 3),  # Charlie in all classes
-        (6, 2), (6, 3),  # Diana in Web Dev and AI
-        (7, 1),  # Ethan in DSA
-    ]
-    
-    for student_id, class_id in enrollments:
-        cursor.execute(
-            'INSERT INTO enrollments (student_id, class_id) VALUES (?, ?)',
-            (student_id, class_id)
-        )
-    
-    db.commit()
-    print(f"[OK] Created {len(enrollments)} enrollments")
-    
-    # Create some sample lectures (file paths would be actual uploaded files in production)
-    print("Creating sample lectures...")
-    
-    lectures = [
-        (1, 'arrays_and_linked_lists.pdf', 'static/uploads/arrays_and_linked_lists.pdf'),
-        (1, 'trees_and_graphs.pdf', 'static/uploads/trees_and_graphs.pdf'),
-        (2, 'html_css_basics.pdf', 'static/uploads/html_css_basics.pdf'),
-        (2, 'javascript_fundamentals.pdf', 'static/uploads/javascript_fundamentals.pdf'),
-        (3, 'intro_to_ml.pdf', 'static/uploads/intro_to_ml.pdf'),
-    ]
-    
-    for class_id, filename, filepath in lectures:
-        cursor.execute(
-            'INSERT INTO lectures (class_id, filename, filepath) VALUES (?, ?, ?)',
-            (class_id, filename, filepath)
-        )
-    
-    db.commit()
-    print(f"[OK] Created {len(lectures)} lectures")
-    
-    # Create quizzes
-    print("Creating quizzes...")
-    
-    quizzes = [
-        (1, 'Arrays and Linked Lists Quiz'),
-        (1, 'Binary Trees Assessment'),
-        (2, 'HTML & CSS Quiz'),
-        (3, 'Machine Learning Basics'),
-    ]
-    
-    for class_id, title in quizzes:
-        cursor.execute(
-            'INSERT INTO quizzes (class_id, title) VALUES (?, ?)',
-            (class_id, title)
-        )
-    
-    db.commit()
-    print(f"[OK] Created {len(quizzes)} quizzes")
-    
-    # Create quiz questions
-    print("Creating quiz questions...")
-    
-    # Quiz 1: Arrays and Linked Lists
-    quiz_1_questions = [
-        {
-            'quiz_id': 1,
-            'question': 'What is the time complexity of accessing an element in an array by index?',
-            'options': ['O(1)', 'O(n)', 'O(log n)', 'O(n^2)'],
-            'correct': 0
-        },
-        {
-            'quiz_id': 1,
-            'question': 'Which operation is more efficient in a linked list compared to an array?',
-            'options': ['Random access', 'Insertion at beginning', 'Binary search', 'Sorting'],
-            'correct': 1
-        },
-        {
-            'quiz_id': 1,
-            'question': 'What is the space complexity of an array of size n?',
-            'options': ['O(1)', 'O(log n)', 'O(n)', 'O(n^2)'],
-            'correct': 2
-        },
-    ]
-    
-    # Quiz 2: Binary Trees
-    quiz_2_questions = [
-        {
-            'quiz_id': 2,
-            'question': 'What is the maximum number of nodes at level k in a binary tree?',
-            'options': ['k', '2^k', '2k', 'k^2'],
-            'correct': 1
-        },
-        {
-            'quiz_id': 2,
-            'question': 'Which traversal visits the root node first?',
-            'options': ['Inorder', 'Preorder', 'Postorder', 'Level order'],
-            'correct': 1
-        },
-    ]
-    
-    # Quiz 3: HTML & CSS
-    quiz_3_questions = [
-        {
-            'quiz_id': 3,
-            'question': 'Which HTML tag is used for the largest heading?',
-            'options': ['<h6>', '<h1>', '<heading>', '<head>'],
-            'correct': 1
-        },
-        {
-            'quiz_id': 3,
-            'question': 'What does CSS stand for?',
-            'options': ['Computer Style Sheets', 'Cascading Style Sheets', 'Creative Style Sheets', 'Colorful Style Sheets'],
-            'correct': 1
-        },
-        {
-            'quiz_id': 3,
-            'question': 'Which property is used to change the background color?',
-            'options': ['bgcolor', 'color', 'background-color', 'bg-color'],
-            'correct': 2
-        },
-    ]
-    
-    # Quiz 4: Machine Learning
-    quiz_4_questions = [
-        {
-            'quiz_id': 4,
-            'question': 'What type of machine learning uses labeled data?',
-            'options': ['Unsupervised', 'Supervised', 'Reinforcement', 'Transfer'],
-            'correct': 1
-        },
-        {
-            'quiz_id': 4,
-            'question': 'Which of these is a classification algorithm?',
-            'options': ['Linear Regression', 'K-Means', 'Decision Tree', 'PCA'],
-            'correct': 2
-        },
-    ]
-    
-    all_questions = quiz_1_questions + quiz_2_questions + quiz_3_questions + quiz_4_questions
-    
-    for q in all_questions:
-        cursor.execute(
-            'INSERT INTO quiz_questions (quiz_id, question_text, options, correct_option_index) VALUES (?, ?, ?, ?)',
-            (q['quiz_id'], q['question'], json.dumps(q['options']), q['correct'])
-        )
-    
-    db.commit()
-    print(f"[OK] Created {len(all_questions)} quiz questions")
-    
-    # Create some sample quiz submissions
-    print("Creating sample quiz submissions...")
-    
-    submissions = [
-        (1, 3, 3, 3, 45),  # Alice scored 3/3 in Quiz 1, took 45 seconds
-        (1, 4, 2, 3, 120), # Bob scored 2/3 in Quiz 1, took 120 seconds
-        (1, 5, 3, 3, 30),  # Charlie scored 3/3 in Quiz 1, took 30 seconds
-        (2, 3, 2, 2, 60),  # Alice scored 2/2 in Quiz 2, took 60 seconds
-        (2, 5, 1, 2, 90),  # Charlie scored 1/2 in Quiz 2, took 90 seconds
-        (3, 3, 3, 3, 50),  # Alice scored 3/3 in Quiz 3
-        (3, 6, 2, 3, 75),  # Diana scored 2/3 in Quiz 3
-    ]
-    
-    for quiz_id, student_id, score, total, duration in submissions:
-        cursor.execute(
-            'INSERT INTO quiz_submissions (quiz_id, student_id, score, total, duration_seconds) VALUES (?, ?, ?, ?, ?)',
-            (quiz_id, student_id, score, total, duration)
-        )
-    
-    db.commit()
-    print(f"[OK] Created {len(submissions)} quiz submissions")
-    
-    # Create some chat messages
-    print("Creating sample chat messages...")
-    
-    messages = [
-        (1, 3, 'Hello everyone! Looking forward to learning DSA!'),
-        (1, 1, 'Welcome to the class, Alice! Feel free to ask questions anytime.'),
-        (1, 4, 'Can someone explain the difference between arrays and linked lists?'),
-        (1, 3, 'Arrays have contiguous memory, linked lists use pointers!'),
-        (2, 3, 'I love web development! 💻'),
-        (2, 6, 'Me too! CSS is so powerful.'),
-    ]
-    
-    for class_id, user_id, message in messages:
-        cursor.execute(
-            'INSERT INTO chat_messages (class_id, user_id, message) VALUES (?, ?, ?)',
-            (class_id, user_id, message)
-        )
-    
-    db.commit()
-    print(f"[OK] Created {len(messages)} chat messages")
-    
-    # Create Topics for Knowledge Gap Tracking
-    print("Creating topics for adaptive learning...")
-    
-    topics_data = [
-        # DSA Class (class_id=1)
-        (1, 'Arrays', 'Array data structures and operations'),
-        (1, 'Linked Lists', 'Single and double linked lists'),
-        (1, 'Trees', 'Binary trees, BST, and tree traversals'),
-        (1, 'Graphs', 'Graph representations and algorithms'),
-        (1, 'Time Complexity', 'Big O notation and complexity analysis'),
+        class_ids = []
+        for title, desc, teacher_id in classes_data:
+            c.execute('INSERT INTO classes (title, description, teacher_id) VALUES (?, ?, ?)',
+                     (title, desc, teacher_id))
+            class_ids.append(c.lastrowid)
+            print(f"  ✓ Created class: {title}")
         
-        # Web Dev Class (class_id=2)
-        (2, 'HTML Basics', 'HTML tags, elements, and structure'),
-        (2, 'CSS Styling', 'CSS selectors, properties, and layout'),
-        (2, 'JavaScript Fundamentals', 'Variables, functions, and control flow'),
-        (2, 'Responsive Design', 'Media queries and mobile-first design'),
+        # Enroll student in first two classes
+        for class_id in class_ids[:2]:
+            c.execute('INSERT INTO enrollments (student_id, class_id) VALUES (?, ?)',
+                     (1, class_id))
+            print(f"  ✓ Enrolled student in class ID {class_id}")
         
-        # AI Class (class_id=3)
-        (3, 'Machine Learning Basics', 'Supervised vs unsupervised learning'),
-        (3, 'Classification Algorithms', 'Decision trees, SVM, KNN'),
-        (3, 'Regression', 'Linear and polynomial regression'),
-        (3, 'Neural Networks', 'Perceptrons and deep learning basics'),
-    ]
-    
-    for class_id, topic_name, description in topics_data:
-        cursor.execute(
-            'INSERT INTO topics (class_id, topic_name, description) VALUES (?, ?, ?)',
-            (class_id, topic_name, description)
-        )
-    
-    db.commit()
-    print(f"[OK] Created {len(topics_data)} topics")
-    
-    # Assign topics to quiz questions (for knowledge gap detection)
-    print("Assigning topics to questions...")
-    
-    # Get question IDs (we know from earlier quiz creation)
-    # Quiz 1 questions (DSA): Array & Time Complexity topics
-    cursor.execute('SELECT id FROM quiz_questions WHERE quiz_id = 1')
-    quiz_1_questions = [row[0] for row in cursor.fetchall()]
-    
-    # Assign to Arrays and Time Complexity topics
-    for q_id in quiz_1_questions[:2]:
-        cursor.execute('INSERT INTO question_topics (question_id, topic_id) VALUES (?, ?)', (q_id, 1))  # Arrays
-    for q_id in quiz_1_questions[2:]:
-        cursor.execute('INSERT INTO question_topics (question_id, topic_id) VALUES (?, ?)', (q_id, 5))  # Time Complexity
-    
-    # Quiz 2 questions (Trees)
-    cursor.execute('SELECT id FROM quiz_questions WHERE quiz_id = 2')
-    quiz_2_questions = [row[0] for row in cursor.fetchall()]
-    for q_id in quiz_2_questions:
-        cursor.execute('INSERT INTO question_topics (question_id, topic_id) VALUES (?, ?)', (q_id, 3))  # Trees
-    
-    # Quiz 3 questions (HTML/CSS)
-    cursor.execute('SELECT id FROM quiz_questions WHERE quiz_id = 3')
-    quiz_3_questions = [row[0] for row in cursor.fetchall()]
-    cursor.execute('INSERT INTO question_topics (question_id, topic_id) VALUES (?, ?)', (quiz_3_questions[0], 6))  # HTML
-    for q_id in quiz_3_questions[1:]:
-        cursor.execute('INSERT INTO question_topics (question_id, topic_id) VALUES (?, ?)', (q_id, 7))  # CSS
-    
-    # Quiz 4 questions (ML)
-    cursor.execute('SELECT id FROM quiz_questions WHERE quiz_id = 4')
-    quiz_4_questions = [row[0] for row in cursor.fetchall()]
-    cursor.execute('INSERT INTO question_topics (question_id, topic_id) VALUES (?, ?)', (quiz_4_questions[0], 10))  # ML Basics
-    cursor.execute('INSERT INTO question_topics (question_id, topic_id) VALUES (?, ?)', (quiz_4_questions[1], 11))  # Classification
-    
-    db.commit()
-    print("[OK] Assigned topics to questions")
-    
-    # Calculate and insert student metrics
-    print("Calculating student metrics...")
-    
-    # Get all students who have submitted quizzes
-    cursor.execute('''
-        SELECT DISTINCT student_id, class_id 
-        FROM quiz_submissions qs
-        JOIN quizzes q ON qs.quiz_id = q.id
-    ''')
-    
-    student_class_pairs = cursor.fetchall()
-    
-    for student_id, class_id in student_class_pairs:
-        # Get quiz submissions for this student in this class
-        cursor.execute('''
-            SELECT score, total, duration_seconds
-            FROM quiz_submissions qs
-            JOIN quizzes q ON qs.quiz_id = q.id
-            WHERE qs.student_id = ? AND q.class_id = ?
-        ''', (student_id, class_id))
+        # Add sample lectures to first class
+        lectures_data = [
+            (class_ids[0], 'python_basics.pdf', 'static/uploads/python_basics.pdf', 2048000),
+            (class_ids[0], 'python_functions.pdf', 'static/uploads/python_functions.pdf', 1536000),
+        ]
         
-        submissions = cursor.fetchall()
+        for class_id, filename, filepath, filesize in lectures_data:
+            c.execute('INSERT INTO lectures (class_id, filename, filepath, file_size) VALUES (?, ?, ?, ?)',
+                     (class_id, filename, filepath, filesize))
+            print(f"  ✓ Added lecture: {filename}")
         
-        if submissions:
-            total_score = sum(s[0] for s in submissions)
-            total_possible = sum(s[1] for s in submissions)
-            accuracy = total_score / total_possible if total_possible > 0 else 0
-            
-            avg_time = sum(s[2] for s in submissions) / len(submissions)
-            speed = min(1, 60 / (avg_time + 1))
-            
-            # Get chat engagement
-            cursor.execute(
-                'SELECT COUNT(*) FROM chat_messages WHERE user_id = ? AND class_id = ?',
-                (student_id, class_id)
-            )
-            chat_count = cursor.fetchone()[0]
-            engagement = min(1, chat_count / 20)
-            
-            # Calculate pace score (0-10)
-            pace_score = round(10 * (0.5 * accuracy + 0.3 * speed + 0.2 * engagement), 1)
-            rating = min(10, pace_score)
-            
-            cursor.execute('''
-                INSERT INTO student_metrics
-                (user_id, class_id, score_avg, avg_time, pace_score, rating)
-                VALUES (?, ?, ?, ?, ?, ?)
-            ''', (student_id, class_id, round(accuracy * 100, 1), round(avg_time, 1), pace_score, rating))
-    
-    db.commit()
-    print(f"[OK] Calculated metrics for {len(student_class_pairs)} student-class pairs")
-    
-    # Close connection
-    db.close()
-    
-    print("\n[SUCCESS] Database seeding complete!")
-    print("\nDemo Accounts:")
-    print("\nTeachers:")
-    print("   teacher1@edu.com / password123")
-    print("   teacher2@edu.com / password123")
-    print("\nStudents:")
-    print("   student1@edu.com / password123")
-    print("   student2@edu.com / password123")
-    print("   student3@edu.com / password123")
-    print("   student4@edu.com / password123")
-    print("   student5@edu.com / password123")
-    print("\nReady to demo! Run: python app.py\n")
+        # Add sample quiz to first class
+        c.execute('''INSERT INTO quizzes (class_id, title, description) 
+                     VALUES (?, ?, ?)''',
+                  (class_ids[0], 'Python Basics Quiz', 'Test your understanding of Python fundamentals'))
+        quiz_id = c.lastrowid
+        print(f"  ✓ Created quiz: Python Basics Quiz")
+        
+        # Add quiz questions
+        questions = [
+            {
+                'quiz_id': quiz_id,
+                'question_text': 'What is the correct way to declare a variable in Python?',
+                'options': '["x = 5", "var x = 5", "let x = 5", "int x = 5"]',
+                'correct_option_index': 0,
+                'explanation': 'In Python, variables are declared by simply assigning a value'
+            },
+            {
+                'quiz_id': quiz_id,
+                'question_text': 'Which data type is used for text in Python?',
+                'options': '["string", "text", "char", "varchar"]',
+                'correct_option_index': 0,
+                'explanation': 'Python uses the str (string) data type for text'
+            },
+            {
+                'quiz_id': quiz_id,
+                'question_text': 'What does the print() function do?',
+                'options': '["Outputs text to console", "Saves to file", "Creates a variable", "None of these"]',
+                'correct option_index': 0,
+                'explanation': 'print() outputs text or data to the console/terminal'
+            }
+        ]
+        
+        for q in questions:
+            c.execute('''INSERT INTO quiz_questions 
+                        (quiz_id, question_text, options, correct_option_index, explanation)
+                        VALUES (?, ?, ?, ?, ?)''',
+                     (q['quiz_id'], q['question_text'], q['options'], 
+                      q['correct_option_index'], q['explanation']))
+        
+        print(f"  ✓ Added {len(questions)} quiz questions")
+        
+        # Add student metrics for enrolled classes
+        c.execute('''INSERT INTO student_metrics 
+                     (user_id, class_id, rating, quizzes_taken, avg_score, engagement_level)
+                     VALUES (?, ?, ?, ?, ?, ?)''',
+                  (1, class_ids[0], 75, 0, 0, 0.7))
+        print("  ✓ Added student metrics")
+        
+        # Add some AI recommendations
+        recommendations = [
+            'Practice Python list comprehensions with coding exercises',
+            'Review Python function parameters and return values',
+            'Complete additional practice on loops and conditionals'
+        ]
+        
+        for rec_text in recommendations:
+            c.execute('''INSERT INTO recommendations 
+                        (user_id, class_id, recommendation, priority, reason)
+                        VALUES (?, ?, ?, ?, ?)''',
+                     (1, class_ids[0], rec_text, 5, 'Based on quiz performance analysis'))
+        
+        print(f"  ✓ Added {len(recommendations)} AI recommendations")
+        
+        conn.commit()
+        print("\n✅ Database seeded successfully!")
+        print(f"\n📊 Summary:")
+        print(f"   - {len(classes_data)} classes created")
+        print(f"   - 2 enrollments created")
+        print(f"   - {len(lectures_data)} lectures added")
+        print(f"   - 1 quiz with {len(questions)} questions")
+        print(f"   - {len(recommendations)} AI recommendations")
+        
+    except Exception as e:
+        print(f"\n❌ Error seeding database: {e}")
+        conn.rollback()
+    finally:
+        conn.close()
 
 if __name__ == '__main__':
     seed_database()
-

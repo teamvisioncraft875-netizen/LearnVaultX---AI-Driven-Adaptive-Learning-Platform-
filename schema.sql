@@ -76,6 +76,7 @@ CREATE TABLE IF NOT EXISTS quiz_submissions (
     student_id INTEGER NOT NULL,
     score INTEGER NOT NULL,
     total INTEGER NOT NULL,
+    answers TEXT NOT NULL DEFAULT '{}', -- JSON of student answers
     duration_seconds INTEGER,
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (quiz_id) REFERENCES quizzes(id),
@@ -88,6 +89,8 @@ CREATE TABLE IF NOT EXISTS ai_queries (
     user_id INTEGER NOT NULL,
     prompt TEXT NOT NULL,
     response TEXT NOT NULL,
+    provider TEXT DEFAULT 'Groq',
+    mode TEXT DEFAULT 'expert',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );

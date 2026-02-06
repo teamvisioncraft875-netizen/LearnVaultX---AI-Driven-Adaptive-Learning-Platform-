@@ -1,0 +1,356 @@
+/* ============================================
+   LAYOUT CORRECTIONS - CSS ONLY
+   Purpose: Fix alignment, spacing, and positioning
+   Rules: NO design changes (colors, fonts, styles)
+   ============================================ */
+
+/* ============================================
+   LOGO SIZE FIX - CRITICAL
+   ============================================ */
+
+/* Force all logo instances to 24px height */
+.brand-logo,
+img.brand-logo,
+.brand-badge img,
+.brand-badge .brand-logo {
+    height: 24px !important;
+    width: auto !important;
+    max-width: 24px !important;
+    max-height: 24px !important;
+    object-fit: contain !important;
+    display: inline-block !important;
+}
+
+/* ============================================
+   HERO BUTTON ALIGNMENT FIX
+   ============================================ */
+
+/* Ensure both hero buttons align perfectly on same baseline */
+[data-theme="futuristic"] .btn-hero-primary,
+[data-theme="futuristic"] .btn-hero-secondary {
+    margin: 0 !important;
+    vertical-align: middle !important;
+}
+
+/* ============================================
+   UNIFIED CONTAINER SYSTEM
+   ============================================ */
+
+/* All section containers use consistent max-width and centering */
+.section-container {
+    max-width: 1400px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 48px !important;
+    padding-right: 48px !important;
+    width: 100% !important;
+}
+
+/* Ensure sections themselves don't add extra width */
+section {
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+}
+
+/* ============================================
+   SECTION SPACING NORMALIZATION
+   ============================================ */
+
+/* Consistent vertical spacing for all main sections */
+.metrics-section,
+.features-section,
+.story-section,
+.capabilities-section,
+.cta-section {
+    padding-top: 80px !important;
+    padding-bottom: 80px !important;
+}
+
+/* Hero section maintains its own spacing from hero-exact-clone.css */
+/* FAQ section spacing */
+.faq-section {
+    padding-top: 80px !important;
+    padding-bottom: 80px !important;
+}
+
+/* Footer section */
+.footer-section {
+    padding-top: 60px !important;
+    padding-bottom: 40px !important;
+}
+
+/* Remove any margin between sections to prevent gaps */
+section {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* ============================================
+   GRID ALIGNMENT FIXES
+   ============================================ */
+
+/* Metrics grid - proper centering and spacing */
+.metrics-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
+    gap: 24px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* Features grid - proper centering and spacing */
+.features-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+    gap: 24px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* Capabilities strip - horizontal scroll prevention */
+.capabilities-strip {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 32px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* ============================================
+   FAB POSITIONING FIX
+   ============================================ */
+
+/* Settings FAB - prevent overlap on tablet/mobile */
+.settings-fab,
+.ai-bot-fab {
+    position: fixed !important;
+    bottom: 24px !important;
+    right: 24px !important;
+    z-index: 999 !important;
+}
+
+/* On tablet and below, move FAB to prevent overlap */
+@media (max-width: 1024px) {
+
+    .settings-fab,
+    .ai-bot-fab {
+        bottom: 80px !important;
+        /* Move higher to avoid overlapping cards */
+    }
+}
+
+/* ============================================
+   MOBILE NAVIGATION FIX
+   ============================================ */
+
+/* Mobile navigation - prevent overflow */
+@media (max-width: 768px) {
+    .hero-nav {
+        flex-wrap: wrap !important;
+        justify-content: space-between !important;
+        padding: 16px 24px !important;
+    }
+
+    /* Stack navigation items on very small screens */
+    @media (max-width: 480px) {
+        .hero-nav {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 12px !important;
+        }
+
+        .hero-nav-link,
+        .hero-nav-separator,
+        .hero-nav-cta {
+            width: 100% !important;
+            text-align: center !important;
+        }
+
+        .hero-nav-separator {
+            display: none !important;
+            /* Hide separator on mobile */
+        }
+    }
+}
+
+/* ============================================
+   RESPONSIVE CONTAINER ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 1200px) {
+    .section-container {
+        padding-left: 40px !important;
+        padding-right: 40px !important;
+    }
+}
+
+@media (max-width: 992px) {
+    .section-container {
+        padding-left: 32px !important;
+        padding-right: 32px !important;
+    }
+
+    /* Reduce section padding on tablet */
+    .metrics-section,
+    .features-section,
+    .story-section,
+    .capabilities-section,
+    .cta-section,
+    .faq-section {
+        padding-top: 60px !important;
+        padding-bottom: 60px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .section-container {
+        padding-left: 24px !important;
+        padding-right: 24px !important;
+    }
+
+    /* Further reduce on mobile */
+    .metrics-section,
+    .features-section,
+    .story-section,
+    .capabilities-section,
+    .cta-section,
+    .faq-section {
+        padding-top: 48px !important;
+        padding-bottom: 48px !important;
+    }
+
+    /* Single column grids on mobile */
+    .metrics-grid,
+    .features-grid {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .section-container {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+}
+
+/* ============================================
+   OVERFLOW PREVENTION
+   ============================================ */
+
+/* Prevent horizontal overflow on all containers */
+body,
+html {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+}
+
+.homepage {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+}
+
+/* Ensure all child elements respect container bounds */
+* {
+    box-sizing: border-box !important;
+}
+
+/* Prevent images and media from overflowing */
+img,
+video,
+iframe {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+/* ============================================
+   FLEXBOX ALIGNMENT FIXES
+   ============================================ */
+
+/* Section headers - consistent alignment */
+.section-header {
+    text-align: center !important;
+    margin-bottom: 48px !important;
+    width: 100% !important;
+}
+
+/* Story content - centered layout */
+.story-content {
+    max-width: 900px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    text-align: center !important;
+}
+
+/* CTA cards - proper grid alignment */
+.cta-cards {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+    gap: 24px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* ============================================
+   CARD SPACING NORMALIZATION
+   ============================================ */
+
+/* Consistent card padding */
+.metric-card,
+.feature-card,
+.capability-item,
+.cta-card {
+    padding: 24px !important;
+}
+
+/* Responsive card padding */
+@media (max-width: 768px) {
+
+    .metric-card,
+    .feature-card,
+    .capability-item,
+    .cta-card {
+        padding: 20px !important;
+    }
+}
+
+/* ============================================
+   FAQ SECTION ALIGNMENT
+   ============================================ */
+
+/* FAQ container - centered and constrained */
+.faq-container {
+    max-width: 900px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    width: 100% !important;
+}
+
+.faq-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    width: 100% !important;
+}
+
+/* ============================================
+   FOOTER ALIGNMENT
+   ============================================ */
+
+/* Footer content - centered and organized */
+.footer-content {
+    max-width: 1400px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 48px !important;
+    padding-right: 48px !important;
+}
+
+@media (max-width: 768px) {
+    .footer-content {
+        padding-left: 24px !important;
+        padding-right: 24px !important;
+    }
+}

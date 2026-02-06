@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}Take Quiz - LearnVaultX{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; padding: var(--space-6) var(--space-4);">
+    <!-- Quiz Header -->
+    <div class="card" style="margin-bottom: var(--space-6);">
+        <div
+            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-4);">
+            <div>
+                <a href="javascript:history.back()" class="text-muted"
+                    style="text-decoration: none; margin-bottom: var(--space-2); display: inline-block;">← Back to
+                    Class</a>
+                <h1 id="quiz-title" style="font-size: var(--text-2xl); color: var(--text-primary); margin: 0;">Loading
+                    Quiz...</h1>
+            </div>
+            <div class="badge badge-primary" id="question-count">0 Questions</div>
+        </div>
+        <p id="quiz-description" style="color: var(--text-secondary);">Please wait while we load your quiz...</p>
+    </div>
+
+    <!-- Questions Container -->
+    <div id="questions-container">
+        <!-- Questions will be injected here -->
+        <div style="text-align: center; padding: var(--space-8);">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <!-- Submit Section -->
+    <div class="card" style="margin-top: var(--space-6); text-align: center;">
+        <button id="submit-btn" class="btn btn-primary btn-lg" onclick="submitQuiz()" style="min-width: 200px;">
+            Submit Quiz
+        </button>
+    </div>
+</div>
+
+<!-- Results Modal -->
+<div id="results-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title">Quiz Results</h2>
+            <button class="btn btn-secondary btn-sm" onclick="closeResultsModal()">Close</button>
+        </div>
+        <div class="modal-body" style="text-align: center;">
+            <div
+                style="font-size: 4rem; font-weight: bold; color: var(--primary-color); margin-bottom: var(--space-2);">
+                <span id="score-display">0</span>%
+            </div>
+            <p id="score-details" style="color: var(--text-secondary); margin-bottom: var(--space-6);">You scored 0 out
+                of 0</p>
+
+            <!-- Adaptive Insights -->
+            <div id="adaptive-insights"
+                style="text-align: left; background: var(--bg-secondary); padding: var(--space-4); border-radius: var(--radius-md);">
+                <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-3);">🤖 AI Insights</h3>
+                <div id="insights-content">
+                    <p>Analyzing your performance...</p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="window.history.back()">Back to Class</button>
+            <button class="btn btn-primary" onclick="window.location.href='/student/dashboard'">Go to Dashboard</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const quizId = {{ quiz_id }};
+    let quizData = null;
+    let startTime = Date.now();
+    let answers = {};
+
+    document.addEventListener('DOMContentLoaded', loadQuiz);
+
+    async function loadQuiz() {
+        try {
+            const response = await fetch(`/api/quiz/${quizId}`);
+            if (!response.ok) throw new Error('Failed to load quiz');
+
+            quizData = await response.json();
+            renderQuiz(quizData);
+        } catch (error) {
+            console.error('Error:', error);
+            toast.error('Failed to load quiz. Please try again.');
+        }
+    }
+
+    function renderQuiz(data) {
+        document.getElementById('quiz-title').textContent = data.title;
+        document.getElementById('quiz-description').textContent = data.description || 'No description provided.';
+        document.getElementById('question-count').textContent = `${data.questions.length} Questions`;
+
+        const container = document.getElementById('questions-container');
+        container.innerHTML = data.questions.map((q, index) => `
+            <div class="card" style="margin-bottom: var(--space-4);">
+                <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-4); display: flex; gap: var(--space-2);">
+                    <span style="color: var(--text-secondary);">${index + 1}.</span>
+                    <span>${escapeHtml(q.question_text)}</span>
+                </h3>
+                <div class="options-list" style="display: flex; flex-direction: column; gap: var(--space-2);">
+                    ${q.options.map((opt, optIndex) => `
+                        <label class="option-item" style="
+                            display: flex; 
+                            align-items: center; 
+                            padding: var(--space-3); 
+                            border: 1px solid var(--border-primary); 
+                            border-radius: var(--radius-md); 
+                            cursor: pointer; 
+                            transition: all 0.2s;
+                        " onmouseover="this.style.borderColor='var(--primary-color)'" onmouseout="if(!this.querySelector('input').checked) this.style.borderColor='var(--border-primary)'">
+                            <input type="radio" name="q_${q.id}" value="${optIndex}" onchange="selectOption(${q.id}, ${optIndex})" style="margin-right: var(--space-3);">
+                            <span>${escapeHtml(opt)}</span>
+                        </label>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function selectOption(questionId, optionIndex) {
+        answers[questionId] = optionIndex;
+
+        // Visual feedback
+        const inputs = document.getElementsByName(`q_${questionId}`);
+        inputs.forEach(input => {
+            const label = input.closest('label');
+            if (input.checked) {
+                label.style.backgroundColor = 'var(--primary-light)';
+                label.style.borderColor = 'var(--primary-color)';
+            } else {
+                label.style.backgroundColor = 'transparent';
+                label.style.borderColor = 'var(--border-primary)';
+            }
+        });
+    }
+
+    let isSubmitting = false;
+
+    async function submitQuiz() {
+        console.log('=== SUBMIT QUIZ CALLED ===');
+
+        // Prevent duplicate submissions
+        if (isSubmitting) {
+            console.log('Already submitting, ignoring...');
+            return;
+        }
+
+        // Validate all questions answered
+        if (Object.keys(answers).length < quizData.questions.length) {
+            alert('Please answer all questions before submitting.');
+            return;
+        }
+
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+        isSubmitting = true;
+
+        const duration = Math.floor((Date.now() - startTime) / 1000);
+
+        console.log('Submitting quiz:', { quiz_id: quizId, answers, duration });
+
+        try {
+            const response = await fetch('/api/submit_quiz', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    quiz_id: quizId,
+                    answers: answers,
+                    duration: duration
+                })
+            });
+
+            console.log('Response status:', response.status);
+
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log('Result:', result);
+
+            if (!result.success) {
+                throw new Error(result.error || result.message || 'Submission failed');
+            }
+
+            // Show results
+            showResults(result);
+
+        } catch (error) {
+            console.error('Submission error:', error);
+            alert('Failed to submit quiz: ' + error.message);
+
+            // Reset button
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Quiz';
+            isSubmitting = false;
+        }
+    }
+
+    function showResults(result) {
+        console.log('=== SHOWING RESULTS ===', result);
+
+        const modal = document.getElementById('results-modal');
+
+        // Set score
+        document.getElementById('score-display').textContent = result.percentage || 0;
+        document.getElementById('score-details').textContent = `You scored ${result.score || 0} out of ${result.total || 0}`;
+
+        // Display adaptive insights
+        const insightsDiv = document.getElementById('insights-content');
+        const insights = result.adaptive_insights || {};
+        const percentage = result.percentage || 0;
+
+        let html = '';
+
+        // Performance feedback
+        if (percentage >= 80) {
+            html += '<div style="margin-bottom: var(--space-3); color: var(--accent-success);"><strong>✅ Excellent work!</strong> You have a strong understanding of this material.</div>';
+        } else if (percentage >= 60) {
+            html += '<div style="margin-bottom: var(--space-3); color: var(--primary-color);"><strong>👍 Good job!</strong> Consider reviewing the topics you missed.</div>';
+        } else {
+            html += '<div style="margin-bottom: var(--space-3); color: var(--accent-warning);"><strong>📚 Keep practicing!</strong> Review the material and try again.</div>';
+        }
+
+        // Knowledge gaps
+        if (insights.knowledge_gaps_detected > 0 && insights.gaps && insights.gaps.length > 0) {
+            html += '<div style="margin-top: var(--space-4);"><strong>⚠️ Areas to Review:</strong><ul style="margin: var(--space-2) 0; padding-left: var(--space-4);">';
+            insights.gaps.forEach(gap => {
+                html += `<li>${gap.quiz || 'Topic'}: ${gap.question || 'Review needed'}</li>`;
+            });
+            html += '</ul></div>';
+        }
+
+        // Recommendations
+        if (insights.recommendations_generated > 0 && insights.recommendations && insights.recommendations.length > 0) {
+            html += '<div style="margin-top: var(--space-4);"><strong>📚 Recommended Next Steps:</strong><ul style="margin: var(--space-2) 0; padding-left: var(--space-4);">';
+            insights.recommendations.forEach(rec => {
+                html += `<li>${rec.reason || rec.title || rec}</li>`;
+            });
+            html += '</ul></div>';
+        }
+
+        insightsDiv.innerHTML = html;
+
+        // FORCE MODAL TO BE VISIBLE with inline styles
+        modal.style.display = 'flex';
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.zIndex = '9999';
+        modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+        modal.style.justifyContent = 'center';
+        modal.style.alignItems = 'center';
+        modal.classList.add('show');
+
+        console.log('=== MODAL DISPLAYED ===');
+        console.log('Modal display:', modal.style.display);
+        console.log('Modal visibility:', window.getComputedStyle(modal).display);
+    }
+
+    function closeResultsModal() {
+        const modal = document.getElementById('results-modal');
+        modal.style.display = 'none';
+        modal.classList.remove('show');
+
+        // Reset button state
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Quiz';
+        isSubmitting = false;
+
+        console.log('=== MODAL CLOSED, STATE RESET ===');
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+</script>
+{% endblock %}

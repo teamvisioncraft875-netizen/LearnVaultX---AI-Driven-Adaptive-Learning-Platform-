@@ -1,0 +1,238 @@
+/* ===============================================
+   ENHANCEMENTS - Optional Features
+   Offline Mode, Performance, Accessibility
+   =============================================== */
+
+/* ===============================================
+   OFFLINE MODE INDICATORS
+   =============================================== */
+
+.offline-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--warning);
+    color: white;
+    padding: var(--space-3) var(--space-4);
+    text-align: center;
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    z-index: var(--z-toast);
+    transform: translateY(-100%);
+    transition: transform var(--transition-base);
+    box-shadow: var(--shadow-md);
+}
+
+.offline-banner.show {
+    transform: translateY(0);
+}
+
+/* ===============================================
+   PERFORMANCE - LAZY LOADING
+   =============================================== */
+
+img[loading="lazy"] {
+    opacity: 0;
+    transition: opacity var(--transition-base);
+}
+
+img[loading="lazy"].loaded {
+    opacity: 1;
+}
+
+/* Skeleton Loaders */
+.skeleton {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    position: relative;
+    overflow: hidden;
+}
+
+.skeleton::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.1),
+            transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    to {
+        left: 100%;
+    }
+}
+
+.skeleton-text {
+    height: 1em;
+    margin-bottom: var(--space-2);
+}
+
+.skeleton-card {
+    height: 200px;
+    border-radius: var(--radius-2xl);
+}
+
+/* ===============================================
+   MICRO-INTERACTIONS
+   =============================================== */
+
+/* Button Ripple Effect */
+.btn-ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-ripple::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-ripple:active::after {
+    width: 300px;
+    height: 300px;
+}
+
+/* Card Hover Glow */
+.card-glow {
+    position: relative;
+}
+
+.card-glow::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(135deg, var(--neural-500), var(--intel-500));
+    border-radius: var(--radius-2xl);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+    z-index: -1;
+}
+
+.card-glow:hover::before {
+    opacity: 0.5;
+}
+
+/* ===============================================
+   ACCESSIBILITY ENHANCEMENTS
+   =============================================== */
+
+/* Enhanced Focus States */
+*:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+}
+
+/* Skip to Content Link */
+.skip-to-content {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--primary);
+    color: white;
+    padding: var(--space-2) var(--space-4);
+    text-decoration: none;
+    z-index: var(--z-tooltip);
+}
+
+.skip-to-content:focus {
+    top: 0;
+}
+
+/* ===============================================
+   PRINT STYLES
+   =============================================== */
+
+@media print {
+
+    .left-zone,
+    .right-zone,
+    .theme-toggle-fab,
+    .offline-banner {
+        display: none !important;
+    }
+
+    .center-zone {
+        width: 100% !important;
+    }
+
+    .three-zone-layout {
+        grid-template-columns: 1fr !important;
+    }
+
+    * {
+        background: white !important;
+        color: black !important;
+    }
+}
+
+/* ===============================================
+   UTILITY ANIMATIONS
+   =============================================== */
+
+/* Fade In */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Slide Up */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-up {
+    animation: slideUp 0.4s ease-out;
+}
+
+/* Pulse */
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
