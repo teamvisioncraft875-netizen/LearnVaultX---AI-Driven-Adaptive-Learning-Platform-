@@ -2,89 +2,96 @@
 
 {% block title %}Register - LearnVaultX{% endblock %}
 
+{% block meta_description %}Create a free LearnVaultX account to start learning with AI-powered adaptive education,
+personalized quizzes, and real-time analytics.{% endblock %}
+{% block og_title %}Register - LearnVaultX{% endblock %}
+{% block og_description %}Create a free LearnVaultX account and start learning with AI-powered adaptive education.{%
+endblock %}
+
 {% block content %}
 <div class="auth-page-container">
-    <!-- Left Panel - Branding with Fixed Readability -->
-    <div class="auth-branding-panel">
-        <div class="auth-branding-content">
-            <div class="auth-logo-container">
-                <div class="auth-logo-box">
-                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LearnVaultX">
+    <div class="auth-card">
+        <!-- Left Panel - Branding -->
+        <div class="auth-branding-panel">
+            <div class="auth-branding-content">
+                <div class="auth-logo-container">
+                    <div class="auth-logo-box">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LearnVaultX">
+                    </div>
+                    <h1 class="auth-brand-name">LearnVaultX</h1>
                 </div>
-                <h1 class="auth-brand-name">LearnVaultX</h1>
-            </div>
 
-            <p class="auth-tagline">
-                Join thousands of students using AI-powered education
-            </p>
+                <p class="auth-tagline">
+                    Join thousands of students using AI-powered education
+                </p>
 
-            <div class="auth-features">
-                <div class="auth-feature-item">
-                    <span class="checkmark">✓</span>
-                    <span>Free to get started</span>
-                </div>
-                <div class="auth-feature-item">
-                    <span class="checkmark">✓</span>
-                    <span>No credit card required</span>
-                </div>
-                <div class="auth-feature-item">
-                    <span class="checkmark">✓</span>
-                    <span>Start learning immediately</span>
+                <div class="auth-features">
+                    <div class="auth-feature-item">
+                        <span class="checkmark">✓</span>
+                        <span>Free to get started</span>
+                    </div>
+                    <div class="auth-feature-item">
+                        <span class="checkmark">✓</span>
+                        <span>No credit card required</span>
+                    </div>
+                    <div class="auth-feature-item">
+                        <span class="checkmark">✓</span>
+                        <span>Start learning immediately</span>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Right Panel - Register Form with Proper Sizing -->
-    <div class="auth-form-panel">
-        <!-- Background decoration -->
-        <div class="auth-form-decoration"></div>
+        <!-- Right Panel - Register Form -->
+        <div class="auth-form-panel">
+            <div class="auth-form-decoration"></div>
 
-        <div class="auth-form-container">
-            <h2 class="auth-form-title">Create account</h2>
-            <p class="auth-form-subtitle">Start your learning journey today</p>
+            <div class="auth-form-container">
+                <h2 class="auth-form-title">Create account</h2>
+                <p class="auth-form-subtitle">Start your learning journey today</p>
 
-            {% if error %}
-            <div class="auth-alert auth-alert-error show">{{ error }}</div>
-            {% endif %}
+                {% if error %}
+                <div class="auth-alert auth-alert-error show">{{ error }}</div>
+                {% endif %}
 
-            <div id="error-message" class="auth-alert auth-alert-error"></div>
+                <div id="error-message" class="auth-alert auth-alert-error"></div>
 
-            <form id="registerForm" onsubmit="handleRegister(event)">
-                <div class="auth-form-group">
-                    <label class="auth-form-label" for="name">Full Name</label>
-                    <input type="text" name="name" id="name" required autocomplete="name" class="auth-form-input"
-                        placeholder="Enter your full name">
-                </div>
+                <form id="registerForm" onsubmit="handleRegister(event)">
+                    <div class="auth-form-group">
+                        <label class="auth-form-label" for="name">Full Name</label>
+                        <input type="text" name="name" id="name" required autocomplete="name" class="auth-form-input"
+                            placeholder="Enter your full name">
+                    </div>
 
-                <div class="auth-form-group">
-                    <label class="auth-form-label" for="email">Email</label>
-                    <input type="email" name="email" id="email" required autocomplete="email" class="auth-form-input"
-                        placeholder="Enter your email">
-                </div>
+                    <div class="auth-form-group">
+                        <label class="auth-form-label" for="email">Email</label>
+                        <input type="email" name="email" id="email" required autocomplete="email"
+                            class="auth-form-input" placeholder="Enter your email">
+                    </div>
 
-                <div class="auth-form-group">
-                    <label class="auth-form-label" for="password">Password</label>
-                    <input type="password" name="password" id="password" required autocomplete="new-password"
-                        class="auth-form-input" placeholder="Create a password">
-                </div>
+                    <div class="auth-form-group">
+                        <label class="auth-form-label" for="password">Password</label>
+                        <input type="password" name="password" id="password" required autocomplete="new-password"
+                            class="auth-form-input" placeholder="Create a password">
+                    </div>
 
-                <div class="auth-form-group">
-                    <label class="auth-form-label" for="role">I am a</label>
-                    <select name="role" id="role" required class="auth-form-select">
-                        <option value="student">Student</option>
-                        <option value="teacher">Teacher</option>
-                    </select>
-                </div>
+                    <div class="auth-form-group">
+                        <label class="auth-form-label" for="role">I am a</label>
+                        <select name="role" id="role" required class="auth-form-select">
+                            <option value="student">Student</option>
+                            <option value="teacher">Teacher</option>
+                        </select>
+                    </div>
 
-                <button type="submit" class="auth-submit-btn" id="submitBtn">
-                    Create Account
-                </button>
+                    <button type="submit" class="auth-submit-btn" id="submitBtn">
+                        Create Account
+                    </button>
 
-                <p class="auth-footer-text">
-                    Already have an account? <a href="/login" class="auth-footer-link">Sign in</a>
-                </p>
-            </form>
+                    <p class="auth-footer-text">
+                        Already have an account? <a href="/login" class="auth-footer-link">Sign in</a>
+                    </p>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -119,8 +126,8 @@
             const data = await response.json();
 
             if (response.ok) {
-                // Registration successful - redirect to login
-                window.location.href = '/login';
+                // Registration initiated - redirect to OTP verification
+                window.location.href = data.redirect || '/verify-signup-otp';
             } else {
                 // Show error
                 errorDiv.textContent = data.error || 'Registration failed';

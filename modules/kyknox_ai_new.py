@@ -75,10 +75,47 @@ You are intelligent, helpful, and adaptive to student needs."""
         
         return ""
 
-    def generate_response(self, prompt, mode='expert', context=None, role='student'):
-        """Generate AI response using Groq API"""
+    def generate_response(self, prompt, mode='expert', context=None, role='student', language='english'):
+        """Generate AI response using Groq API with multilingual support"""
         system_prompt = self.get_system_prompt(mode, role)
         context_message = self.build_context_message(context)
+        
+        # Add language instruction
+        language = language.lower() if language else 'english'
+        
+        # Dynamic strict language instruction
+        if language == 'english':
+             lang_instruction = ""
+        else:
+             # Map common language codes/names to full names for the prompt
+             lang_map = {
+                 'hindi': 'Hindi (हिंदी)',
+                 'hi': 'Hindi (हिंदी)',
+                 'odia': 'Odia (ଓଡ଼ିଆ)',
+                 'or': 'Odia (ଓଡ଼ିଆ)',
+                 'bengali': 'Bengali (বাংলা)',
+                 'bn': 'Bengali (বাংলা)',
+                 'telugu': 'Telugu (తెలుగు)',
+                 'te': 'Telugu (తెలుగు)',
+                 'tamil': 'Tamil (தமிழ்)',
+                 'ta': 'Tamil (தமிழ்)',
+                 'marathi': 'Marathi (मराठी)',
+                 'mr': 'Marathi (मराठी)'
+             }
+             target_lang = lang_map.get(language, language.title())
+             
+             lang_instruction = f"""
+            
+**IMPORTANT: LANGUAGE ENFORCEMENT**
+You must respond STRICTLY in **{target_lang}**.
+- Do NOT use English words unless absolutely necessary for technical terms.
+- Use the native script for {target_lang}.
+- Do NOT mix languages (no Hinglish/Odlish).
+- If you are unsure of a translation, explain simply in {target_lang}.
+"""
+
+        # Append language instruction to system prompt
+        system_prompt += lang_instruction
         
         # Construct messages
         messages = [
@@ -89,8 +126,8 @@ You are intelligent, helpful, and adaptive to student needs."""
         if context_message:
             messages.append({"role": "system", "content": context_message})
         
-        # Add user prompt
-        messages.append({"role": "user", "content": prompt})
+        # Add user prompt (with reminder)
+        messages.append({"role": "user", "content": f"Answer in {language}: {prompt}"})
         
         try:
             if self.api_key:

@@ -707,6 +707,214 @@
 }
 
 /* Text utilities */
-.text-secondary {
+
+/* =============================================================================
+   ANALYTICS DASHBOARD
+   ============================================================================= */
+
+.analytics-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+}
+
+.stats-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-6);
+}
+
+.stat-card {
+    background: linear-gradient(135deg, rgba(31, 41, 55, 0.6), rgba(17, 24, 39, 0.8));
+    border: 1px solid var(--border-color);
+    padding: var(--space-6);
+    border-radius: var(--radius-xl);
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+
+.stat-value {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.stat-label {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.analytics-section h3 {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-4);
+}
+
+.stud-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--text-secondary);
+}
+
+.stud-table th,
+.stud-table td {
+    padding: var(--space-4);
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.stud-table th {
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.stud-table tr:last-child td {
+    border-bottom: none;
+}
+
+.badge {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.badge-success {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.badge-warning {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.badge-danger {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.analytics-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-8);
+}
+
+@media (max-width: 768px) {
+    .analytics-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.topic-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.topic-item {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--space-3);
+    border-radius: var(--radius-lg);
+    background: rgba(31, 41, 55, 0.4);
+    border: 1px solid var(--border-color);
+}
+
+.topic-item.strong {
+    border-left: 4px solid #10b981;
+}
+
+.topic-item.weak {
+    border-left: 4px solid #ef4444;
+}
+
+.topic-score {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Gaps Grid */
+.gaps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-6);
+}
+
+.gap-card {
+    background: rgba(31, 41, 55, 0.4);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    position: relative;
+}
+
+.gap-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-4);
+}
+
+.gap-severity {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.gap-severity.MEDIUM {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.gap-severity.HIGH {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.gap-quiz {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.gap-question {
+    font-style: italic;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-6);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.gap-actions {
+    display: flex;
+    gap: var(--space-3);
+}
+
+.gap-btn {
+    flex: 1;
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+}
+
+.gap-btn.secondary {
+    background: transparent;
+    border: 1px solid var(--border-color);
     color: var(--text-secondary);
 }

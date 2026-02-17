@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS users (
     email TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
     role TEXT NOT NULL CHECK(role IN ('student', 'teacher')),
+    is_verified INTEGER DEFAULT 0,
+    verified_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -14,6 +16,7 @@ CREATE TABLE IF NOT EXISTS classes (
     title TEXT NOT NULL,
     description TEXT,
     teacher_id INTEGER NOT NULL,
+    code TEXT UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (teacher_id) REFERENCES users(id)
 );
@@ -126,7 +129,20 @@ CREATE TABLE IF NOT EXISTS password_reset_otp (
     otp TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     expires_at TIMESTAMP NOT NULL,
-    used INTEGER DEFAULT 0
+    used INTEGER DEFAULT 0,
+    attempts INTEGER DEFAULT 0
+);
+
+-- OTP requests table (for signup and login verification)
+CREATE TABLE IF NOT EXISTS otp_requests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL,
+    otp_hash TEXT NOT NULL,
+    otp_type TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP NOT NULL,
+    attempts INTEGER DEFAULT 0,
+    is_used INTEGER DEFAULT 0
 );
 
 -- Live sessions table

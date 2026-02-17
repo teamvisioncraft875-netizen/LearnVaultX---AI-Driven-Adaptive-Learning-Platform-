@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}500 - Server Error - LearnVaultX{% endblock %}
+
+{% block content %}
+<div
+    style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg-primary); padding: var(--space-4);">
+    <div class="glass-card" style="
+        max-width: 600px;
+        width: 100%;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 165, 0, 0.3);
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        padding: var(--space-8);
+        box-shadow: 0 8px 32px rgba(255, 165, 0, 0.2);
+    ">
+        <!-- Error Code -->
+        <div style="
+            font-size: 120px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffa500, #ff6b35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: var(--space-4);
+            text-shadow: 0 0 40px rgba(255, 165, 0, 0.3);
+        ">500</div>
+
+        <!-- Error Title -->
+        <h1 style="
+            font-size: var(--text-3xl);
+            color: var(--text-primary);
+            margin-bottom: var(--space-3);
+            font-weight: 700;
+        ">Internal Server Error</h1>
+
+        <!-- Error Description -->
+        <p style="
+            color: var(--text-secondary);
+            font-size: var(--text-lg);
+            margin-bottom: var(--space-4);
+            line-height: 1.6;
+        ">
+            Oops! Something went wrong on our end. We're working to fix it.
+        </p>
+
+        <!-- Info Box -->
+        <div style="
+            background: rgba(255, 165, 0, 0.1);
+            border: 1px solid rgba(255, 165, 0, 0.2);
+            border-radius: 12px;
+            padding: var(--space-4);
+            margin-bottom: var(--space-6);
+            text-align: left;
+        ">
+            <h3 style="
+                color: #ffa500;
+                font-size: var(--text-base);
+                font-weight: 600;
+                margin-bottom: var(--space-2);
+            ">⚠️ What can I do?</h3>
+            <ul style="
+                color: var(--text-secondary);
+                font-size: var(--text-sm);
+                margin: 0;
+                padding-left: var(--space-5);
+                line-height: 1.8;
+            ">
+                <li>Try refreshing the page</li>
+                <li>Wait a few minutes and try again</li>
+                <li>Clear your browser cache and cookies</li>
+                <li>If the problem persists, contact our support team</li>
+            </ul>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: var(--space-3); justify-content: center; flex-wrap: wrap;">
+            <button onclick="location.reload()" class="btn btn-secondary" style="
+                padding: 14px 28px;
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 165, 0, 0.3);
+                border-radius: 12px;
+                color: var(--text-primary);
+                font-size: var(--text-base);
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            " onmouseover="this.style.background='rgba(255, 255, 255, 0.15)'; this.style.borderColor='rgba(255, 165, 0, 0.5)'; this.style.boxShadow='0 0 20px rgba(255, 165, 0, 0.2)'"
+                onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.borderColor='rgba(255, 165, 0, 0.3)'; this.style.boxShadow='none'">
+                🔄 Refresh Page
+            </button>
+
+            <a href="/" class="btn btn-primary" style="
+                padding: 14px 28px;
+                background: linear-gradient(135deg, #00ff88, #00e5ff);
+                border: none;
+                border-radius: 12px;
+                color: #0f0f1e;
+                font-size: var(--text-base);
+                font-weight: 700;
+                text-decoration: none;
+                display: inline-block;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 24px rgba(0, 255, 136, 0.4)'"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                🏠 Go Home
+            </a>
+
+            {% if session.user_id %}
+            <a href="{% if session.role == 'teacher' %}/teacher/dashboard{% else %}/student/dashboard{% endif %}"
+                class="btn btn-primary" style="
+                padding: 14px 28px;
+                background: linear-gradient(135deg, #00e5ff, #ff006e);
+                border: none;
+                border-radius: 12px;
+                color: white;
+                font-size: var(--text-base);
+                font-weight: 700;
+                text-decoration: none;
+                display: inline-block;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 24px rgba(0, 229, 255, 0.4)'"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                📊 Dashboard
+            </a>
+            {% endif %}
+        </div>
+
+        <!-- Decorative Element -->
+        <div style="
+            margin-top: var(--space-8);
+            padding-top: var(--space-6);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        ">
+            <p style="color: var(--text-muted); font-size: var(--text-sm);">
+                Error persists? <a href="mailto:support@learnvaultx.com"
+                    style="color: #ffa500; text-decoration: none; font-weight: 600;">Contact Support</a>
+            </p>
+        </div>
+
+        <!-- Error ID (for debugging) -->
+        <div style="margin-top: var(--space-4);">
+            <p style="color: var(--text-muted); font-size: var(--text-xs); font-family: 'JetBrains Mono', monospace;">
+                Error ID: {{ request.headers.get('X-Request-ID', 'N/A') }} | Time: {{ now().strftime('%Y-%m-%d %H:%M:%S
+                UTC') if now else 'N/A' }}
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

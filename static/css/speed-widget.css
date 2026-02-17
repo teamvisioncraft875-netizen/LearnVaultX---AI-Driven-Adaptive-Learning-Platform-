@@ -1,0 +1,80 @@
+/* Draggable Speed Widget */
+#speed-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    padding: 8px 16px;
+    border-radius: 24px;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Inter', sans-serif;
+    color: #e2e8f0;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: grab;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+    user-select: none;
+    min-width: 100px;
+    justify-content: center;
+}
+
+#speed-widget:active {
+    cursor: grabbing;
+    transform: scale(0.98);
+}
+
+#speed-widget:hover {
+    background: rgba(15, 23, 42, 0.85);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    border-color: rgba(96, 165, 250, 0.3);
+}
+
+.speed-icon {
+    font-size: 14px;
+}
+
+.speed-value {
+    color: #38bdf8;
+    min-width: 60px;
+    text-align: right;
+}
+
+.speed-unit {
+    color: #94a3b8;
+    font-size: 11px;
+    margin-left: 2px;
+    text-transform: uppercase;
+}
+
+/* Status Indicators */
+#speed-widget.offline {
+    border-color: rgba(239, 68, 68, 0.5);
+    background: rgba(69, 10, 10, 0.8);
+}
+
+#speed-widget.offline .speed-value {
+    color: #ef4444;
+}
+
+#speed-widget.slow {
+    border-color: rgba(245, 158, 11, 0.5);
+}
+
+#speed-widget.slow .speed-value {
+    color: #f59e0b;
+}
+
+#speed-widget.fast {
+    border-color: rgba(16, 185, 129, 0.5);
+}
+
+#speed-widget.fast .speed-value {
+    color: #34d399;
+}

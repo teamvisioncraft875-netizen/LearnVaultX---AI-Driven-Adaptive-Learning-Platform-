@@ -2,6 +2,9 @@
 
 {% block title %}Take Quiz - LearnVaultX{% endblock %}
 
+{% block meta_robots %}noindex, nofollow{% endblock %}
+{% block meta_description %}Take a quiz and get AI-powered feedback on your performance.{% endblock %}
+
 {% block content %}
 <div class="container" style="max-width: 800px; padding: var(--space-6) var(--space-4);">
     <!-- Quiz Header -->
@@ -77,14 +80,27 @@
 
     async function loadQuiz() {
         try {
-            const response = await fetch(`/api/quiz/${quizId}`);
-            if (!response.ok) throw new Error('Failed to load quiz');
+            const response = await fetch(`/api/quiz/${quizId}`, {
+                credentials: 'include'
+            });
 
-            quizData = await response.json();
+            const json = await response.json();
+
+            if (!response.ok || !json.success) {
+                console.error('Failed to load quiz', json);
+                if (json && json.error) {
+                    showToast(json.error, 'error');
+                } else {
+                    showToast('Failed to load quiz. Please try again.', 'error');
+                }
+                return;
+            }
+
+            quizData = json.data;
             renderQuiz(quizData);
         } catch (error) {
             console.error('Error:', error);
-            toast.error('Failed to load quiz. Please try again.');
+            showToast('Failed to load quiz. Please try again.', 'error');
         }
     }
 
@@ -92,6 +108,23 @@
         document.getElementById('quiz-title').textContent = data.title;
         document.getElementById('quiz-description').textContent = data.description || 'No description provided.';
         document.getElementById('question-count').textContent = `${data.questions.length} Questions`;
+
+        // Check for max attempts
+        if (data.is_allowed === false) {
+            document.getElementById('questions-container').innerHTML = `
+                <div class="card" style="text-align: center; padding: var(--space-8); border-color: var(--accent-warning);">
+                    <div style="font-size: 4rem; margin-bottom: var(--space-4);">⚠️</div>
+                    <h2 style="color: var(--text-primary); margin-bottom: var(--space-2);">Maximum Attempts Reached</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: var(--space-6);">
+                        You have used all ${data.max_attempts} attempts for this quiz.
+                    </p>
+                    <button class="btn btn-primary" onclick="window.history.back()">Back to Class</button>
+                    <button class="btn btn-secondary" onclick="window.location.href='/student/dashboard'">Go to Dashboard</button>
+                </div>
+            `;
+            document.getElementById('submit-btn').parentElement.style.display = 'none';
+            return;
+        }
 
         const container = document.getElementById('questions-container');
         container.innerHTML = data.questions.map((q, index) => `
@@ -150,11 +183,13 @@
 
         // Validate all questions answered
         if (Object.keys(answers).length < quizData.questions.length) {
-            alert('Please answer all questions before submitting.');
+            showToast('Please answer all questions before submitting', 'warning');
             return;
         }
 
         const submitBtn = document.getElementById('submit-btn');
+
+        // Set submitting state
         submitBtn.disabled = true;
         submitBtn.textContent = 'Submitting...';
         isSubmitting = true;
@@ -164,40 +199,95 @@
         console.log('Submitting quiz:', { quiz_id: quizId, answers, duration });
 
         try {
+            // Submission timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => {
+                console.error('Request timed out after 20 seconds');
+                controller.abort();
+            }, 20000);
+
             const response = await fetch('/api/submit_quiz', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({
                     quiz_id: quizId,
                     answers: answers,
                     duration: duration
-                })
+                }),
+                signal: controller.signal
             });
 
+            clearTimeout(timeoutId);
+
             console.log('Response status:', response.status);
+            console.log('Response ok:', response.ok);
+
+            // Get response text first for debugging
+            const responseText = await response.text();
+            console.log('Raw response text:', responseText.substring(0, 200));
+
+            // Check if response is HTML (session expired / redirected to login)
+            if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html')) {
+                console.error('Received HTML instead of JSON - session likely expired');
+                showToast('Session expired. Please login again', 'error');
+                // Redirect to login after 2 seconds
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 2000);
+                return;
+            }
 
             if (!response.ok) {
                 throw new Error(`Server error: ${response.status}`);
             }
 
-            const result = await response.json();
-            console.log('Result:', result);
+            // Parse JSON
+            let result;
+            try {
+                result = JSON.parse(responseText);
+                console.log('Parsed result:', result);
+            } catch (parseError) {
+                console.error('JSON parse error:', parseError);
+                throw new Error('Invalid response from server');
+            }
 
             if (!result.success) {
                 throw new Error(result.error || result.message || 'Submission failed');
             }
 
-            // Show results
-            showResults(result);
+            // SUCCESS - Show toast
+            if (typeof toast !== 'undefined' && toast.success) {
+                toast.success('Quiz submitted successfully!');
+            }
+
+            // Show results modal
+            showResults(result.data || result);
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitted';
+            submitBtn.dataset.submitted = 'true';
+            isSubmitting = false;
+            return;
 
         } catch (error) {
             console.error('Submission error:', error);
-            alert('Failed to submit quiz: ' + error.message);
+            console.error('Error name:', error.name);
+            console.error('Error message:', error.message);
 
-            // Reset button
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Submit Quiz';
-            isSubmitting = false;
+            if (error.name === 'AbortError') {
+                showToast('Submission timed out. Please try again', 'error');
+            } else {
+                showToast('Failed to submit quiz: ' + error.message, 'error');
+            }
+
+        } finally {
+            // Reset button only if not submitted
+            if (submitBtn.dataset.submitted !== 'true') {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Quiz';
+                isSubmitting = false;
+            }
+            console.log('=== BUTTON STATE RESET ===');
         }
     }
 
@@ -205,10 +295,14 @@
         console.log('=== SHOWING RESULTS ===', result);
 
         const modal = document.getElementById('results-modal');
+        const submitBtn = document.getElementById('submit-btn');
 
         // Set score
         document.getElementById('score-display').textContent = result.percentage || 0;
-        document.getElementById('score-details').textContent = `You scored ${result.score || 0} out of ${result.total || 0}`;
+
+        // Show attempt number if available
+        const attemptText = result.attempt_number ? ` (Attempt #${result.attempt_number}/3)` : '';
+        document.getElementById('score-details').textContent = `You scored ${result.score || 0} out of ${result.total || 0}${attemptText}`;
 
         // Display adaptive insights
         const insightsDiv = document.getElementById('insights-content');
@@ -244,9 +338,125 @@
             html += '</ul></div>';
         }
 
+        // Max attempts warning and button logic
+        if (result.is_limit_reached) {
+            // Change close button to redirect
+            const closeBtn = modal.querySelector('.btn-secondary[onclick="closeResultsModal()"]');
+            if (closeBtn) {
+                closeBtn.onclick = function () { window.location.href = '/student/dashboard'; };
+                closeBtn.textContent = 'Back to Dashboard';
+            }
+            if (submitBtn) {
+                submitBtn.textContent = 'Max Attempts Reached';
+                submitBtn.disabled = true;
+                submitBtn.dataset.submitted = 'true';
+            }
+
+            // Add warning message
+            const warning = '<div style="margin-bottom: var(--space-4); padding: var(--space-3); background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-md); color: #ef4444;"><strong>Please Note:</strong> You have used all 3 allowed attempts for this quiz. This is your final score.</div>';
+            html = warning + html;
+        }
+
+        // Detailed Question Results
+        if (result.question_results && result.question_results.length > 0) {
+            html += '<div style="margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--border-color);">';
+            html += '<h4 style="margin-bottom: var(--space-4); color: var(--text-primary);">Detailed Results</h4>';
+            html += '<div style="display: flex; flex-direction: column; gap: var(--space-4); max-height: 300px; overflow-y: auto; padding-right: var(--space-2); text-align: left;">';
+
+            result.question_results.forEach((q, index) => {
+                const statusColor = q.is_correct ? 'var(--accent-success)' : 'var(--accent-warning)';
+                const icon = q.is_correct ? '✅' : '❌';
+
+                html += `
+                    <div style="background: var(--bg-tertiary); padding: var(--space-3); border-radius: var(--radius-md); border-left: 4px solid ${statusColor};">
+                        <div style="font-weight: 600; margin-bottom: var(--space-2); color: var(--text-primary);">
+                            <span style="margin-right: var(--space-2);">${index + 1}.</span> ${escapeHtml(q.question_text)}
+                        </div>
+                        <div style="font-size: var(--text-sm); color: var(--text-secondary);">
+                            <div style="margin-bottom: 4px;">Your Answer: <span style="color: ${q.is_correct ? 'var(--accent-success)' : 'var(--accent-warning)'}; font-weight: 500;">${escapeHtml(q.user_answer)} ${icon}</span></div>
+                            ${!q.is_correct ? `<div style="color: var(--text-muted);">Correct Answer: <span style="color: var(--accent-success); font-weight: 500;">${escapeHtml(q.correct_answer)}</span></div>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div></div>';
+        }
+
+        // Badges
+        if (result.badges && result.badges.length > 0) {
+            html += '<div style="margin-top: var(--space-6); text-align: center; animation: popIn 0.5s ease-out;">';
+            html += '<h4 style="margin-bottom: var(--space-4); color: var(--accent-success);">🎉 New Badge Earned!</h4>';
+            html += '<div style="display: flex; justify-content: center; gap: var(--space-4); flex-wrap: wrap;">';
+            result.badges.forEach(badge => {
+                html += `
+                    <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-success); padding: var(--space-4); border-radius: var(--radius-lg); width: 140px; text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: var(--space-2);">${badge.icon}</div>
+                        <div style="font-weight: 700; color: var(--text-primary); margin-bottom: var(--space-1);">${escapeHtml(badge.title)}</div>
+                        <div style="font-size: var(--text-xs); color: var(--text-secondary);">${escapeHtml(badge.description)}</div>
+                    </div>
+                 `;
+            });
+            html += '</div></div>';
+        }
+
         insightsDiv.innerHTML = html;
 
+        // Render KyKnoX Mistake Notes (after the main insights)
+        if (result.mistake_notes && result.mistake_notes.length > 0) {
+            let notesHtml = `
+                <div style="margin-top: var(--space-6); padding-top: var(--space-4); border-top: 2px solid rgba(139, 92, 246, 0.3);">
+                    <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-4); color: #a78bfa; display: flex; align-items: center; gap: 8px;">
+                        📌 KyKnoX Mistake Notes
+                    </h3>
+                    <div style="display: flex; flex-direction: column; gap: var(--space-4); max-height: 400px; overflow-y: auto; padding-right: var(--space-2); text-align: left;">
+            `;
+
+            result.mistake_notes.forEach((note, index) => {
+                notesHtml += `
+                    <div style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(96, 165, 250, 0.08)); 
+                                border: 1px solid rgba(139, 92, 246, 0.2); 
+                                border-radius: var(--radius-lg); 
+                                padding: var(--space-4); 
+                                position: relative;
+                                overflow: hidden;">
+                        <div style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: linear-gradient(to bottom, #8b5cf6, #60a5fa);"></div>
+                        
+                        <div style="padding-left: var(--space-3);">
+                            <div style="font-weight: 600; color: var(--text-primary); margin-bottom: var(--space-2); font-size: var(--text-sm);">
+                                ❌ Q: ${escapeHtml(note.question_text || '')}
+                            </div>
+                            
+                            <div style="display: grid; gap: var(--space-2); font-size: var(--text-sm);">
+                                <div style="display: flex; gap: 8px;">
+                                    <span style="color: #ef4444; flex-shrink: 0;">✅</span>
+                                    <div><strong style="color: #a78bfa;">Mistake:</strong> <span style="color: var(--text-secondary);">${escapeHtml(note.mistake_summary || '')}</span></div>
+                                </div>
+                                <div style="display: flex; gap: 8px;">
+                                    <span style="color: #10b981; flex-shrink: 0;">📌</span>
+                                    <div><strong style="color: #10b981;">Quick Fix:</strong> <span style="color: var(--text-secondary);">${escapeHtml(note.quick_fix || '')}</span></div>
+                                </div>
+                                <div style="display: flex; gap: 8px;">
+                                    <span style="color: #f59e0b; flex-shrink: 0;">🧠</span>
+                                    <div><strong style="color: #f59e0b;">Memory Trick:</strong> <span style="color: var(--text-secondary);">${escapeHtml(note.memory_trick || '')}</span></div>
+                                </div>
+                                ${note.recommended_topic ? `
+                                <div style="display: flex; gap: 8px;">
+                                    <span style="color: #60a5fa; flex-shrink: 0;">📚</span>
+                                    <div><strong style="color: #60a5fa;">Review:</strong> <span style="color: var(--text-secondary);">${escapeHtml(note.recommended_topic)}</span></div>
+                                </div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            notesHtml += `</div></div>`;
+            insightsDiv.innerHTML += notesHtml;
+        }
+
         // FORCE MODAL TO BE VISIBLE with inline styles
+        modal.display = 'block'; // Fallback
         modal.style.display = 'flex';
         modal.style.position = 'fixed';
         modal.style.top = '0';
@@ -260,8 +470,6 @@
         modal.classList.add('show');
 
         console.log('=== MODAL DISPLAYED ===');
-        console.log('Modal display:', modal.style.display);
-        console.log('Modal visibility:', window.getComputedStyle(modal).display);
     }
 
     function closeResultsModal() {

@@ -1,0 +1,38 @@
+<!-- LEARNING PATH VIEW -->
+<div class="stud-view" id="learningPathView" style="display: none;">
+    <div class="stud-view-head">
+        <h1 class="view-main-title">My Learning Path</h1>
+        <p class="view-sub-text">Structured curriculum to master your subjects</p>
+    </div>
+
+    <div class="stud-view-body">
+        <div class="learning-path-container">
+            <!-- Subject Selector -->
+            <div class="lp-subject-selector">
+                <span class="lp-subject-label">Select Subject:</span>
+                <select id="lpSubjectSelect" class="lp-select" onchange="loadLearningPath(this.value)">
+                    <option value="" disabled selected>-- Choose a Class --</option>
+                    <!-- Options populated by JS -->
+                </select>
+            </div>
+
+            <!-- Next Action Banner (Dynamic) -->
+            <div id="lpNextActionBanner" class="lp-next-action-banner" style="display: none;">
+                <div class="lp-banner-content">
+                    <div class="lp-banner-label">📌 Next Step</div>
+                    <div class="lp-banner-text" id="lpNextActionText">Complete Module 1 Quiz to unlock Module 2</div>
+                </div>
+                <button class="lp-banner-btn" id="lpNextActionBtn">Start Now</button>
+            </div>
+
+            <!-- Timeline -->
+            <div id="lpTimeline" class="lp-timeline">
+                <!-- Modules populated by JS -->
+                <div class="loading-box">
+                    <div class="loading-spinner"></div>
+                    <p class="loading-text">Select a subject to view learning path...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

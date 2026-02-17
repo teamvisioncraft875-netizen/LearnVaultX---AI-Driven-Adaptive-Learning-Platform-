@@ -2,8 +2,272 @@
 
 {% block title %}My Analytics - LearnVaultX{% endblock %}
 
+{% block meta_robots %}noindex, nofollow{% endblock %}
+{% block meta_description %}View your personalized learning analytics, quiz performance, topic breakdowns, and exam
+predictions.{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/analytics.css') }}">
+<style>
+    /* ── EXAM PREDICTOR CARD ──────────────────── */
+    .predictor-section {
+        margin-bottom: var(--space-6, 24px);
+    }
+
+    .predictor-card {
+        background: linear-gradient(135deg, rgba(17, 24, 39, 0.95), rgba(31, 41, 55, 0.92));
+        border: 1px solid rgba(96, 165, 250, 0.2);
+        border-radius: 16px;
+        padding: 28px;
+        backdrop-filter: blur(12px);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .predictor-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #60a5fa, #a78bfa, #34d399);
+    }
+
+    .predictor-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .predictor-header h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #f0f4ff;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .predictor-badge {
+        font-size: 11px;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+
+    .predictor-badge.improving {
+        background: rgba(52, 211, 153, 0.15);
+        color: #34d399;
+    }
+
+    .predictor-badge.declining {
+        background: rgba(239, 68, 68, 0.15);
+        color: #f87171;
+    }
+
+    .predictor-badge.stable {
+        background: rgba(96, 165, 250, 0.15);
+        color: #60a5fa;
+    }
+
+    .predictor-body {
+        display: grid;
+        grid-template-columns: 200px 1fr;
+        gap: 28px;
+        align-items: start;
+    }
+
+    @media (max-width: 768px) {
+        .predictor-body {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Score Gauge */
+    .predictor-gauge {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .gauge-ring {
+        position: relative;
+        width: 160px;
+        height: 160px;
+    }
+
+    .gauge-ring svg {
+        transform: rotate(-90deg);
+    }
+
+    .gauge-bg {
+        fill: none;
+        stroke: rgba(75, 85, 99, 0.3);
+        stroke-width: 10;
+    }
+
+    .gauge-fill {
+        fill: none;
+        stroke: url(#gaugeGrad);
+        stroke-width: 10;
+        stroke-linecap: round;
+        transition: stroke-dashoffset 1.2s ease;
+    }
+
+    .gauge-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+    }
+
+    .gauge-score {
+        font-size: 36px;
+        font-weight: 800;
+        background: linear-gradient(135deg, #60a5fa, #a78bfa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        line-height: 1;
+    }
+
+    .gauge-label {
+        font-size: 11px;
+        color: #9ca3af;
+        margin-top: 2px;
+    }
+
+    /* CGPA Bar */
+    .cgpa-section {
+        margin-top: 8px;
+        width: 100%;
+    }
+
+    .cgpa-label {
+        font-size: 12px;
+        color: #9ca3af;
+        margin-bottom: 6px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .cgpa-bar-bg {
+        height: 8px;
+        background: rgba(75, 85, 99, 0.3);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .cgpa-bar-fill {
+        height: 100%;
+        border-radius: 4px;
+        background: linear-gradient(90deg, #a78bfa, #34d399);
+        transition: width 1s ease;
+    }
+
+    /* Right Column */
+    .predictor-details {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .predictor-detail-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #d1d5db;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .weak-topic-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 12px;
+        background: rgba(245, 158, 11, 0.06);
+        border-radius: 8px;
+        margin-bottom: 4px;
+        font-size: 13px;
+        color: #e5e7eb;
+    }
+
+    .weak-topic-score {
+        color: #f59e0b;
+        font-weight: 600;
+        font-size: 12px;
+    }
+
+    .suggestion-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 8px 12px;
+        background: rgba(96, 165, 250, 0.05);
+        border-radius: 8px;
+        margin-bottom: 4px;
+        font-size: 13px;
+        color: #d1d5db;
+        line-height: 1.4;
+    }
+
+    .suggestion-icon {
+        font-size: 15px;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+
+    .suggestion-item.priority-high {
+        border-left: 3px solid #f87171;
+    }
+
+    .suggestion-item.priority-medium {
+        border-left: 3px solid #f59e0b;
+    }
+
+    .suggestion-item.priority-low {
+        border-left: 3px solid #34d399;
+    }
+
+    .predictor-meta {
+        font-size: 11px;
+        color: #6b7280;
+        text-align: right;
+        margin-top: 12px;
+    }
+
+    .predictor-loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        padding: 40px;
+        color: #9ca3af;
+    }
+
+    .pred-spinner {
+        width: 28px;
+        height: 28px;
+        border: 3px solid rgba(96, 165, 250, 0.2);
+        border-top-color: #60a5fa;
+        border-radius: 50%;
+        animation: predSpin 0.7s linear infinite;
+    }
+
+    @keyframes predSpin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -53,6 +317,68 @@
             <div class="stat-trend positive">
                 <span>✓</span>
                 <span>Excellent!</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Exam Predictor Card ═══ -->
+    <div class="predictor-section">
+        <div class="predictor-card" id="predictorCard">
+            <div class="predictor-loading" id="predictorLoading">
+                <div class="pred-spinner"></div>
+                <p>Analyzing your performance...</p>
+            </div>
+            <div id="predictorContent" style="display:none;">
+                <div class="predictor-header">
+                    <h3>📌 Exam Predictor <span style="font-weight:400;font-size:13px;color:#a78bfa;">(KyKnoX)</span>
+                    </h3>
+                    <span class="predictor-badge stable" id="trendBadge">● Stable</span>
+                </div>
+                <div class="predictor-body">
+                    <!-- Left: Gauge -->
+                    <div class="predictor-gauge">
+                        <div class="gauge-ring">
+                            <svg width="160" height="160">
+                                <defs>
+                                    <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#60a5fa" />
+                                        <stop offset="50%" style="stop-color:#a78bfa" />
+                                        <stop offset="100%" style="stop-color:#34d399" />
+                                    </linearGradient>
+                                </defs>
+                                <circle class="gauge-bg" cx="80" cy="80" r="70"></circle>
+                                <circle class="gauge-fill" id="gaugeFill" cx="80" cy="80" r="70"
+                                    stroke-dasharray="439.82" stroke-dashoffset="439.82"></circle>
+                            </svg>
+                            <div class="gauge-center">
+                                <div class="gauge-score" id="gaugeScore">0%</div>
+                                <div class="gauge-label">Predicted</div>
+                            </div>
+                        </div>
+                        <div class="cgpa-section">
+                            <div class="cgpa-label">
+                                <span>8+ CGPA Chance</span>
+                                <span id="cgpaValue">0%</span>
+                            </div>
+                            <div class="cgpa-bar-bg">
+                                <div class="cgpa-bar-fill" id="cgpaFill" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right: Details -->
+                    <div class="predictor-details">
+                        <div>
+                            <div class="predictor-detail-title">⚠️ Weak Topics Affecting Prediction</div>
+                            <div id="predWeakTopics"><span style="color:#6b7280;font-size:13px;">Loading...</span></div>
+                        </div>
+                        <div>
+                            <div class="predictor-detail-title">💡 Suggested Improvements</div>
+                            <div id="predSuggestions"><span style="color:#6b7280;font-size:13px;">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="predictor-meta" id="predictorMeta"></div>
             </div>
         </div>
     </div>
@@ -163,39 +489,79 @@
     // Load analytics data
     async function loadAnalytics() {
         try {
-            const response = await fetch('/api/student/analytics');
-            const data = await response.json();
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
 
+            const response = await fetch('/api/student/analytics', {
+                method: 'GET',
+                credentials: 'same-origin',
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
             console.log('Analytics data:', data);
 
             // Update stats
-            document.getElementById('overall-progress').textContent = data.overall_progress + '%';
-            document.getElementById('avg-score').textContent = data.avg_score + '%';
-            document.getElementById('total-quizzes').textContent = data.total_quizzes;
-            document.getElementById('accuracy').textContent = data.accuracy + '%';
+            document.getElementById('overall-progress').textContent = (data.overall_progress || 0) + '%';
+            document.getElementById('avg-score').textContent = (data.avg_score || 0) + '%';
+            document.getElementById('total-quizzes').textContent = data.total_quizzes || 0;
+            document.getElementById('accuracy').textContent = (data.accuracy || 0) + '%';
 
             // Update progress circle
-            updateProgressCircle(data.overall_progress);
+            updateProgressCircle(data.overall_progress || 0);
 
             // Create weekly trend chart
             if (weeklyChart) weeklyChart.destroy();
-            weeklyChart = createWeeklyTrendChart('weeklyTrendChart', data.weekly_trend);
+            if (data.weekly_trend && data.weekly_trend.length > 0) {
+                weeklyChart = createWeeklyTrendChart('weeklyTrendChart', data.weekly_trend);
+            } else {
+                const parent = document.getElementById('weeklyTrendChart').parentElement;
+                parent.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-secondary);">No Data Available Yet</div>';
+            }
 
             // Create topic breakdown chart
             if (topicChart) topicChart.destroy();
-            topicChart = createTopicBreakdownChart('topicBreakdownChart', data.topic_breakdown);
+            if (data.topic_breakdown && data.topic_breakdown.length > 0) {
+                topicChart = createTopicBreakdownChart('topicBreakdownChart', data.topic_breakdown);
+            } else {
+                const parent = document.getElementById('topicBreakdownChart').parentElement;
+                parent.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-secondary);">No Data Available Yet</div>';
+            }
 
             // Display strong topics
-            displayTopics('strong-topics-list', data.strong_topics, true);
+            displayTopics('strong-topics-list', data.strong_topics || [], true);
 
             // Display weak topics
-            displayTopics('weak-topics-list', data.weak_topics, false);
+            displayTopics('weak-topics-list', data.weak_topics || [], false);
 
             // Display recent attempts
-            displayRecentAttempts(data.quiz_attempts.slice(0, 5));
+            if (data.quiz_attempts && data.quiz_attempts.length > 0) {
+                displayRecentAttempts(data.quiz_attempts.slice(0, 5));
+            } else {
+                document.getElementById('recent-attempts-tbody').innerHTML = '<tr><td colspan="7" style="text-align:center; padding:2rem;">No quiz attempts yet</td></tr>';
+            }
 
         } catch (error) {
             console.error('Error loading analytics:', error);
+            const errorMsg = error.name === 'AbortError' ? 'Request timeout' : 'Failed to load analytics';
+
+            // Show error state in stats
+            ['overall-progress', 'avg-score', 'total-quizzes', 'accuracy'].forEach(id => {
+                document.getElementById(id).textContent = '--';
+            });
+
+            // Show error in table
+            document.getElementById('recent-attempts-tbody').innerHTML = `<tr><td colspan="7" style="text-align:center; padding:2rem; color: #ef4444;">${errorMsg}</td></tr>`;
         }
     }
 
@@ -253,6 +619,79 @@
     }
 
     // Load on page load
-    document.addEventListener('DOMContentLoaded', loadAnalytics);
+    document.addEventListener('DOMContentLoaded', () => {
+        loadAnalytics();
+        loadExamPrediction();
+    });
+
+    // ─── EXAM PREDICTOR ──────────────────────────
+    async function loadExamPrediction() {
+        const loading = document.getElementById('predictorLoading');
+        const content = document.getElementById('predictorContent');
+        try {
+            const resp = await fetch('/api/exam-prediction', { credentials: 'same-origin' });
+            const json = await resp.json();
+
+            if (json.success && json.data) {
+                renderPrediction(json.data);
+                loading.style.display = 'none';
+                content.style.display = 'block';
+            } else {
+                loading.innerHTML = '<p style="color:#6b7280;">No prediction data available yet. Complete a quiz to get started!</p>';
+            }
+        } catch (err) {
+            console.error('Prediction load error:', err);
+            loading.innerHTML = '<p style="color:#ef4444;">Failed to load prediction</p>';
+        }
+    }
+
+    function renderPrediction(data) {
+        // Score gauge
+        const score = data.predicted_score || 0;
+        const circumference = 439.82;
+        const offset = circumference - (score / 100) * circumference;
+        document.getElementById('gaugeFill').style.strokeDashoffset = offset;
+        document.getElementById('gaugeScore').textContent = score + '%';
+
+        // CGPA chance
+        const cgpa = data.cgpa_chance || 0;
+        document.getElementById('cgpaValue').textContent = cgpa + '%';
+        document.getElementById('cgpaFill').style.width = cgpa + '%';
+
+        // Trend badge
+        const badge = document.getElementById('trendBadge');
+        const trend = data.trend_direction || 'stable';
+        badge.className = 'predictor-badge ' + trend;
+        const trendLabels = { improving: '↑ Improving', declining: '↓ Declining', stable: '● Stable' };
+        badge.textContent = trendLabels[trend] || '● Stable';
+
+        // Weak topics
+        const weakEl = document.getElementById('predWeakTopics');
+        const weakTopics = data.weak_topics || [];
+        if (weakTopics.length > 0) {
+            weakEl.innerHTML = weakTopics.map(t =>
+                `<div class="weak-topic-row"><span>${t.topic} <small style="color:#6b7280;">(${t.class})</small></span><span class="weak-topic-score">${t.avg_score}%</span></div>`
+            ).join('');
+        } else {
+            weakEl.innerHTML = '<span style="color:#34d399;font-size:13px;">✅ No weak topics detected!</span>';
+        }
+
+        // Suggestions
+        const sugEl = document.getElementById('predSuggestions');
+        const suggestions = data.suggestions || [];
+        if (suggestions.length > 0) {
+            sugEl.innerHTML = suggestions.map(s =>
+                `<div class="suggestion-item priority-${s.priority || 'medium'}"><span class="suggestion-icon">${s.icon || '💡'}</span><span>${s.text}</span></div>`
+            ).join('');
+        } else {
+            sugEl.innerHTML = '<span style="color:#6b7280;font-size:13px;">Complete more quizzes for suggestions.</span>';
+        }
+
+        // Meta
+        const meta = document.getElementById('predictorMeta');
+        const quizCount = data.quiz_count_used || 0;
+        const ts = data.created_at ? new Date(data.created_at).toLocaleString() : 'just now';
+        meta.textContent = `Based on ${quizCount} quiz${quizCount !== 1 ? 'zes' : ''} • Updated: ${ts}`;
+    }
 </script>
 {% endblock %}

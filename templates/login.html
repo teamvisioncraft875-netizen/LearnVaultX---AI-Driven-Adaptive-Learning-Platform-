@@ -2,75 +2,87 @@
 
 {% block title %}Login - LearnVaultX{% endblock %}
 
+{% block meta_description %}Sign in to LearnVaultX to access your AI-powered personalized learning dashboard, quizzes,
+and analytics.{% endblock %}
+{% block og_title %}Login - LearnVaultX{% endblock %}
+{% block og_description %}Sign in to LearnVaultX to access your AI-powered personalized learning dashboard.{% endblock
+%}
+
 {% block content %}
 <div class="auth-page-container">
-    <!-- Left Panel - Branding with Fixed Readability -->
-    <div class="auth-branding-panel">
-        <div class="auth-branding-content">
-            <div class="auth-logo-container">
-                <div class="auth-logo-box">
-                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LearnVaultX">
+    <div class="auth-card">
+        <!-- Left Panel - Branding with Fixed Readability -->
+        <div class="auth-branding-panel">
+            <div class="auth-branding-content">
+                <div class="auth-logo-container">
+                    <div class="auth-logo-box">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LearnVaultX">
+                    </div>
+                    <h1 class="auth-brand-name">LearnVaultX</h1>
                 </div>
-                <h1 class="auth-brand-name">LearnVaultX</h1>
-            </div>
 
-            <p class="auth-tagline">
-                AI-powered adaptive learning that understands you
-            </p>
+                <p class="auth-tagline">
+                    AI-powered adaptive learning that understands you
+                </p>
 
-            <div class="auth-features">
-                <div class="auth-feature-item">
-                    <span class="checkmark">✓</span>
-                    <span>Personalized learning paths</span>
-                </div>
-                <div class="auth-feature-item">
-                    <span class="checkmark">✓</span>
-                    <span>Real-time progress tracking</span>
-                </div>
-                <div class="auth-feature-item">
-                    <span class="checkmark">✓</span>
-                    <span>AI-powered tutoring</span>
+                <div class="auth-features">
+                    <div class="auth-feature-item">
+                        <span class="checkmark">✓</span>
+                        <span>Personalized learning paths</span>
+                    </div>
+                    <div class="auth-feature-item">
+                        <span class="checkmark">✓</span>
+                        <span>Real-time progress tracking</span>
+                    </div>
+                    <div class="auth-feature-item">
+                        <span class="checkmark">✓</span>
+                        <span>AI-powered tutoring</span>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Right Panel - Login Form with Proper Sizing -->
-    <div class="auth-form-panel">
-        <!-- Background decoration -->
-        <div class="auth-form-decoration"></div>
+        <!-- Right Panel - Login Form -->
+        <div class="auth-form-panel">
+            <div class="auth-form-decoration"></div>
 
-        <div class="auth-form-container">
-            <h2 class="auth-form-title">Welcome back</h2>
-            <p class="auth-form-subtitle">Sign in to continue your learning journey</p>
+            <div class="auth-form-container">
+                <h2 class="auth-form-title">Welcome back</h2>
+                <p class="auth-form-subtitle">Sign in to continue your learning journey</p>
 
-            {% if error %}
-            <div class="auth-alert auth-alert-error show">{{ error }}</div>
-            {% endif %}
+                {% if error %}
+                <div class="auth-alert auth-alert-error show">{{ error }}</div>
+                {% endif %}
 
-            <div id="error-message" class="auth-alert auth-alert-error"></div>
+                <div id="error-message" class="auth-alert auth-alert-error"></div>
 
-            <form id="loginForm" onsubmit="handleLogin(event)">
-                <div class="auth-form-group">
-                    <label class="auth-form-label" for="email">Email</label>
-                    <input type="email" name="email" id="email" required autocomplete="email" class="auth-form-input"
-                        placeholder="Enter your email">
-                </div>
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="auth-form-group">
+                        <label class="auth-form-label" for="email">Email</label>
+                        <input type="email" name="email" id="email" required autocomplete="email"
+                            class="auth-form-input" placeholder="Enter your email">
+                    </div>
 
-                <div class="auth-form-group">
-                    <label class="auth-form-label" for="password">Password</label>
-                    <input type="password" name="password" id="password" required autocomplete="current-password"
-                        class="auth-form-input" placeholder="Enter your password">
-                </div>
+                    <div class="auth-form-group">
+                        <label class="auth-form-label" for="password">Password</label>
+                        <input type="password" name="password" id="password" required autocomplete="current-password"
+                            class="auth-form-input" placeholder="Enter your password">
+                    </div>
 
-                <button type="submit" class="auth-submit-btn" id="submitBtn">
-                    Sign In
-                </button>
+                    <button type="submit" class="auth-submit-btn" id="submitBtn">
+                        Sign In
+                    </button>
 
-                <p class="auth-footer-text">
-                    Don't have an account? <a href="/register" class="auth-footer-link">Sign up</a>
-                </p>
-            </form>
+                    <p style="text-align: right; margin: -8px 0 12px;">
+                        <a href="/forgot-password" class="auth-footer-link"
+                            style="font-size: 13px; opacity: 0.7;">Forgot password?</a>
+                    </p>
+
+                    <p class="auth-footer-text">
+                        Don't have an account? <a href="/register" class="auth-footer-link">Sign up</a>
+                    </p>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -103,8 +115,8 @@
             const data = await response.json();
 
             if (response.ok) {
-                // Login successful - redirect based on role
-                window.location.href = data.redirect;
+                // Credentials valid - redirect to OTP verification
+                window.location.href = data.redirect || '/verify-login-otp';
             } else {
                 // Show error
                 errorDiv.textContent = data.error || 'Login failed';

@@ -1,0 +1,958 @@
+/* ============================================
+   LEARNVAULTX – PURPLE / TEAL GLOW THEME
+   Loaded LAST to override all existing styles.
+   ============================================ */
+
+/* ============================================
+   CSS VARIABLES
+   ============================================ */
+
+:root {
+    /* Base backgrounds */
+    --bg-dark: #050714;
+    --bg-dark-secondary: #0c0f24;
+    --bg-dark-tertiary: #111530;
+    --bg-surface: #161a35;
+
+    /* Purple / Teal accent colors */
+    --purple-glow: rgba(138, 43, 226, 0.35);
+    --teal-glow: rgba(0, 255, 200, 0.18);
+    --purple-primary: #8b5cf6;
+    --purple-primary-hover: #7c3aed;
+    --purple-light: #a78bfa;
+    --teal-accent: #2dd4bf;
+    --teal-accent-hover: #14b8a6;
+
+    /* Card / glass */
+    --card-bg: rgba(20, 22, 40, 0.65);
+    --card-border: rgba(160, 120, 255, 0.22);
+    --card-border-hover: rgba(160, 120, 255, 0.45);
+    --card-glow: 0 0 18px rgba(138, 70, 255, 0.25);
+    --card-glow-hover: 0 0 28px rgba(138, 70, 255, 0.40);
+
+    /* Text */
+    --text-main: #ffffff;
+    --text-muted: rgba(255, 255, 255, 0.72);
+    --text-dim: rgba(255, 255, 255, 0.50);
+
+    /* Buttons */
+    --btn-purple-start: #6d5dfc;
+    --btn-purple-end: #8b5cf6;
+    --btn-orange-start: #ff7a18;
+    --btn-orange-end: #ffb300;
+
+    /* Borders */
+    --border-glow: rgba(138, 70, 255, 0.35);
+    --border-glow-soft: rgba(138, 70, 255, 0.18);
+}
+
+/* ============================================
+   OVERRIDE DESIGN-TOKENS FUTURISTIC THEME
+   ============================================ */
+
+[data-theme="futuristic"] {
+    --bg-primary: var(--bg-dark);
+    --bg-secondary: var(--bg-dark-secondary);
+    --bg-tertiary: var(--bg-dark-tertiary);
+    --bg-surface: var(--bg-surface);
+
+    --text-primary: var(--text-main);
+    --text-secondary: var(--text-muted);
+    --text-tertiary: var(--text-dim);
+
+    --primary: var(--purple-primary);
+    --primary-hover: var(--purple-primary-hover);
+    --secondary: var(--teal-accent);
+    --secondary-hover: var(--teal-accent-hover);
+    --accent: var(--teal-accent);
+
+    --border-primary: var(--border-glow);
+    --border-secondary: var(--border-glow-soft);
+
+    --glass-bg: var(--card-bg);
+    --glass-border: var(--card-border);
+    --glass-blur: 14px;
+
+    --glow-primary: var(--card-glow);
+    --glow-primary-strong: var(--card-glow-hover);
+    --glow-secondary: 0 0 18px rgba(0, 255, 200, 0.25);
+}
+
+/* Also override for default (no theme attribute set) */
+:root {
+    --bg-primary: var(--bg-dark);
+    --bg-secondary: var(--bg-dark-secondary);
+    --bg-tertiary: var(--bg-dark-tertiary);
+}
+
+/* ============================================
+   BODY GRADIENT BACKGROUND
+   ============================================ */
+
+body {
+    background:
+        radial-gradient(ellipse at 10% 10%, rgba(140, 70, 255, 0.35), transparent 55%),
+        radial-gradient(ellipse at 90% 10%, rgba(0, 255, 200, 0.20), transparent 55%),
+        radial-gradient(ellipse at 50% 80%, rgba(80, 40, 180, 0.12), transparent 60%),
+        linear-gradient(135deg, #040512, #06071a, #02030b) !important;
+    color: var(--text-main) !important;
+    min-height: 100vh;
+}
+
+/* Replace the star-dust and light-sweep pseudo-elements */
+[data-theme="futuristic"] body::before {
+    content: '' !important;
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        radial-gradient(1px 1px at 25% 15%, rgba(255, 255, 255, 0.12), transparent),
+        radial-gradient(1px 1px at 55% 35%, rgba(255, 255, 255, 0.08), transparent),
+        radial-gradient(1px 1px at 80% 60%, rgba(255, 255, 255, 0.10), transparent),
+        radial-gradient(1px 1px at 10% 80%, rgba(255, 255, 255, 0.06), transparent) !important;
+    background-size: 250px 250px !important;
+    opacity: 0.35 !important;
+    pointer-events: none;
+    z-index: 0;
+}
+
+[data-theme="futuristic"] body::after {
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(140, 70, 255, 0.04) 45%,
+            rgba(0, 255, 200, 0.07) 50%,
+            rgba(140, 70, 255, 0.04) 55%,
+            transparent 100%) !important;
+}
+
+/* ============================================
+   DASHBOARD CONTAINERS (inline style overrides)
+   ============================================ */
+
+/* Student dashboard app container */
+.student-app {
+    background:
+        radial-gradient(ellipse at 10% 10%, rgba(140, 70, 255, 0.30), transparent 55%),
+        radial-gradient(ellipse at 90% 10%, rgba(0, 255, 200, 0.15), transparent 55%),
+        linear-gradient(135deg, #040512, #06071a, #02030b) !important;
+}
+
+/* Teacher dashboard app container */
+.dashboard-app {
+    background:
+        radial-gradient(ellipse at 10% 10%, rgba(140, 70, 255, 0.30), transparent 55%),
+        radial-gradient(ellipse at 90% 10%, rgba(0, 255, 200, 0.15), transparent 55%),
+        linear-gradient(135deg, #040512, #06071a, #02030b) !important;
+}
+
+/* ============================================
+   SIDEBAR OVERRIDES
+   ============================================ */
+
+.stud-sidebar,
+.dash-sidebar {
+    background: rgba(10, 12, 30, 0.92) !important;
+    border-right: 1px solid var(--border-glow-soft) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+.brand-title-text {
+    color: var(--purple-light) !important;
+}
+
+.brand-role-badge {
+    color: var(--teal-accent) !important;
+    background: rgba(45, 212, 191, 0.12) !important;
+}
+
+.brand-role-badge.teacher {
+    color: #ffb300 !important;
+    background: rgba(255, 179, 0, 0.12) !important;
+}
+
+/* Nav items */
+.nav-menu-item {
+    color: var(--text-muted) !important;
+}
+
+.nav-menu-item:hover {
+    background: rgba(138, 70, 255, 0.12) !important;
+    color: var(--text-main) !important;
+    box-shadow: 0 0 16px rgba(138, 70, 255, 0.18) !important;
+}
+
+.nav-menu-item.active {
+    background: rgba(138, 70, 255, 0.18) !important;
+    color: var(--purple-light) !important;
+    box-shadow: 0 0 20px rgba(138, 70, 255, 0.28) !important;
+    border: 1px solid rgba(138, 70, 255, 0.30) !important;
+}
+
+/* Sidebar user profile */
+.sidebar-user-profile {
+    border-top-color: var(--border-glow-soft) !important;
+}
+
+.user-avatar {
+    background: linear-gradient(135deg, var(--purple-primary), var(--teal-accent)) !important;
+}
+
+.user-avatar.teacher {
+    background: linear-gradient(135deg, #ff7a18, #ef4444) !important;
+}
+
+.sidebar-logout-area {
+    border-top-color: var(--border-glow-soft) !important;
+}
+
+.sidebar-toggle-btn {
+    background: var(--bg-dark-secondary) !important;
+    border-color: var(--border-glow-soft) !important;
+}
+
+.sidebar-toggle-btn:hover {
+    background: var(--bg-dark-tertiary) !important;
+}
+
+/* ============================================
+   HEADER / VIEW HEAD OVERRIDES
+   ============================================ */
+
+.stud-view-head,
+.dash-view-head {
+    background: rgba(10, 12, 30, 0.85) !important;
+    border-bottom-color: var(--border-glow-soft) !important;
+    backdrop-filter: blur(12px);
+}
+
+.stud-mobile-head,
+.dash-mobile-head {
+    background: rgba(10, 12, 30, 0.92) !important;
+    border-bottom-color: var(--border-glow-soft) !important;
+}
+
+.mob-brand-text {
+    color: var(--purple-light) !important;
+}
+
+.mob-sidebar-btn,
+.mob-ai-btn {
+    background: rgba(138, 70, 255, 0.10) !important;
+    border-color: rgba(138, 70, 255, 0.30) !important;
+    color: var(--purple-light) !important;
+}
+
+/* ============================================
+   VIEW BODY / CONTENT AREAS
+   ============================================ */
+
+.stud-view-body,
+.dash-view-body {
+    background: transparent !important;
+}
+
+/* ============================================
+   CARDS & PANELS — GLASSMORPHISM
+   ============================================ */
+
+.quick-act-box,
+.stat-card,
+.class-card,
+.stud-class-card,
+.browse-class-card,
+.join-class-card,
+.analytics-card,
+.student-card,
+.progress-card,
+.recommend-card,
+.question-block,
+.modal-box,
+.loading-box,
+.empty-state-box {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--card-border) !important;
+    border-radius: 14px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: var(--card-glow);
+}
+
+.quick-act-box:hover,
+.stat-card:hover,
+.class-card:hover,
+.stud-class-card:hover,
+.browse-class-card:hover,
+.recommend-card:hover {
+    border-color: var(--card-border-hover) !important;
+    box-shadow: var(--card-glow-hover) !important;
+}
+
+/* Card border glow strip */
+.card-border-glow {
+    background: linear-gradient(90deg, var(--purple-primary), var(--teal-accent)) !important;
+}
+
+.scard-border,
+.bcard-border {
+    background: linear-gradient(135deg, var(--purple-primary), var(--teal-accent)) !important;
+}
+
+/* Stat values */
+.stat-value,
+.analytics-stat .stat-value,
+.question-num,
+.modal-info,
+.ai-name,
+.sai-title {
+    color: var(--purple-light) !important;
+}
+
+/* Select input */
+.select-input {
+    background: var(--card-bg) !important;
+    border-color: var(--border-glow-soft) !important;
+}
+
+/* Form inputs inside teacher modal */
+.form-input {
+    background: rgba(16, 18, 40, 0.70) !important;
+    border-color: var(--border-glow-soft) !important;
+}
+
+.form-input:focus {
+    border-color: var(--purple-primary) !important;
+    box-shadow: 0 0 0 3px rgba(138, 70, 255, 0.15) !important;
+}
+
+/* ============================================
+   BUTTONS — PURPLE GRADIENT PRIMARY
+   ============================================ */
+
+/* Main purple gradient buttons */
+.btn-primary,
+.scard-btn,
+.join-submit-btn,
+.empty-btn,
+.auth-submit-btn {
+    background: linear-gradient(135deg, var(--btn-purple-start), var(--btn-purple-end)) !important;
+    border: none !important;
+    color: white !important;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(138, 70, 255, 0.35) !important;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover,
+.scard-btn:hover,
+.join-submit-btn:hover,
+.empty-btn:hover,
+.auth-submit-btn:hover {
+    box-shadow: 0 0 30px rgba(138, 70, 255, 0.55), 0 0 60px rgba(138, 70, 255, 0.20) !important;
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+/* Card-level buttons (teacher dashboard) */
+.btn-card.primary {
+    background: var(--purple-primary) !important;
+}
+
+.btn-card.primary:hover {
+    background: var(--purple-primary-hover) !important;
+}
+
+.btn-card.secondary {
+    background: rgba(138, 70, 255, 0.10) !important;
+    color: var(--purple-light) !important;
+    border: 1px solid rgba(138, 70, 255, 0.30) !important;
+}
+
+.btn-card.secondary:hover {
+    background: rgba(138, 70, 255, 0.20) !important;
+}
+
+/* Secondary button */
+.btn-secondary {
+    border-color: var(--border-glow-soft) !important;
+    color: var(--text-muted) !important;
+}
+
+.btn-secondary:hover {
+    border-color: var(--purple-primary) !important;
+    color: var(--purple-light) !important;
+}
+
+/* Browse card join button — teal variant */
+.bcard-join-btn {
+    background: linear-gradient(135deg, var(--purple-primary), var(--teal-accent)) !important;
+    box-shadow: 0 0 16px rgba(45, 212, 191, 0.30) !important;
+}
+
+.bcard-join-btn:hover {
+    box-shadow: 0 0 28px rgba(45, 212, 191, 0.50) !important;
+}
+
+/* AI float button */
+.ai-float-stud {
+    background: linear-gradient(135deg, var(--purple-primary), var(--teal-accent)) !important;
+    box-shadow: 0 8px 24px rgba(138, 70, 255, 0.40) !important;
+}
+
+.ai-float-stud:hover {
+    box-shadow: 0 12px 32px rgba(138, 70, 255, 0.55) !important;
+}
+
+.ai-float {
+    background: linear-gradient(135deg, var(--purple-primary), var(--teal-accent)) !important;
+    box-shadow: 0 4px 20px rgba(138, 70, 255, 0.35) !important;
+}
+
+.ai-float:hover {
+    box-shadow: 0 8px 28px rgba(138, 70, 255, 0.50) !important;
+}
+
+/* ============================================
+   AI PANEL OVERRIDES
+   ============================================ */
+
+.stud-ai-panel,
+.dash-ai {
+    background: rgba(10, 12, 30, 0.95) !important;
+    border-left: 1px solid var(--border-glow-soft) !important;
+    backdrop-filter: blur(16px);
+}
+
+/* AI mode tabs */
+.sai-tab.active,
+.mode-tab.active {
+    background: var(--purple-primary) !important;
+    color: white !important;
+    border-color: var(--purple-primary) !important;
+    box-shadow: 0 0 14px rgba(138, 70, 255, 0.35) !important;
+}
+
+.sai-tab:hover,
+.mode-tab:hover {
+    background: rgba(138, 70, 255, 0.12) !important;
+    box-shadow: 0 0 8px rgba(138, 70, 255, 0.15) !important;
+}
+
+/* AI chat bubbles */
+.user-side .msg-bubble {
+    background: var(--purple-primary) !important;
+}
+
+.ai-msg.user-msg .msg-text {
+    background: rgba(138, 70, 255, 0.10) !important;
+    border-color: rgba(138, 70, 255, 0.30) !important;
+}
+
+.ai-side .msg-bubble,
+.msg-text {
+    background: rgba(20, 22, 40, 0.80) !important;
+}
+
+/* AI send button */
+.sai-send-btn,
+.ai-send {
+    background: linear-gradient(135deg, var(--purple-primary), var(--teal-accent)) !important;
+}
+
+.sai-send-btn:hover,
+.ai-send:hover {
+    box-shadow: 0 4px 14px rgba(138, 70, 255, 0.40) !important;
+}
+
+/* AI input field */
+.sai-input-field,
+.ai-input {
+    background: rgba(16, 18, 40, 0.70) !important;
+    border-color: var(--border-glow-soft) !important;
+}
+
+.sai-input-field:focus,
+.ai-input:focus {
+    border-color: var(--purple-primary) !important;
+    box-shadow: 0 0 0 4px rgba(138, 70, 255, 0.12) !important;
+}
+
+/* ============================================
+   PROGRESS BAR OVERRIDES
+   ============================================ */
+
+.progress-fill {
+    background: linear-gradient(90deg, var(--purple-primary), var(--teal-accent)) !important;
+}
+
+.progress-track {
+    background: rgba(138, 70, 255, 0.15) !important;
+}
+
+/* Existing progress bars from external CSS */
+[data-theme="futuristic"] .progress-bar {
+    background: linear-gradient(90deg, var(--purple-primary), var(--teal-accent)) !important;
+    box-shadow: 0 0 12px rgba(138, 70, 255, 0.40) !important;
+}
+
+/* ============================================
+   LOADING SPINNER OVERRIDE
+   ============================================ */
+
+.loading-spinner {
+    border-color: rgba(138, 70, 255, 0.15) !important;
+    border-top-color: var(--purple-primary) !important;
+    border-right-color: var(--teal-accent) !important;
+    box-shadow: 0 0 32px rgba(138, 70, 255, 0.30) !important;
+    filter: drop-shadow(0 0 16px rgba(138, 70, 255, 0.40)) !important;
+}
+
+/* ============================================
+   EMPTY STATE OVERRIDES
+   ============================================ */
+
+.empty-state-box {
+    border: 2px dashed rgba(138, 70, 255, 0.25) !important;
+    box-shadow: inset 0 2px 16px rgba(0, 0, 0, 0.30);
+}
+
+/* ============================================
+   AUTH PAGES — BRANDING PANEL PURPLE
+   ============================================ */
+
+/* Auth pages — unified glass card */
+.auth-page-container {
+    background:
+        radial-gradient(ellipse at 15% 30%, rgba(91, 46, 255, 0.28) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(0, 212, 255, 0.12) 0%, transparent 45%),
+        radial-gradient(ellipse at 85% 75%, rgba(0, 245, 255, 0.10) 0%, transparent 50%),
+        radial-gradient(ellipse at 40% 85%, rgba(43, 108, 255, 0.10) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(109, 59, 255, 0.06) 0%, transparent 60%),
+        linear-gradient(155deg, #050816 0%, #070B1F 30%, #0d1035 55%, #090d28 80%, #050816 100%) !important;
+}
+
+.auth-branding-panel {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.auth-branding-panel::before {
+    content: none !important;
+}
+
+.auth-feature-item .checkmark {
+    color: var(--teal-accent) !important;
+}
+
+.auth-form-panel {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.auth-form-decoration {
+    background: radial-gradient(circle, rgba(138, 70, 255, 0.06) 0%, transparent 70%) !important;
+}
+
+.auth-form-input,
+.auth-form-select {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+}
+
+.auth-form-input:focus,
+.auth-form-select:focus {
+    border-color: rgba(103, 232, 249, 0.50) !important;
+    background: rgba(255, 255, 255, 0.07) !important;
+    box-shadow: 0 0 0 3px rgba(103, 232, 249, 0.10),
+        0 0 20px rgba(103, 232, 249, 0.06) !important;
+}
+
+.auth-submit-btn {
+    background: linear-gradient(135deg, #7C3AED 0%, #4F46E5 50%, #2563EB 100%) !important;
+    border: none !important;
+    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.35),
+        0 0 40px rgba(124, 58, 237, 0.12) !important;
+}
+
+.auth-submit-btn:hover {
+    box-shadow: 0 6px 28px rgba(124, 58, 237, 0.50),
+        0 0 50px rgba(103, 232, 249, 0.10) !important;
+}
+
+.auth-footer-link {
+    color: var(--teal-accent) !important;
+}
+
+.auth-footer-link:hover {
+    color: var(--purple-light) !important;
+}
+
+/* ============================================
+   MODAL OVERRIDES
+   ============================================ */
+
+.modal-overlay {
+    background: rgba(5, 7, 20, 0.80) !important;
+}
+
+.modal-box {
+    background: rgba(12, 15, 36, 0.96) !important;
+    border: 1px solid var(--card-border) !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.60), var(--card-glow) !important;
+}
+
+.modal-header {
+    border-bottom-color: var(--border-glow-soft) !important;
+}
+
+/* ============================================
+   TOAST OVERRIDES
+   ============================================ */
+
+.toast-notification.info {
+    background: rgba(138, 70, 255, 0.10) !important;
+    border-color: rgba(138, 70, 255, 0.30) !important;
+    color: var(--purple-light) !important;
+    box-shadow: 0 8px 24px rgba(138, 70, 255, 0.25) !important;
+}
+
+/* ============================================
+   MIDNIGHT-THEME VARIABLE OVERRIDES
+   ============================================ */
+
+:root {
+    --midnight-bg-primary: var(--bg-dark);
+    --midnight-bg-secondary: var(--bg-dark-secondary);
+    --midnight-bg-glass: var(--card-bg);
+
+    --neon-blue: var(--purple-light);
+    --neon-cyan: var(--teal-accent);
+    --neon-blue-dark: var(--purple-primary-hover);
+
+    --midnight-text-primary: var(--text-main);
+    --midnight-text-secondary: var(--text-muted);
+
+    --midnight-border: var(--border-glow);
+    --midnight-border-soft: var(--border-glow-soft);
+
+    --glow-soft: var(--card-glow);
+    --glow-medium: var(--card-glow-hover);
+    --glow-strong: 0 0 40px rgba(138, 70, 255, 0.50);
+    --glow-cyan: 0 0 25px rgba(45, 212, 191, 0.40);
+}
+
+/* ============================================
+   NEON-UI-UPGRADE VARIABLE OVERRIDES
+   ============================================ */
+
+:root {
+    --neon-green: var(--teal-accent);
+    --neon-purple: var(--purple-light);
+    --glass-border: var(--card-border);
+    --glass-hover-border: var(--card-border-hover);
+}
+
+/* ============================================
+   HOMEPAGE / HERO OVERRIDES
+   ============================================ */
+
+[data-theme="futuristic"] body,
+[data-theme="futuristic"] .homepage {
+    background:
+        radial-gradient(ellipse at 10% 10%, rgba(140, 70, 255, 0.30), transparent 55%),
+        radial-gradient(ellipse at 90% 10%, rgba(0, 255, 200, 0.15), transparent 55%),
+        var(--bg-dark) !important;
+}
+
+[data-theme="futuristic"] .hero-section {
+    background: linear-gradient(135deg,
+            #050714 0%,
+            #0a0d22 40%,
+            #0f1230 70%,
+            #141840 100%) !important;
+}
+
+[data-theme="futuristic"] .hero-section::before {
+    background:
+        radial-gradient(ellipse at 25% 40%, rgba(138, 70, 255, 0.08) 0%, transparent 55%),
+        radial-gradient(ellipse at 70% 35%, rgba(45, 212, 191, 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 70%, rgba(138, 70, 255, 0.04) 0%, transparent 50%) !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    width: 100% !important;
+    height: 100% !important;
+    top: 0 !important;
+    left: 0 !important;
+}
+
+[data-theme="futuristic"] .brand-badge {
+    background: rgba(138, 70, 255, 0.10) !important;
+    border-color: rgba(138, 70, 255, 0.30) !important;
+    box-shadow: var(--card-glow) !important;
+}
+
+[data-theme="futuristic"] .brand-text {
+    color: var(--purple-light) !important;
+}
+
+[data-theme="futuristic"] .brand-name {
+    background: linear-gradient(135deg, var(--purple-light), var(--teal-accent)) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+}
+
+/* Hero video container — seamless blend, no border */
+.hero-video-container {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+}
+
+.hero-video-container:hover {
+    box-shadow: none !important;
+}
+
+/* ============================================
+   FUTURISTIC SIDEBAR & PANEL OVERRIDES
+   ============================================ */
+
+[data-theme="futuristic"] .sidebar,
+[data-theme="futuristic"] .left-zone {
+    background: rgba(10, 12, 30, 0.90) !important;
+    border-color: var(--border-glow-soft) !important;
+    box-shadow: 2px 0 20px rgba(138, 70, 255, 0.08) !important;
+}
+
+[data-theme="futuristic"] #ai-panel,
+[data-theme="futuristic"] #classAI,
+[data-theme="futuristic"] .right-zone {
+    background: rgba(10, 12, 30, 0.90) !important;
+    border-color: var(--border-glow-soft) !important;
+    box-shadow: -2px 0 20px rgba(138, 70, 255, 0.08) !important;
+}
+
+/* ============================================
+   FUTURISTIC BUTTONS OVERRIDE
+   ============================================ */
+
+[data-theme="futuristic"] .btn-hero-primary,
+[data-theme="futuristic"] .btn-primary {
+    background: linear-gradient(135deg, var(--btn-purple-start), var(--btn-purple-end)) !important;
+    border: 2px solid var(--teal-accent) !important;
+    box-shadow: 0 0 30px rgba(138, 70, 255, 0.45), 0 0 60px rgba(138, 70, 255, 0.20) !important;
+}
+
+[data-theme="futuristic"] .btn-hero-primary:hover,
+[data-theme="futuristic"] .btn-primary:hover {
+    box-shadow: 0 0 40px rgba(138, 70, 255, 0.65), 0 0 80px rgba(138, 70, 255, 0.30) !important;
+    background: linear-gradient(135deg, #7c3aed, #6d5dfc) !important;
+}
+
+[data-theme="futuristic"] .btn-hero-secondary,
+[data-theme="futuristic"] .btn-secondary {
+    border-color: rgba(138, 70, 255, 0.30) !important;
+    background: rgba(5, 7, 20, 0.60) !important;
+}
+
+[data-theme="futuristic"] .btn-hero-secondary:hover,
+[data-theme="futuristic"] .btn-secondary:hover {
+    border-color: rgba(138, 70, 255, 0.50) !important;
+    box-shadow: 0 0 25px rgba(138, 70, 255, 0.25) !important;
+}
+
+/* ============================================
+   INPUT FOCUS — PURPLE GLOW
+   ============================================ */
+
+[data-theme="futuristic"] input:focus,
+[data-theme="futuristic"] textarea:focus,
+[data-theme="futuristic"] select:focus {
+    border-color: var(--purple-primary) !important;
+    box-shadow: 0 0 0 3px rgba(138, 70, 255, 0.15), var(--card-glow) !important;
+}
+
+.join-code-input {
+    background: rgba(16, 18, 40, 0.70) !important;
+    border-color: var(--border-glow-soft) !important;
+}
+
+.join-code-input:focus {
+    border-color: var(--purple-primary) !important;
+    box-shadow: 0 0 0 4px rgba(138, 70, 255, 0.12) !important;
+}
+
+/* ============================================
+   SETTINGS MODAL OVERRIDES
+   ============================================ */
+
+.settings-content {
+    background: rgba(12, 15, 36, 0.96) !important;
+    border-color: var(--card-border) !important;
+}
+
+.btn-settings-save {
+    background: linear-gradient(135deg, var(--btn-purple-start), var(--btn-purple-end)) !important;
+}
+
+.btn-settings-save:hover {
+    box-shadow: 0 8px 24px rgba(138, 70, 255, 0.40) !important;
+}
+
+.theme-option.active {
+    background: linear-gradient(135deg, rgba(138, 70, 255, 0.10), rgba(45, 212, 191, 0.10)) !important;
+    border-color: var(--purple-primary) !important;
+    box-shadow: 0 4px 16px rgba(138, 70, 255, 0.20) !important;
+}
+
+.theme-option:hover {
+    border-color: var(--purple-primary) !important;
+}
+
+.toggle-switch:checked {
+    background: linear-gradient(135deg, var(--purple-primary), var(--teal-accent)) !important;
+}
+
+.settings-fab {
+    background: linear-gradient(135deg, var(--purple-primary), var(--teal-accent)) !important;
+    box-shadow: 0 8px 24px rgba(138, 70, 255, 0.35) !important;
+}
+
+.settings-fab:hover {
+    box-shadow: 0 12px 32px rgba(138, 70, 255, 0.50) !important;
+}
+
+.theme-toggle-fab {
+    background: linear-gradient(135deg, var(--purple-primary), var(--teal-accent)) !important;
+    box-shadow: var(--card-glow) !important;
+}
+
+.theme-toggle-fab:hover {
+    box-shadow: 0 0 40px rgba(138, 70, 255, 0.50) !important;
+}
+
+/* ============================================
+   GLASSMORPHISM CARDS OVERRIDE (external CSS)
+   ============================================ */
+
+[data-theme="futuristic"] .glass-card,
+[data-theme="futuristic"] .metric-card,
+[data-theme="futuristic"] .feature-card,
+[data-theme="futuristic"] .card,
+[data-theme="futuristic"] .faq-item {
+    background: var(--card-bg) !important;
+    border-color: var(--card-border) !important;
+    box-shadow: var(--card-glow) !important;
+}
+
+[data-theme="futuristic"] .glass-card:hover,
+[data-theme="futuristic"] .metric-card:hover,
+[data-theme="futuristic"] .feature-card:hover,
+[data-theme="futuristic"] .card:hover {
+    border-color: var(--card-border-hover) !important;
+    box-shadow: var(--card-glow-hover) !important;
+}
+
+/* ============================================
+   GLASSMORPHISM PRODUCTION OVERRIDES
+   ============================================ */
+
+.glass-card {
+    border-color: var(--card-border) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.30) !important;
+}
+
+.glass-card:hover {
+    border-color: var(--card-border-hover) !important;
+    box-shadow: 0 12px 40px rgba(138, 70, 255, 0.18) !important;
+}
+
+.glass-panel {
+    background: rgba(10, 12, 30, 0.85) !important;
+    border-color: var(--card-border) !important;
+}
+
+.glass-modal {
+    background: rgba(12, 15, 36, 0.96) !important;
+    border-color: var(--card-border) !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.70), var(--card-glow) !important;
+}
+
+/* Text gradient overrides */
+.text-gradient-blue {
+    background: linear-gradient(135deg, var(--purple-light), var(--teal-accent)) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+}
+
+.text-gradient-green {
+    background: linear-gradient(135deg, var(--teal-accent), #00e5ff) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+}
+
+/* Metric value override */
+.metric-value {
+    background: linear-gradient(135deg, var(--purple-light), var(--teal-accent)) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+}
+
+/* ============================================
+   GLOW ANIMATION OVERRIDE
+   ============================================ */
+
+@keyframes btn-glow {
+    0% {
+        box-shadow: 0 0 5px rgba(138, 70, 255, 0.45);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(138, 70, 255, 0.70), 0 0 10px rgba(138, 70, 255, 0.35);
+    }
+
+    100% {
+        box-shadow: 0 0 5px rgba(138, 70, 255, 0.45);
+    }
+}
+
+@keyframes pulseGlow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 15px rgba(138, 70, 255, 0.25);
+    }
+
+    50% {
+        box-shadow: 0 0 30px rgba(138, 70, 255, 0.50);
+    }
+}
+
+/* ============================================
+   ANALYTICS PAGES
+   ============================================ */
+
+.analytics-card {
+    background: var(--card-bg) !important;
+    border-color: var(--card-border) !important;
+}
+
+/* ============================================
+   ERROR PAGES (403, 404, 500)
+   ============================================ */
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}

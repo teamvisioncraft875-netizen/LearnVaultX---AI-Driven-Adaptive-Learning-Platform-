@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}404 - Page Not Found - LearnVaultX{% endblock %}
+
+{% block content %}
+<div
+    style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg-primary); padding: var(--space-4);">
+    <div class="glass-card" style="
+        max-width: 600px;
+        width: 100%;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(0, 255, 136, 0.2);
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        padding: var(--space-8);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    ">
+        <!-- Error Code -->
+        <div style="
+            font-size: 120px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00ff88, #00e5ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: var(--space-4);
+            text-shadow: 0 0 40px rgba(0, 255, 136, 0.3);
+        ">404</div>
+
+        <!-- Error Title -->
+        <h1 style="
+            font-size: var(--text-3xl);
+            color: var(--text-primary);
+            margin-bottom: var(--space-3);
+            font-weight: 700;
+        ">Page Not Found</h1>
+
+        <!-- Error Description -->
+        <p style="
+            color: var(--text-secondary);
+            font-size: var(--text-lg);
+            margin-bottom: var(--space-6);
+            line-height: 1.6;
+        ">
+            Oops! The page you're looking for doesn't exist. It might have been moved or deleted.
+        </p>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: var(--space-3); justify-content: center; flex-wrap: wrap;">
+            <button onclick="history.back()" class="btn btn-secondary" style="
+                padding: 14px 28px;
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(0, 255, 136, 0.3);
+                border-radius: 12px;
+                color: var(--text-primary);
+                font-size: var(--text-base);
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            " onmouseover="this.style.background='rgba(255, 255, 255, 0.15)'; this.style.borderColor='rgba(0, 255, 136, 0.5)'; this.style.boxShadow='0 0 20px rgba(0, 255, 136, 0.2)'"
+                onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.borderColor='rgba(0, 255, 136, 0.3)'; this.style.boxShadow='none'">
+                ← Go Back
+            </button>
+
+            <a href="/" class="btn btn-primary" style="
+                padding: 14px 28px;
+                background: linear-gradient(135deg, #00ff88, #00e5ff);
+                border: none;
+                border-radius: 12px;
+                color: #0f0f1e;
+                font-size: var(--text-base);
+                font-weight: 700;
+                text-decoration: none;
+                display: inline-block;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 24px rgba(0, 255, 136, 0.4)'"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                🏠 Go Home
+            </a>
+
+            {% if session.user_id %}
+            <a href="{% if session.role == 'teacher' %}/teacher/dashboard{% else %}/student/dashboard{% endif %}"
+                class="btn btn-primary" style="
+                padding: 14px 28px;
+                background: linear-gradient(135deg, #00e5ff, #ff006e);
+                border: none;
+                border-radius: 12px;
+                color: white;
+                font-size: var(--text-base);
+                font-weight: 700;
+                text-decoration: none;
+                display: inline-block;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 24px rgba(0, 229, 255, 0.4)'"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                📊 Dashboard
+            </a>
+            {% endif %}
+        </div>
+
+        <!-- Decorative Element -->
+        <div style="
+            margin-top: var(--space-8);
+            padding-top: var(--space-6);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        ">
+            <p style="color: var(--text-muted); font-size: var(--text-sm);">
+                Need help? <a href="mailto:support@learnvaultx.com"
+                    style="color: #00ff88; text-decoration: none; font-weight: 600;">Contact Support</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

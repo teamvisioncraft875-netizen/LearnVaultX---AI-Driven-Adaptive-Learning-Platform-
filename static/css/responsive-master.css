@@ -1,0 +1,912 @@
+/* ============================================================
+   RESPONSIVE MASTER – LearnVaultX
+   Loaded last in base.html to override all existing styles.
+   Breakpoints:
+     ≤480px   — Small Mobile
+     481–600  — Medium Mobile
+     601–768  — Tablet Portrait
+     769–1024 — Tablet Landscape
+     1025–1440 — Laptop / Desktop
+     1441+    — Large Desktop
+   ============================================================ */
+
+/* ============================================================
+   0. GLOBAL OVERFLOW PREVENTION
+   ============================================================ */
+html,
+body {
+    overflow-x: hidden;
+    max-width: 100vw;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+img,
+video,
+canvas,
+svg {
+    max-width: 100%;
+    height: auto;
+}
+
+/* ============================================================
+   1. RESPONSIVE TYPOGRAPHY — clamp() system
+   ============================================================ */
+
+/* Hero / Page headline */
+h1,
+.view-main-title,
+.hero-title,
+.hero-main-title {
+    font-size: clamp(1.5rem, 3vw + 0.5rem, 2.75rem) !important;
+    line-height: 1.2;
+}
+
+/* Section titles */
+h2,
+.section-label,
+.sai-title,
+.ai-name,
+.modal-title,
+.card-title,
+.analytics-name,
+.join-card-title {
+    font-size: clamp(1.1rem, 2vw + 0.3rem, 1.5rem) !important;
+    line-height: 1.3;
+}
+
+/* Card headings */
+h3,
+.qact-title,
+.scard-title,
+.bcard-title,
+.empty-heading,
+.empty-title,
+.student-name {
+    font-size: clamp(0.95rem, 1.5vw + 0.2rem, 1.25rem) !important;
+    line-height: 1.35;
+}
+
+/* Body / paragraph text */
+p,
+.view-sub-text,
+.qact-text,
+.card-desc,
+.scard-subject,
+.bcard-desc,
+.join-card-desc,
+.welcome-message,
+.welcome-msg,
+.empty-desc,
+.empty-text {
+    font-size: clamp(0.85rem, 1vw + 0.15rem, 1rem);
+    line-height: 1.6;
+}
+
+/* Small / meta text */
+.meta-item,
+.scard-teacher,
+.bcard-instructor,
+.bcard-students,
+.progress-pct,
+.student-email,
+.stat-label,
+.user-email,
+.sai-subtitle,
+.ai-tag,
+.form-hint,
+.brand-role-badge,
+.feedback-error,
+.feedback-success,
+.feedback-loading {
+    font-size: clamp(0.7rem, 0.8vw + 0.1rem, 0.85rem);
+}
+
+/* Stat numbers */
+.stat-value {
+    font-size: clamp(1.5rem, 3vw, 2.25rem) !important;
+}
+
+/* ============================================================
+   2. DESKTOP COMPACTION (1025px – 1440px)
+   — Slightly tighter padding for an 80%-zoom feel
+   ============================================================ */
+@media (min-width: 1025px) and (max-width: 1440px) {
+    .dash-view-head {
+        padding: 24px 32px 20px !important;
+    }
+
+    .dash-view-body {
+        padding: 24px 32px !important;
+    }
+
+    .quick-act-grid {
+        gap: 16px;
+    }
+
+    .stud-class-card,
+    .browse-class-card,
+    .class-card,
+    .stat-card,
+    .analytics-card,
+    .student-card,
+    .progress-card {
+        padding: 20px;
+    }
+
+    /* Slightly narrower AI panel */
+    .stud-ai-panel,
+    .dash-ai {
+        width: 340px !important;
+    }
+
+    .stud-ai-panel.open~.stud-center,
+    .dash-center.ai-active {
+        margin-right: 340px !important;
+    }
+}
+
+/* ============================================================
+   3. LARGE DESKTOP (1441px+)
+   ============================================================ */
+@media (min-width: 1441px) {
+
+    /* Max-width container to avoid ultra-wide stretch */
+    .dash-view-body {
+        max-width: 1400px;
+    }
+
+    .quick-act-grid,
+    .stud-classes-grid,
+    .browse-classes-grid,
+    .recommend-grid,
+    .gaps-grid,
+    .progress-grid,
+    .class-grid,
+    .students-grid {
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    }
+}
+
+/* ============================================================
+   4. TABLET LANDSCAPE (769px – 1024px)
+   ============================================================ */
+@media (max-width: 1024px) {
+
+    /* Sidebar – collapsed by default, expand on toggle */
+    .stud-sidebar,
+    .dash-sidebar {
+        width: 80px !important;
+        overflow: hidden;
+    }
+
+    .stud-sidebar .brand-title-text,
+    .stud-sidebar .brand-role-badge,
+    .stud-sidebar .item-label,
+    .stud-sidebar .user-info,
+    .stud-sidebar .logout-txt,
+    .dash-sidebar .brand-title-text,
+    .dash-sidebar .brand-role-badge,
+    .dash-sidebar .item-label,
+    .dash-sidebar .user-info,
+    .dash-sidebar .logout-txt {
+        display: none;
+    }
+
+    .stud-sidebar .sidebar-brand-area,
+    .dash-sidebar .sidebar-brand-area {
+        padding: 16px 10px;
+        justify-content: center;
+    }
+
+    .stud-sidebar .nav-menu-item,
+    .dash-sidebar .nav-menu-item,
+    .stud-sidebar .stud-nav-item {
+        justify-content: center;
+        padding: 12px 10px;
+    }
+
+    .stud-sidebar .item-icon,
+    .dash-sidebar .item-icon,
+    .stud-sidebar .stud-nav-icon {
+        margin-right: 0;
+        font-size: 22px;
+    }
+
+    .stud-sidebar .sidebar-user-profile,
+    .dash-sidebar .sidebar-user-profile {
+        justify-content: center;
+        padding: 12px 10px;
+    }
+
+    .stud-sidebar .sidebar-logout-area,
+    .dash-sidebar .sidebar-logout-area {
+        padding: 12px 10px;
+    }
+
+    .stud-sidebar .logout-button,
+    .dash-sidebar .logout-button {
+        justify-content: center;
+    }
+
+    /* Sidebar toggle btn hide on tablet (it's already collapsed) */
+    .sidebar-toggle-btn {
+        display: none !important;
+    }
+
+    /* Dashboard grids — 2 columns */
+    .quick-act-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .stud-classes-grid,
+    .browse-classes-grid,
+    .recommend-grid,
+    .gaps-grid,
+    .progress-grid,
+    .class-grid,
+    .students-grid,
+    .analytics-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    /* View padding compaction */
+    .dash-view-head {
+        padding: 20px 24px 16px !important;
+    }
+
+    .dash-view-body {
+        padding: 20px 24px !important;
+    }
+
+    /* AI panel  – narrower */
+    .stud-ai-panel,
+    .dash-ai {
+        width: 300px !important;
+    }
+
+    .stud-ai-panel.open~.stud-center,
+    .dash-center.ai-active {
+        margin-right: 300px !important;
+    }
+}
+
+/* ============================================================
+   5. TABLET PORTRAIT (601px – 768px)
+   ============================================================ */
+@media (max-width: 768px) {
+
+    /* Sidebar – overlay drawer */
+    .stud-sidebar,
+    .dash-sidebar {
+        position: fixed !important;
+        left: -260px !important;
+        top: 0 !important;
+        height: 100vh !important;
+        width: 260px !important;
+        z-index: 1000 !important;
+        transition: left 0.3s ease !important;
+        overflow-y: auto;
+    }
+
+    .stud-sidebar.mobile-show,
+    .dash-sidebar.mobile-show {
+        left: 0 !important;
+    }
+
+    /* Re-show labels in mobile drawer */
+    .stud-sidebar.mobile-show .brand-title-text,
+    .stud-sidebar.mobile-show .brand-role-badge,
+    .stud-sidebar.mobile-show .item-label,
+    .stud-sidebar.mobile-show .user-info,
+    .stud-sidebar.mobile-show .logout-txt,
+    .dash-sidebar.mobile-show .brand-title-text,
+    .dash-sidebar.mobile-show .brand-role-badge,
+    .dash-sidebar.mobile-show .item-label,
+    .dash-sidebar.mobile-show .user-info,
+    .dash-sidebar.mobile-show .logout-txt {
+        display: block !important;
+    }
+
+    .stud-sidebar.mobile-show .nav-menu-item,
+    .dash-sidebar.mobile-show .nav-menu-item,
+    .stud-sidebar.mobile-show .stud-nav-item {
+        justify-content: flex-start;
+        padding: 14px 16px;
+    }
+
+    .stud-sidebar.mobile-show .sidebar-brand-area,
+    .dash-sidebar.mobile-show .sidebar-brand-area {
+        padding: 20px 16px;
+    }
+
+    .stud-sidebar.mobile-show .sidebar-user-profile,
+    .dash-sidebar.mobile-show .sidebar-user-profile {
+        padding: 16px 12px;
+    }
+
+    .stud-sidebar.mobile-show .sidebar-logout-area,
+    .dash-sidebar.mobile-show .sidebar-logout-area {
+        padding: 16px 12px;
+    }
+
+    .stud-sidebar.mobile-show .logout-button,
+    .dash-sidebar.mobile-show .logout-button {
+        justify-content: center;
+    }
+
+    /* Mobile header – show */
+    .dash-mobile-head,
+    .stud-mobile-head {
+        display: flex !important;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background: #111827;
+        border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+    }
+
+    .mob-sidebar-btn,
+    .mob-ai-btn,
+    .stud-mob-sidebar,
+    .stud-mob-ai {
+        width: 40px;
+        height: 40px;
+        background: rgba(96, 165, 250, 0.1);
+        border: 1px solid rgba(96, 165, 250, 0.3);
+        border-radius: 8px;
+        color: #60a5fa;
+        font-size: 18px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .mob-brand-text,
+    .stud-mob-brand {
+        font-size: 15px;
+        font-weight: 700;
+        color: #e5e7eb;
+    }
+
+    /* Center content – remove margin for AI */
+    .dash-center.ai-active,
+    .stud-center.ai-active {
+        margin-right: 0 !important;
+    }
+
+    .dash-view-head {
+        padding: 16px 20px !important;
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start !important;
+    }
+
+    .dash-view-body {
+        padding: 16px 20px !important;
+    }
+
+    /* Grids — 2 columns still for tablets */
+    .quick-act-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px;
+    }
+
+    .stud-classes-grid,
+    .browse-classes-grid,
+    .recommend-grid,
+    .gaps-grid,
+    .progress-grid,
+    .class-grid,
+    .students-grid,
+    .analytics-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 16px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px;
+    }
+
+    /* AI Panel – full screen overlay */
+    .stud-ai-panel,
+    .dash-ai {
+        width: 100% !important;
+        right: -100% !important;
+        z-index: 1000 !important;
+    }
+
+    .stud-ai-panel.open,
+    .dash-ai.open {
+        right: 0 !important;
+        transform: translateX(0) !important;
+    }
+
+    /* AI Float button — bottom-right */
+    .ai-float,
+    .ai-float-stud {
+        position: fixed !important;
+        bottom: 20px !important;
+        right: 20px !important;
+        top: auto !important;
+        width: 52px !important;
+        height: 52px !important;
+        font-size: 24px !important;
+        z-index: 500 !important;
+    }
+
+    /* Overlay */
+    .dash-overlay,
+    .stud-overlay {
+        z-index: 900 !important;
+    }
+
+    /* Modals */
+    .modal-overlay {
+        padding: 12px !important;
+    }
+
+    .modal-box {
+        max-width: 100% !important;
+        border-radius: 12px !important;
+    }
+
+    .modal-box.modal-lg {
+        max-width: 100% !important;
+    }
+
+    .modal-header {
+        padding: 16px !important;
+    }
+
+    .modal-body {
+        padding: 16px !important;
+    }
+
+    .modal-footer {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .modal-footer .btn-primary,
+    .modal-footer .btn-secondary {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Cards compact */
+    .stud-class-card,
+    .browse-class-card,
+    .class-card,
+    .stat-card,
+    .analytics-card,
+    .student-card,
+    .progress-card,
+    .quick-act-box {
+        padding: 16px !important;
+    }
+
+    /* Chart container */
+    .progress-chart-container {
+        height: 250px !important;
+    }
+
+    canvas {
+        max-width: 100% !important;
+    }
+
+    /* Quiz view */
+    .container {
+        padding: 16px 12px !important;
+    }
+
+    /* Table horizontal scroll */
+    table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Auth pages — ensure single column */
+    .auth-glass-card {
+        flex-direction: column !important;
+        max-width: 100% !important;
+    }
+
+    .auth-branding {
+        min-height: 180px !important;
+        padding: 24px !important;
+    }
+
+    .auth-form-side {
+        padding: 24px !important;
+    }
+
+    /* Landing / Hero page */
+    .hero-content,
+    .hero-inner {
+        flex-direction: column !important;
+        text-align: center;
+        padding: 24px 16px !important;
+    }
+
+    .hero-video-area,
+    .hero-visual {
+        width: 100% !important;
+        max-width: 100%;
+    }
+
+    .hero-text-area,
+    .hero-copy {
+        width: 100% !important;
+        text-align: center;
+    }
+
+    .hero-cta-group,
+    .hero-buttons {
+        flex-direction: column !important;
+        gap: 12px !important;
+        align-items: center;
+    }
+
+    .hero-cta-group a,
+    .hero-cta-group button,
+    .hero-buttons a,
+    .hero-buttons button {
+        width: 100%;
+        max-width: 300px;
+        text-align: center;
+    }
+
+    /* Feature cards stacking */
+    .features-grid,
+    .trust-metrics-row,
+    .faq-grid,
+    .cta-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px;
+    }
+
+    /* Footer */
+    .footer-grid,
+    .footer-columns {
+        grid-template-columns: 1fr !important;
+        text-align: center;
+        gap: 24px;
+    }
+}
+
+/* ============================================================
+   6. MEDIUM MOBILE (481px – 600px)
+   ============================================================ */
+@media (max-width: 600px) {
+
+    /* All grids — single column */
+    .quick-act-grid,
+    .stud-classes-grid,
+    .browse-classes-grid,
+    .recommend-grid,
+    .gaps-grid,
+    .progress-grid,
+    .class-grid,
+    .students-grid,
+    .analytics-grid,
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Compact view head/body */
+    .dash-view-head {
+        padding: 12px 16px !important;
+    }
+
+    .dash-view-body {
+        padding: 12px 16px !important;
+    }
+
+    /* Join class card */
+    .join-class-card {
+        padding: 24px 16px !important;
+    }
+
+    .join-icon {
+        font-size: 48px !important;
+    }
+
+    /* AI panel input */
+    .sai-input-section,
+    .ai-input-area {
+        padding: 12px !important;
+        gap: 8px;
+    }
+
+    .sai-chat-area,
+    .ai-messages {
+        padding: 16px 12px !important;
+    }
+
+    /* Stat value */
+    .stat-value {
+        font-size: clamp(1.25rem, 4vw, 1.75rem) !important;
+    }
+
+    /* Card actions flex wrap */
+    .card-actions,
+    .bcard-footer {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .btn-card {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Quiz: options more comfortable */
+    .option-item,
+    [class*="option-item"] {
+        padding: 12px !important;
+    }
+
+    /* Results modal body */
+    .modal .modal-body {
+        padding: 16px !important;
+    }
+
+    /* Progress chart smaller */
+    .progress-chart-container {
+        height: 200px !important;
+    }
+}
+
+/* ============================================================
+   7. SMALL MOBILE (≤480px)
+   ============================================================ */
+@media (max-width: 480px) {
+
+    /* Tightest spacing */
+    .dash-view-head {
+        padding: 10px 12px !important;
+    }
+
+    .dash-view-body {
+        padding: 10px 12px !important;
+    }
+
+    .view-section {
+        margin-bottom: 20px;
+    }
+
+    /* Cards — minimal padding */
+    .stud-class-card,
+    .browse-class-card,
+    .class-card,
+    .stat-card,
+    .analytics-card,
+    .student-card,
+    .progress-card,
+    .quick-act-box {
+        padding: 12px !important;
+        border-radius: 10px !important;
+    }
+
+    /* Quick action icon smaller */
+    .qact-icon,
+    .qact-icon-wrapper .qact-icon {
+        font-size: 28px !important;
+    }
+
+    .qact-icon-wrapper {
+        width: 48px !important;
+        height: 48px !important;
+    }
+
+    /* Mobile header compact */
+    .dash-mobile-head,
+    .stud-mobile-head {
+        padding: 10px 12px !important;
+    }
+
+    .mob-sidebar-btn,
+    .mob-ai-btn,
+    .stud-mob-sidebar,
+    .stud-mob-ai {
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 16px !important;
+    }
+
+    .mob-brand-text,
+    .stud-mob-brand {
+        font-size: 13px !important;
+    }
+
+    /* AI float button smaller */
+    .ai-float,
+    .ai-float-stud {
+        width: 46px !important;
+        height: 46px !important;
+        font-size: 20px !important;
+        bottom: 16px !important;
+        right: 16px !important;
+    }
+
+    /* Empty state */
+    .empty-state-box,
+    .empty-state {
+        padding: 40px 16px !important;
+    }
+
+    .empty-ico,
+    .empty-icon {
+        font-size: 48px !important;
+    }
+
+    .loading-box {
+        padding: 60px 16px !important;
+    }
+
+    .loading-spinner {
+        width: 48px !important;
+        height: 48px !important;
+    }
+
+    /* Sidebar drawer narrower */
+    .stud-sidebar,
+    .dash-sidebar {
+        width: 220px !important;
+        left: -220px !important;
+    }
+
+    /* Join class */
+    .join-class-card {
+        padding: 20px 12px !important;
+    }
+
+    .join-submit-btn {
+        padding: 14px 24px !important;
+    }
+
+    /* Auth pages */
+    .auth-glass-card {
+        margin: 8px !important;
+        border-radius: 12px !important;
+    }
+
+    .auth-branding {
+        min-height: 140px !important;
+        padding: 20px 16px !important;
+    }
+
+    .auth-form-side {
+        padding: 20px 16px !important;
+    }
+
+    .auth-form-side input,
+    .auth-form-side button {
+        font-size: 14px !important;
+        padding: 12px !important;
+    }
+
+    /* Hero section minimal */
+    .hero-content,
+    .hero-inner {
+        padding: 20px 12px !important;
+    }
+
+    .hero-cta-group a,
+    .hero-cta-group button,
+    .hero-buttons a,
+    .hero-buttons button {
+        padding: 12px 20px !important;
+        font-size: 14px !important;
+    }
+
+    /* Trust metrics wrap */
+    .trust-metrics-row {
+        flex-wrap: wrap !important;
+        gap: 12px !important;
+        justify-content: center;
+    }
+
+    .trust-metric-item {
+        min-width: 120px;
+    }
+
+    /* Quiz container */
+    .container {
+        padding: 12px 8px !important;
+    }
+
+    /* Results modal */
+    #results-modal .modal {
+        margin: 8px !important;
+        max-height: 95vh;
+    }
+
+    /* Chart even smaller */
+    .progress-chart-container {
+        height: 180px !important;
+    }
+
+    /* Settings modal */
+    .settings-modal-content {
+        width: 95vw !important;
+        max-width: 95vw !important;
+        padding: 16px !important;
+    }
+
+    /* Speed widget */
+    .speed-widget {
+        transform: scale(0.85);
+        transform-origin: bottom right;
+    }
+}
+
+/* ============================================================
+   8. FOCUS & ACCESSIBILITY
+   ============================================================ */
+*:focus-visible {
+    outline: 2px solid #60a5fa;
+    outline-offset: 2px;
+}
+
+button,
+a,
+input,
+select,
+textarea,
+[tabindex] {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Ensure clickable targets meet minimum 44x44 */
+@media (max-width: 768px) {
+
+    button,
+    [role="button"],
+    a.nav-menu-item,
+    a.stud-nav-item,
+    .sai-tab,
+    .mode-tab {
+        min-height: 44px;
+        min-width: 44px;
+    }
+}
+
+/* ============================================================
+   9. PRINT STYLES — hide non-essential
+   ============================================================ */
+@media print {
+
+    .stud-sidebar,
+    .dash-sidebar,
+    .stud-ai-panel,
+    .dash-ai,
+    .ai-float,
+    .ai-float-stud,
+    .dash-mobile-head,
+    .stud-mobile-head,
+    .speed-widget,
+    .fab-container {
+        display: none !important;
+    }
+
+    .dash-center,
+    .stud-center {
+        margin: 0 !important;
+    }
+}

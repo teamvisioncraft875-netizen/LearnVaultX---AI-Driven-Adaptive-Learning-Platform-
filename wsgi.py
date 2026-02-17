@@ -16,7 +16,7 @@ if os.path.exists(secret_env_path):
     print("Loaded secret file from /etc/secrets/.env")
 
 # Import Flask app
-from app import app, init_db
+from app import app, initialize_database
 
 def create_app():
     """Create and configure the Flask application"""
@@ -24,7 +24,7 @@ def create_app():
         # Initialize database if needed
         if not os.path.exists('education.db'):
             print("Creating database...")
-            init_db()
+            initialize_database()
             print("Database created successfully!")
         
         return app

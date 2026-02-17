@@ -3,6 +3,56 @@
 {% block title %}Live Class: {{ class_title }} - LearnVaultX{% endblock %}
 
 {% block content %}
+<!-- Critical CSS to prevent FOUC -->
+<style>
+    /* Load immediately to prevent flash of unstyled content */
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        background: #0a0e1a !important;
+        color: #e5e7eb;
+        overflow: hidden;
+    }
+
+    /* Loading overlay */
+    .live-loading-overlay {
+        position: fixed;
+        inset: 0;
+        background: #0a0e1a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.3s ease;
+    }
+
+    .live-loading-overlay.loaded {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .live-loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 3px solid rgba(96, 165, 250, 0.2);
+        border-top-color: #60a5fa;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+
+<!-- Loading Overlay -->
+<div class="live-loading-overlay" id="liveLoadingOverlay">
+    <div class="live-loading-spinner"></div>
+</div>
+
 <!-- LIVE CLASS - PROFESSIONAL 3-PANE IDE LAYOUT -->
 <div class="live-class-container">
 
@@ -20,27 +70,6 @@
                 <span class="live-nav-label">Exit Class</span>
             </a>
 
-            <div class="live-nav-divider"></div>
-
-            <button class="live-nav-item" onclick="switchTab('overview')">
-                <span class="live-nav-icon">📊</span>
-                <span class="live-nav-label">Overview</span>
-            </button>
-
-            <button class="live-nav-item" onclick="switchTab('lectures')">
-                <span class="live-nav-icon">📚</span>
-                <span class="live-nav-label">Lectures</span>
-            </button>
-
-            <button class="live-nav-item" onclick="switchTab('quizzes')">
-                <span class="live-nav-icon">📝</span>
-                <span class="live-nav-label">Quizzes</span>
-            </button>
-
-            <button class="live-nav-item" onclick="switchTab('resources')">
-                <span class="live-nav-icon">📎</span>
-                <span class="live-nav-label">Resources</span>
-            </button>
         </nav>
 
         <div class="live-sidebar-footer">
@@ -224,19 +253,30 @@
         document.getElementById(`tab-${tabName}`).classList.add('active');
     }
 
-    // AI Mode Switching
+    // AI Mode Switching with persistence
+    function setAIMode(mode) {
+        localStorage.setItem('aiMode', mode);
+        document.querySelectorAll('.live-ai-mode').forEach(b => {
+            b.classList.toggle('active', b.dataset.mode === mode);
+        });
+    }
+
+    // Initialize mode from storage
+    const savedMode = localStorage.getItem('aiMode') || 'socratic';
+    setAIMode(savedMode);
+
     document.querySelectorAll('.live-ai-mode').forEach(btn => {
         btn.addEventListener('click', function () {
-            document.querySelectorAll('.live-ai-mode').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
+            setAIMode(this.dataset.mode);
         });
     });
 
-    // Send AI Message
+    // Send AI Message (calls /api/chatbot)
+    let aiSubmitting = false;
     async function sendAIMessage() {
         const input = document.getElementById('ai-input');
         const message = input.value.trim();
-        if (!message) return;
+        if (!message || aiSubmitting) return;
 
         const container = document.getElementById('ai-messages');
 
@@ -249,14 +289,64 @@
         input.value = '';
         container.scrollTop = container.scrollHeight;
 
-        // Simulate AI response
-        setTimeout(() => {
-            const aiMsg = document.createElement('div');
-            aiMsg.className = 'live-ai-message live-ai-message-bot';
-            aiMsg.textContent = "I'm processing that in the context of the current class discussion...";
-            container.appendChild(aiMsg);
+        // Add loading placeholder
+        const loading = document.createElement('div');
+        loading.className = 'live-ai-message live-ai-message-loading';
+        loading.id = 'ai-loading';
+        loading.innerHTML = '<div class="skeleton shimmer" style="height:18px;width:80%"></div>';
+        container.appendChild(loading);
+        container.scrollTop = container.scrollHeight;
+
+        aiSubmitting = true;
+        const mode = localStorage.getItem('aiMode') || 'socratic';
+
+        try {
+            const resp = await fetch('/api/chatbot', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ prompt: message, mode })
+            });
+
+            const json = await resp.json().catch(() => null);
+            const loadEl = document.getElementById('ai-loading');
+            if (loadEl) loadEl.remove();
+
+            if (!resp.ok || !json || json.success === false) {
+                const errText = (json && (json.error || json.message)) || 'AI failed to respond';
+                const errDiv = document.createElement('div');
+                errDiv.className = 'live-ai-message live-ai-message-bot live-ai-error';
+                errDiv.textContent = errText;
+                container.appendChild(errDiv);
+                container.scrollTop = container.scrollHeight;
+                return;
+            }
+
+            // Render response (backend returns rendered markdown in `reply`)
+            const aiDiv = document.createElement('div');
+            aiDiv.className = 'live-ai-message live-ai-message-bot';
+            aiDiv.innerHTML = json.reply || json.raw || '';
+            container.appendChild(aiDiv);
+
+            // Trigger MathJax typeset if needed
+            if (typeof MathJax !== 'undefined' && MathJax.typeset) {
+                MathJax.typeset([aiDiv]);
+            }
+
             container.scrollTop = container.scrollHeight;
-        }, 1000);
+
+        } catch (e) {
+            console.error('AI message send error', e);
+            const loadEl = document.getElementById('ai-loading');
+            if (loadEl) loadEl.remove();
+            const errDiv = document.createElement('div');
+            errDiv.className = 'live-ai-message live-ai-message-bot live-ai-error';
+            errDiv.textContent = 'Network error. Please try again.';
+            container.appendChild(errDiv);
+            container.scrollTop = container.scrollHeight;
+        } finally {
+            aiSubmitting = false;
+        }
     }
 
     // Send Class Chat Message
@@ -307,6 +397,16 @@
             e.preventDefault();
             sendClassMessage();
         }
+    });
+
+    // Hide loading overlay when page is fully loaded
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            const overlay = document.getElementById('liveLoadingOverlay');
+            if (overlay) {
+                overlay.classList.add('loaded');
+            }
+        }, 300);
     });
 </script>
 

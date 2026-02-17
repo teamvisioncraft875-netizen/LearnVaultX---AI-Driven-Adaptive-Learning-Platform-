@@ -245,94 +245,17 @@
 }
 
 /* ============================================
-   FOUR-SQUARE GLOW ELEMENT (2×2 GRID)
+   HERO VIDEO CONTAINER (Replacing Four-Square)
    ============================================ */
 
-.four-square-glow {
-    position: absolute;
-    right: 10%;
-    top: 50%;
-    transform: translateY(-50%);
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    z-index: 3;
+.hero-video-container {
+    border: none;
+    box-shadow: none;
+    background: transparent;
 }
 
-.four-square-glow .square {
-    width: 60px;
-    height: 60px;
-    background: rgba(77, 163, 255, 0.15);
-    border: 2px solid var(--neon-cyan);
-    border-radius: 14px;
-    box-shadow: var(--glow-cyan);
-    position: relative;
-    animation: squarePulse 3s ease-in-out infinite, squareFloat 4s ease-in-out infinite;
-}
-
-.four-square-glow .square:nth-child(1) {
-    animation-delay: 0s, 0s;
-}
-
-.four-square-glow .square:nth-child(2) {
-    animation-delay: 0.3s, 0.5s;
-}
-
-.four-square-glow .square:nth-child(3) {
-    animation-delay: 0.6s, 1s;
-}
-
-.four-square-glow .square:nth-child(4) {
-    animation-delay: 0.9s, 1.5s;
-}
-
-/* Trailing Light Arc */
-.four-square-glow .square::after {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    background: linear-gradient(135deg, var(--neon-cyan), transparent);
-    border-radius: 14px;
-    opacity: 0.3;
-    filter: blur(8px);
-    z-index: -1;
-}
-
-@keyframes squarePulse {
-
-    0%,
-    100% {
-        box-shadow: 0 0 15px rgba(103, 232, 249, 0.4);
-        opacity: 0.8;
-    }
-
-    50% {
-        box-shadow: 0 0 30px rgba(103, 232, 249, 0.7);
-        opacity: 1;
-    }
-}
-
-@keyframes squareFloat {
-
-    0%,
-    100% {
-        transform: translate(0, 0);
-    }
-
-    25% {
-        transform: translate(3px, -3px);
-    }
-
-    50% {
-        transform: translate(-3px, 3px);
-    }
-
-    75% {
-        transform: translate(3px, 3px);
-    }
+.hero-video-container:hover {
+    box-shadow: none;
 }
 
 /* ============================================
@@ -383,22 +306,27 @@
     overflow: hidden;
 }
 
-/* Large Floating Glass Container Behind Text */
+/* Smooth ambient glow overlays - NO partition, full width blend */
 [data-theme="futuristic"] .hero-section::before {
     content: '';
     position: absolute;
-    top: 15%;
-    left: 5%;
-    width: 70%;
-    height: 70%;
-    background: rgba(77, 163, 255, 0.03);
-    border: 1px solid rgba(77, 163, 255, 0.2);
-    border-radius: 24px;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    box-shadow: 0 0 60px rgba(77, 163, 255, 0.15);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(ellipse at 25% 40%, rgba(77, 163, 255, 0.08) 0%, transparent 55%),
+        radial-gradient(ellipse at 70% 35%, rgba(103, 232, 249, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 70%, rgba(138, 70, 255, 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 60%, rgba(77, 163, 255, 0.04) 0%, transparent 45%);
+    border: none;
+    border-radius: 0;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
     z-index: 1;
     pointer-events: none;
+    opacity: 1;
 }
 
 /* Glow Stroke Around Hero Container */
@@ -450,37 +378,21 @@
    ============================================ */
 
 @media (max-width: 1024px) {
-    .four-square-glow {
-        right: 5%;
-        gap: 12px;
-    }
-
-    .four-square-glow .square {
-        width: 50px;
-        height: 50px;
+    .hero-video {
+        max-width: 380px;
+        min-height: 280px;
     }
 }
 
 @media (max-width: 768px) {
-    .four-square-glow {
-        position: relative;
-        right: auto;
-        top: auto;
+    .hero-video-container {
+        grid-column: 1;
+        grid-row: auto;
+        min-height: 240px;
+        height: auto;
+        margin: 16px auto;
+        pointer-events: auto;
         transform: none;
-        margin: 32px auto;
-        justify-content: center;
-        max-width: 160px;
-    }
-
-    .four-square-glow .square {
-        width: 40px;
-        height: 40px;
-    }
-
-    [data-theme="futuristic"] .hero-section::before {
-        width: 90%;
-        height: 60%;
-        left: 5%;
     }
 }
 
@@ -492,7 +404,7 @@
 [data-theme="futuristic"] .glass-card,
 [data-theme="futuristic"] .btn-hero-primary,
 [data-theme="futuristic"] .btn-hero-secondary,
-[data-theme="futuristic"] .four-square-glow .square {
+[data-theme="futuristic"] .hero-video-container {
     will-change: transform;
     transform: translateZ(0);
     backface-visibility: hidden;
@@ -507,10 +419,6 @@
     }
 
     [data-theme="futuristic"] body::after {
-        animation: none;
-    }
-
-    .four-square-glow .square {
         animation: none;
     }
 }

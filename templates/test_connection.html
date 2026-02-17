@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Connection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #eee;
+        }
+
+        .test-box {
+            background: #16213e;
+            border: 2px solid #0f3460;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .success {
+            border-color: #00ff88;
+        }
+
+        .error {
+            border-color: #ff0055;
+        }
+
+        .pending {
+            border-color: #ffaa00;
+        }
+
+        h1 {
+            color: #00ff88;
+            text-align: center;
+        }
+
+        h2 {
+            color: #00d4ff;
+        }
+
+        button {
+            background: #00ff88;
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+
+        button:hover {
+            background: #00d470;
+        }
+
+        .status {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .info {
+            background: #2a2a4e;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        code {
+            background: #0a0a1e;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #00ff88;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔍 LearnVaultX Backend Connection Test</h1>
+
+    <div class="test-box pending" id="serverTest">
+        <h2>1. Server Connection</h2>
+        <div class="status" id="serverStatus">⏳ Testing...</div>
+        <div id="serverInfo"></div>
+    </div>
+
+    <div class="test-box pending" id="dbTest">
+        <h2>2. Database Connection</h2>
+        <div class="status" id="dbStatus">⏳ Testing...</div>
+        <div id="dbInfo"></div>
+    </div>
+
+    <div class="test-box pending" id="staticTest">
+        <h2>3. Static Files (Toast JS)</h2>
+        <div class="status" id="staticStatus">⏳ Testing...</div>
+        <div id="staticInfo"></div>
+    </div>
+
+    <div class="test-box pending" id="templateTest">
+        <h2>4. Template Updates</h2>
+        <div class="status" id="templateStatus">⏳ Testing...</div>
+        <div id="templateInfo"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>🔄 Actions</h2>
+        <button onclick="runAllTests()">🔄 Re-run All Tests</button>
+        <button onclick="clearCacheAndReload()">🗑️ Clear Cache & Reload</button>
+        <button onclick="window.location.href='/'">🏠 Go to Homepage</button>
+    </div>
+
+    <div class="info">
+        <h3>📋 If Tests Fail:</h3>
+        <ol>
+            <li>Make sure <code>python app.py</code> is running</li>
+            <li>Check terminal for errors</li>
+            <li>Try <code>Ctrl + Shift + R</code> to hard refresh</li>
+            <li>Clear browser cache completely</li>
+            <li>Try incognito/private window</li>
+        </ol>
+    </div>
+
+    <script>
+        async function testServer() {
+            const box = document.getElementById('serverTest');
+            const status = document.getElementById('serverStatus');
+            const info = document.getElementById('serverInfo');
+
+            try {
+                const response = await fetch('/api/health', {
+                    method: 'GET',
+                    cache: 'no-cache'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    box.className = 'test-box success';
+                    status.innerHTML = '✅ Server Connected';
+                    info.innerHTML = `<div class="info">Server is running and responding to API calls</div>`;
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                box.className = 'test-box error';
+                status.innerHTML = '❌ Server Not Responding';
+                info.innerHTML = `<div class="info">Error: ${error.message}<br>Make sure python app.py is running</div>`;
+            }
+        }
+
+        async function testDatabase() {
+            const box = document.getElementById('dbTest');
+            const status = document.getElementById('dbStatus');
+            const info = document.getElementById('dbInfo');
+
+            try {
+                const response = await fetch('/api/health', {
+                    method: 'GET',
+                    cache: 'no-cache'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.database) {
+                        box.className = 'test-box success';
+                        status.innerHTML = '✅ Database Connected';
+                        info.innerHTML = `<div class="info">Database: ${data.database}</div>`;
+                    } else {
+                        box.className = 'test-box success';
+                        status.innerHTML = '✅ Backend Responding';
+                        info.innerHTML = `<div class="info">Backend is working</div>`;
+                    }
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                box.className = 'test-box error';
+                status.innerHTML = '❌ Database Check Failed';
+                info.innerHTML = `<div class="info">Error: ${error.message}</div>`;
+            }
+        }
+
+        async function testStaticFiles() {
+            const box = document.getElementById('staticTest');
+            const status = document.getElementById('staticStatus');
+            const info = document.getElementById('staticInfo');
+
+            try {
+                const response = await fetch('/static/js/toast-notifications.js', {
+                    method: 'HEAD',
+                    cache: 'no-cache'
+                });
+
+                if (response.ok) {
+                    box.className = 'test-box success';
+                    status.innerHTML = '✅ Static Files Loading';
+                    info.innerHTML = `<div class="info">Toast notification system is available</div>`;
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                box.className = 'test-box error';
+                status.innerHTML = '❌ Static Files Not Loading';
+                info.innerHTML = `<div class="info">Error: ${error.message}<br>Toast notifications may not work</div>`;
+            }
+        }
+
+        async function testTemplates() {
+            const box = document.getElementById('templateTest');
+            const status = document.getElementById('templateStatus');
+            const info = document.getElementById('templateInfo');
+
+            try {
+                const response = await fetch('/', {
+                    method: 'GET',
+                    cache: 'no-cache'
+                });
+
+                const html = await response.text();
+
+                // Check for updated features
+                const hasToast = html.includes('toast-notifications');
+                const hasBase = html.includes('LearnVaultX');
+
+                if (hasToast && hasBase) {
+                    box.className = 'test-box success';
+                    status.innerHTML = '✅ Templates Updated';
+                    info.innerHTML = `<div class="info">Homepage is loading with updated features</div>`;
+                } else if (hasBase) {
+                    box.className = 'test-box pending';
+                    status.innerHTML = '⚠️ Templates Loading (Check Cache)';
+                    info.innerHTML = `<div class="info">Page loads but may be cached. Try Ctrl+Shift+R</div>`;
+                } else {
+                    throw new Error('Unexpected content');
+                }
+            } catch (error) {
+                box.className = 'test-box error';
+                status.innerHTML = '❌ Template Check Failed';
+                info.innerHTML = `<div class="info">Error: ${error.message}</div>`;
+            }
+        }
+
+        async function runAllTests() {
+            // Reset all boxes
+            document.querySelectorAll('.test-box').forEach(box => {
+                if (!box.querySelector('button')) {
+                    box.className = 'test-box pending';
+                }
+            });
+
+            // Run tests sequentially
+            await testServer();
+            await testDatabase();
+            await testStaticFiles();
+            await testTemplates();
+        }
+
+        function clearCacheAndReload() {
+            // Clear service worker cache if exists
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    names.forEach(name => caches.delete(name));
+                });
+            }
+
+            // Force reload
+            window.location.reload(true);
+        }
+
+        // Run tests on page load
+        window.addEventListener('load', runAllTests);
+    </script>
+</body>
+
+</html>

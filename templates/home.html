@@ -1,6 +1,59 @@
 {% extends "base.html" %}
 
-{% block title %}LearnVaultX - AI-Powered Learning Platform{% endblock %}
+{% block title %}LearnVaultX - AI-Powered Adaptive Learning Platform{% endblock %}
+
+{% block meta_description %}LearnVaultX is an AI-powered adaptive learning platform offering personalized education,
+intelligent quizzes, real-time analytics, and an AI tutor for students and teachers.{% endblock %}
+
+{% block meta_keywords %}LearnVaultX, AI learning platform, adaptive education, personalized learning, online quizzes,
+student analytics, AI tutor, KyKnoX, smart education{% endblock %}
+
+{% block og_title %}LearnVaultX - AI-Powered Adaptive Learning Platform{% endblock %}
+{% block og_description %}Transform your education with AI-driven personalized learning, intelligent quizzes, real-time
+performance analytics, and an AI tutor assistant.{% endblock %}
+
+{% block twitter_title %}LearnVaultX - AI-Powered Adaptive Learning Platform{% endblock %}
+{% block twitter_description %}Transform your education with AI-driven personalized learning, intelligent quizzes,
+real-time performance analytics, and an AI tutor assistant.{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@graph": [
+        {
+            "@type": "Organization",
+            "name": "LearnVaultX",
+            "url": "{{ request.host_url }}",
+            "logo": "{{ url_for('static', filename='images/logo.png', _external=True) }}",
+            "description": "AI-powered adaptive learning platform for personalized education."
+        },
+        {
+            "@type": "WebSite",
+            "name": "LearnVaultX",
+            "url": "{{ request.host_url }}",
+            "potentialAction": {
+                "@type": "SearchAction",
+                "target": "{{ request.host_url }}search?q={search_term_string}",
+                "query-input": "required name=search_term_string"
+            }
+        },
+        {
+            "@type": "SoftwareApplication",
+            "name": "LearnVaultX",
+            "applicationCategory": "EducationalApplication",
+            "operatingSystem": "Web",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+            },
+            "description": "AI-powered adaptive learning platform with personalized quizzes, analytics, and an AI tutor."
+        }
+    ]
+}
+</script>
+{% endblock %}
 
 {% block content %}
 <!-- HOME PAGE - PREMIUM FUTURISTIC DESIGN -->
@@ -22,12 +75,11 @@
         <!-- Light Arc Sweep -->
         <div class="light-arc-sweep"></div>
 
-        <!-- Four-Square Element - Positioned Absolutely on Right -->
-        <div class="four-square-glow">
-            <div class="square"></div>
-            <div class="square"></div>
-            <div class="square"></div>
-            <div class="square"></div>
+        <!-- Hero Video - Replacing Four-Square Element -->
+        <div class="hero-video-container">
+            <video class="hero-video" autoplay muted loop playsinline>
+                <source src="{{ url_for('static', filename='hero.mp4') }}" type="video/mp4">
+            </video>
         </div>
 
         <!-- Hero Content Wrapper - Left Aligned -->

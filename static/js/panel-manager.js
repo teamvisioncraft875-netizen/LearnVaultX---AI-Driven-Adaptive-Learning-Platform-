@@ -192,6 +192,9 @@ function initializeFloatingButtons() {
 
     // Add styles
     addFloatingButtonStyles();
+
+    // Enable draggable FAB container with persisted position
+    enableDraggableFab(fabContainer);
 }
 
 function addFloatingButtonStyles() {
@@ -210,6 +213,7 @@ function addFloatingButtonStyles() {
             gap: 16px;
             z-index: 999;
             pointer-events: none;
+            touch-action: none;
         }
 
         .fab-container > * {
@@ -231,6 +235,11 @@ function addFloatingButtonStyles() {
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .fab-container.dragging {
+            transition: none !important;
+            cursor: grabbing;
         }
 
         .fab-button:hover {
@@ -310,6 +319,124 @@ function addFloatingButtonStyles() {
         }
     `;
     document.head.appendChild(style);
+}
+
+function enableDraggableFab(fabContainer) {
+    if (!fabContainer || fabContainer.dataset.draggableReady === 'true') return;
+    fabContainer.dataset.draggableReady = 'true';
+
+    const STORAGE_KEY = 'settingsFabPosition';
+    const margin = 12;
+    let startX = 0;
+    let startY = 0;
+    let originX = 0;
+    let originY = 0;
+    let dragging = false;
+
+    function getViewportBounds() {
+        const rect = fabContainer.getBoundingClientRect();
+        return {
+            minX: margin,
+            minY: margin,
+            maxX: window.innerWidth - rect.width - margin,
+            maxY: window.innerHeight - rect.height - margin
+        };
+    }
+
+    function applyPos(x, y) {
+        const bounds = getViewportBounds();
+        const safeX = Math.min(bounds.maxX, Math.max(bounds.minX, x));
+        const safeY = Math.min(bounds.maxY, Math.max(bounds.minY, y));
+        fabContainer.style.left = `${safeX}px`;
+        fabContainer.style.top = `${safeY}px`;
+        fabContainer.style.right = 'auto';
+        fabContainer.style.bottom = 'auto';
+        return { x: safeX, y: safeY };
+    }
+
+    function restoreSavedPos() {
+        const savedRaw = localStorage.getItem(STORAGE_KEY);
+        if (savedRaw) {
+            try {
+                const saved = JSON.parse(savedRaw);
+                applyPos(Number(saved.x || 0), Number(saved.y || 0));
+                return;
+            } catch (_) { }
+        }
+        const rect = fabContainer.getBoundingClientRect();
+        applyPos(window.innerWidth - rect.width - 24, window.innerHeight - rect.height - 24);
+    }
+
+    function snapToEdge() {
+        const rect = fabContainer.getBoundingClientRect();
+        const bounds = getViewportBounds();
+        const distLeft = Math.abs(rect.left - bounds.minX);
+        const distRight = Math.abs(bounds.maxX - rect.left);
+        const targetX = distLeft < distRight ? bounds.minX : bounds.maxX;
+        const pos = applyPos(targetX, rect.top);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(pos));
+    }
+
+    let movedEnough = false;
+    let justDragged = false;
+    function onPointerMove(e) {
+        if (!dragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        if (!movedEnough && Math.hypot(dx, dy) > 6) {
+            movedEnough = true;
+        }
+        if (movedEnough) {
+            applyPos(originX + dx, originY + dy);
+        }
+    }
+
+    function onPointerUp() {
+        if (!dragging) return;
+        dragging = false;
+        fabContainer.classList.remove('dragging');
+        if (movedEnough) {
+            snapToEdge();
+            justDragged = true;
+            setTimeout(() => { justDragged = false; }, 150);
+        }
+        movedEnough = false;
+        window.removeEventListener('pointermove', onPointerMove);
+        window.removeEventListener('pointerup', onPointerUp);
+    }
+
+    fabContainer.addEventListener('pointerdown', (e) => {
+        // Allow drag from container or settings button.
+        if (!e.target.closest('.fab-container') && !e.target.closest('.settings-fab')) return;
+        const rect = fabContainer.getBoundingClientRect();
+        dragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        originX = rect.left;
+        originY = rect.top;
+        movedEnough = false;
+        fabContainer.classList.add('dragging');
+        window.addEventListener('pointermove', onPointerMove);
+        window.addEventListener('pointerup', onPointerUp);
+    });
+
+    const settingsBtn = fabContainer.querySelector('.settings-fab');
+    if (settingsBtn) {
+        settingsBtn.addEventListener('click', (e) => {
+            if (justDragged) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }, true);
+    }
+
+    window.addEventListener('resize', () => {
+        const rect = fabContainer.getBoundingClientRect();
+        const pos = applyPos(rect.left, rect.top);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(pos));
+    });
+
+    restoreSavedPos();
 }
 
 // ============================================

@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Login Verification - LearnVaultX{% endblock %}
+
+{% block meta_robots %}noindex, nofollow{% endblock %}
+{% block meta_description %}Verify your login with a one-time code sent to your email.{% endblock %}
+
+{% block content %}
+<div class="auth-page-container">
+    <div class="auth-card" style="max-width: 520px; min-height: auto;">
+        <div class="auth-form-panel" style="flex: 1; width: 100%; padding: 48px 40px;">
+            <div class="auth-form-decoration"></div>
+            <div class="auth-form-content" style="position: relative; z-index: 1;">
+                <div style="text-align: center; margin-bottom: 32px;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">🔑</div>
+                    <h2 class="auth-form-title" style="margin-bottom: 8px;">Login Verification</h2>
+                    <p class="auth-form-subtitle"
+                        style="color: rgba(255,255,255,0.55); font-size: 14px; line-height: 1.5;">
+                        We sent a 6-digit code to your email.<br>Enter it below to complete login.
+                    </p>
+                </div>
+
+                <div id="alertBox"
+                    style="display:none; padding: 12px 16px; border-radius: 10px; margin-bottom: 20px; font-size: 13px; font-weight: 500;">
+                </div>
+
+                <form id="verifyForm" onsubmit="return false;">
+                    <div class="auth-form-group">
+                        <label class="auth-form-label" for="otp">Verification Code</label>
+                        <input type="text" id="otp" name="otp" class="auth-form-input" placeholder="Enter 6-digit OTP"
+                            required maxlength="6" pattern="[0-9]{6}" inputmode="numeric" autocomplete="one-time-code"
+                            autofocus
+                            style="text-align: center; font-size: 24px; letter-spacing: 8px; font-weight: 700;">
+                    </div>
+
+                    <button type="submit" class="auth-submit-btn" id="verifyBtn" onclick="verifyOTP()">
+                        <span id="btnText">Verify & Sign In</span>
+                        <span id="btnSpinner" style="display:none;">Verifying...</span>
+                    </button>
+                </form>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button id="resendBtn" onclick="resendOTP()" disabled style="background: none; border: none; color: rgba(167, 139, 250, 0.6);
+                                   font-size: 13px; cursor: not-allowed; font-family: inherit;">
+                        Resend OTP <span id="cooldownTimer">(60s)</span>
+                    </button>
+                </div>
+
+                <div class="auth-switch-text" style="text-align: center; margin-top: 20px;">
+                    <a href="/login" class="auth-switch-link">← Back to Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let cooldown = 60;
+    const cdInterval = setInterval(() => {
+        cooldown--;
+        const timer = document.getElementById('cooldownTimer');
+        const btn = document.getElementById('resendBtn');
+        if (cooldown <= 0) {
+            clearInterval(cdInterval);
+            timer.textContent = '';
+            btn.disabled = false;
+            btn.style.color = '#a78bfa';
+            btn.style.cursor = 'pointer';
+        } else {
+            timer.textContent = `(${cooldown}s)`;
+        }
+    }, 1000);
+
+    async function verifyOTP() {
+        const otp = document.getElementById('otp').value.trim();
+        const btn = document.getElementById('verifyBtn');
+        const btnText = document.getElementById('btnText');
+        const btnSpinner = document.getElementById('btnSpinner');
+
+        if (!otp || otp.length !== 6) { showAlert('Please enter the 6-digit OTP', 'error'); return; }
+
+        btn.disabled = true; btnText.style.display = 'none'; btnSpinner.style.display = 'inline';
+
+        try {
+            const res = await fetch('/api/verify-login-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ otp })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                showAlert(data.message || 'Login successful! Redirecting...', 'success');
+                setTimeout(() => { window.location.href = data.redirect || '/'; }, 1000);
+            } else {
+                showAlert(data.message || data.error || 'Verification failed', 'error');
+                btn.disabled = false; btnText.style.display = 'inline'; btnSpinner.style.display = 'none';
+            }
+        } catch (err) {
+            showAlert('Network error. Please try again.', 'error');
+            btn.disabled = false; btnText.style.display = 'inline'; btnSpinner.style.display = 'none';
+        }
+    }
+
+    async function resendOTP() {
+        const btn = document.getElementById('resendBtn');
+        btn.disabled = true; btn.textContent = 'Sending...';
+        try {
+            const res = await fetch('/api/resend-login-otp', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+            const data = await res.json();
+            if (res.ok) {
+                showAlert('New OTP sent!', 'success');
+                cooldown = 60;
+                btn.style.color = 'rgba(167,139,250,0.6)'; btn.style.cursor = 'not-allowed';
+                const iv = setInterval(() => {
+                    cooldown--;
+                    if (cooldown <= 0) { clearInterval(iv); btn.disabled = false; btn.textContent = 'Resend OTP'; btn.style.color = '#a78bfa'; btn.style.cursor = 'pointer'; }
+                    else { btn.innerHTML = `Resend OTP <span>(${cooldown}s)</span>`; }
+                }, 1000);
+            } else {
+                showAlert(data.message || data.error || 'Failed to resend', 'error');
+                btn.disabled = false; btn.textContent = 'Resend OTP'; btn.style.color = '#a78bfa'; btn.style.cursor = 'pointer';
+            }
+        } catch (err) {
+            showAlert('Network error.', 'error');
+            btn.disabled = false; btn.textContent = 'Resend OTP';
+        }
+    }
+
+    function showAlert(msg, type) {
+        const a = document.getElementById('alertBox'); a.style.display = 'block'; a.textContent = msg;
+        if (type === 'error') { a.style.background = 'rgba(239,68,68,0.15)'; a.style.color = '#fca5a5'; a.style.border = '1px solid rgba(239,68,68,0.3)'; }
+        else { a.style.background = 'rgba(34,197,94,0.15)'; a.style.color = '#86efac'; a.style.border = '1px solid rgba(34,197,94,0.3)'; }
+    }
+</script>
+{% endblock %}

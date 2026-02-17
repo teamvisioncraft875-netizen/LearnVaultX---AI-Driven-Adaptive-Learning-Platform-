@@ -2,11 +2,21 @@
 
 {% block title %}Student Dashboard - LearnVaultX{% endblock %}
 
+{% block meta_robots %}noindex, nofollow{% endblock %}
+{% block meta_description %}Your personalized learning dashboard with AI-powered quizzes, analytics, and adaptive
+recommendations.{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='css/student-dashboard-polish.css') }}?v={{ config.APP_VERSION }}">
+{% endblock %}
+
 {% block content %}
 <!-- STUDENT DASHBOARD - FINAL POLISHED VERSION -->
 <div class="student-app">
     <!-- LEFT SIDEBAR - FIXED -->
     <aside class="stud-sidebar" id="studSidebar">
+        <div class="sidebar-toggle-btn" onclick="toggleDesktopSidebar()">◀</div>
         <div class="sidebar-brand-area">
             <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LearnVaultX" class="brand-logo-img">
             <span class="brand-title-text">LearnVaultX</span>
@@ -21,6 +31,10 @@
             <a href="#" class="nav-menu-item" onclick="switchStudentView('join'); return false;">
                 <span class="item-icon">➕</span>
                 <span class="item-label">Join Class</span>
+            </a>
+            <a href="#" class="nav-menu-item" onclick="switchStudentView('learningPath'); return false;">
+                <span class="item-icon">🛣️</span>
+                <span class="item-label">My Learning Path</span>
             </a>
             <a href="#" class="nav-menu-item" onclick="switchStudentView('browse'); return false;">
                 <span class="item-icon">🔍</span>
@@ -45,6 +59,14 @@
             <a href="/student/quiz-history" class="nav-menu-item">
                 <span class="item-icon">📝</span>
                 <span class="item-label">Quiz History</span>
+            </a>
+            <a href="/student/micro-learning" class="nav-menu-item">
+                <span class="item-icon">⚡</span>
+                <span class="item-label">Micro Learning</span>
+            </a>
+            <a href="/ai_tutor" class="nav-menu-item">
+                <span class="item-icon">🧠</span>
+                <span class="item-label">AI Tutor Avatar</span>
             </a>
         </nav>
 
@@ -146,6 +168,8 @@
             </div>
         </div>
 
+        {% include 'components/learning_path_view.html' %}
+
         <!-- BROWSE CLASSES VIEW -->
         <div class="stud-view" id="browseView" style="display: none;">
             <div class="stud-view-head">
@@ -229,9 +253,22 @@
         </div>
 
         <div class="sai-mode-tabs">
-            <button class="sai-tab active" onclick="switchStudAIMode('socratic')">Socratic</button>
-            <button class="sai-tab" onclick="switchStudAIMode('expert')">Expert</button>
-            <button class="sai-tab" onclick="switchStudAIMode('coach')">Coach</button>
+            <button class="sai-tab active" data-mode="socratic"
+                onclick="switchStudAIMode('socratic', this)">Socratic</button>
+            <button class="sai-tab" data-mode="expert" onclick="switchStudAIMode('expert', this)">Expert</button>
+            <button class="sai-tab" data-mode="coach" onclick="switchStudAIMode('coach', this)">Coach</button>
+        </div>
+
+        <!-- Language Selector -->
+        <div style="padding: 12px 16px; border-bottom: 1px solid rgba(75, 85, 99, 0.3);">
+            <label for="aiLanguageStudent"
+                style="display: block; font-size: 12px; color: #9ca3af; margin-bottom: 6px;">Language:</label>
+            <select id="aiLanguageStudent" onchange="localStorage.setItem('learnvaultx_ai_language', this.value)"
+                style="width: 100%; padding: 8px 12px; font-size: 14px; background: #1f2937; color: #e5e7eb; border: 1px solid rgba(96, 165, 250, 0.3); border-radius: 8px;">
+                <option value="english">English</option>
+                <option value="hindi">हिंदी (Hindi)</option>
+                <option value="odia">ଓଡ଼ିଆ (Odia)</option>
+            </select>
         </div>
 
         <div class="sai-chat-area" id="studAIMessages">
@@ -242,10 +279,117 @@
         </div>
 
         <div class="sai-input-section">
-            <textarea class="sai-input-field" id="studAIInput" placeholder="Ask me anything..." rows="2"></textarea>
+            <div class="voice-controls">
+                <button id="btnVoiceMic" class="voice-btn" onclick="toggleVoiceInput()" title="Click to Speak">
+                    🎤
+                </button>
+                <button id="btnVoiceSpeaker" class="voice-btn" onclick="toggleVoiceSpeaker()"
+                    title="Toggle Voice Response">
+                    🔊
+                </button>
+                <div id="voiceStatus" class="voice-status" style="display:none;">
+                    <span class="pulse-dot"></span> Listening...
+                </div>
+            </div>
+            <textarea class="sai-input-field" id="studAIInput" placeholder="Ask me anything... (or use mic)"
+                rows="2"></textarea>
             <button class="sai-send-btn" onclick="sendStudAI()">→</button>
         </div>
     </aside>
+
+    <style>
+        /* Voice Assistant Styles */
+        .voice-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            padding: 0 4px;
+        }
+
+        .voice-btn {
+            background: #374151;
+            border: 1px solid #4b5563;
+            color: #e5e7eb;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 16px;
+        }
+
+        .voice-btn:hover {
+            background: #4b5563;
+            transform: scale(1.05);
+        }
+
+        .voice-btn.active {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border-color: #f87171;
+            animation: pulse-red 2s infinite;
+        }
+
+        .voice-btn.speaker-active {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            border-color: #34d399;
+        }
+
+        .voice-status {
+            font-size: 12px;
+            color: #60a5fa;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+            margin-left: auto;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #60a5fa;
+            border-radius: 50%;
+            display: block;
+            animation: pulse-blue 1.5s infinite;
+        }
+
+        @keyframes pulse-red {
+            0% {
+                box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(248, 113, 113, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(248, 113, 113, 0);
+            }
+        }
+
+        @keyframes pulse-blue {
+            0% {
+                transform: scale(0.95);
+                opacity: 0.7;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(0.95);
+                opacity: 0.7;
+            }
+        }
+    </style>
 
     <!-- AI FLOAT BUTTON -->
     <button class="ai-float-stud" id="aiFloatStud" onclick="openStudAI()">
@@ -260,427 +404,11 @@
 </div>
 
 <script>
-    // State
-    let currentStudView = 'dashboard';
-    let currentStudAIMode = 'socratic';
-    let studAIOpen = false;
-    let studClasses = [];
-
-    // View Navigation
-    function switchStudentView(viewName) {
-        document.querySelectorAll('.stud-view').forEach(v => v.style.display = 'none');
-        document.getElementById(viewName + 'View').style.display = 'flex';
-
-        document.querySelectorAll('.nav-menu-item').forEach(link => {
-            link.classList.remove('active');
-        });
-
-        // Find and activate the corresponding nav item
-        const navItems = Array.from(document.querySelectorAll('.nav-menu-item'));
-        const viewMap = {
-            'dashboard': 0,
-            'join': 1,
-            'browse': 2,
-            'recommendations': 3,
-            'gaps': 4,
-            'progress': 5
-        };
-        if (viewMap[viewName] !== undefined) {
-            navItems[viewMap[viewName]]?.classList.add('active');
-        }
-
-        currentStudView = viewName;
-
-        if (viewName === 'browse') loadBrowseClasses();
-        if (viewName === 'gaps') loadKnowledgeGaps();
-        if (viewName === 'recommendations') loadRecommendations();
-        if (viewName === 'progress') loadProgress();
-    }
-
-    // Mobile
-    function toggleStudSidebar() {
-        document.getElementById('studSidebar').classList.toggle('mobile-show');
-        document.getElementById('studOverlay').classList.add('show');
-    }
-
-    function toggleStudAI() {
-        if (studAIOpen) closeStudAI();
-        else openStudAI();
-    }
-
-    function closeAllStudMobile() {
-        document.getElementById('studSidebar').classList.remove('mobile-show');
-        document.getElementById('studOverlay').classList.remove('show');
-    }
-
-    // AI Panel
-    function openStudAI() {
-        document.getElementById('studAIPanel').classList.add('open');
-        document.getElementById('studCenter').classList.add('ai-active');
-        document.getElementById('aiFloatStud').style.display = 'none';
-        studAIOpen = true;
-    }
-
-    function closeStudAI() {
-        document.getElementById('studAIPanel').classList.remove('open');
-        document.getElementById('studCenter').classList.remove('ai-active');
-        document.getElementById('aiFloatStud').style.display = 'flex';
-        studAIOpen = false;
-    }
-
-    function switchStudAIMode(mode) {
-        currentStudAIMode = mode;
-        document.querySelectorAll('.sai-tab').forEach(tab => tab.classList.remove('active'));
-        event.target.classList.add('active');
-    }
-
-    function sendStudAI() {
-        const input = document.getElementById('studAIInput');
-        const msg = input.value.trim();
-        if (!msg) return;
-
-        const container = document.getElementById('studAIMessages');
-        const welcome = container.querySelector('.sai-welcome-box');
-        if (welcome) welcome.remove();
-
-        // User message
-        const userDiv = document.createElement('div');
-        userDiv.className = 'sai-message user-side';
-        userDiv.innerHTML = `<div class="msg-bubble">${escapeHtml(msg)}</div>`;
-        container.appendChild(userDiv);
-
-        input.value = '';
-        container.scrollTop = container.scrollHeight;
-
-        // AI Response
-        fetch('/api/chatbot', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: msg, mode: currentStudAIMode })
-        })
-            .then(res => res.json())
-            .then(data => {
-                const aiDiv = document.createElement('div');
-                aiDiv.className = 'sai-message ai-side';
-                aiDiv.innerHTML = `<div class="msg-bubble">${data.response || data.answer}</div>`;
-                container.appendChild(aiDiv);
-                container.scrollTop = container.scrollHeight;
-            })
-            .catch(err => {
-                console.error('AI error:', err);
-                showToast('Failed to get AI response', 'error');
-            });
-    }
-
-    document.getElementById('studAIInput')?.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendStudAI();
-        }
-    });
-
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    // Toast Notification
-    function showToast(message, type = 'info') {
-        const toast = document.getElementById('toastNotification');
-        toast.textContent = message;
-        toast.className = 'toast-notification show ' + type;
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 3000);
-    }
-
-    // Join Class
-    async function joinClassByCode() {
-        const input = document.getElementById('classCodeInput');
-        const code = input.value.trim();
-        const feedback = document.getElementById('joinFeedback');
-
-        if (!code) {
-            feedback.innerHTML = '<div class="feedback-error">Please enter a class code</div>';
-            return;
-        }
-
-        feedback.innerHTML = '<div class="feedback-loading">Joining class...</div>';
-
-        try {
-            const response = await fetch('/api/join_class', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ class_code: code })
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                feedback.innerHTML = '<div class="feedback-success">✓ Successfully joined class!</div>';
-                input.value = '';
-                showToast('Successfully joined class!', 'success');
-                setTimeout(() => {
-                    switchStudentView('dashboard');
-                    loadStudentData();
-                }, 1500);
-            } else {
-                feedback.innerHTML = `<div class="feedback-error">✗ ${data.error || 'Failed to join class'}</div>`;
-            }
-        } catch (error) {
-            feedback.innerHTML = '<div class="feedback-error">✗ Network error. Please try again.</div>';
-        }
-    }
-
-    // Load Data
-    async function loadStudentData() {
-        try {
-            const response = await fetch('/api/user/data');
-            if (!response.ok) throw new Error('Failed');
-            const data = await response.json();
-
-            studClasses = data.classes || [];
-            renderClasses();
-        } catch (error) {
-            console.error('Load error:', error);
-            renderClasses(); // Render empty state
-        }
-    }
-
-    function renderClasses() {
-        const container = document.getElementById('studClassesGrid');
-        if (!studClasses.length) {
-            container.innerHTML = `
-            <div class="empty-state-box">
-                <div class="empty-ico">📚</div>
-                <h3 class="empty-heading">No classes yet</h3>
-                <p class="empty-desc">Join a class to start your learning journey</p>
-                <button class="empty-btn" onclick="switchStudentView('join')">Join Class</button>
-            </div>
-        `;
-            return;
-        }
-
-        container.innerHTML = studClasses.map(cls => `
-        <div class="stud-class-card">
-            <div class="scard-border"></div>
-            <h3 class="scard-title">${cls.name || cls.title}</h3>
-            <p class="scard-teacher">Teacher: ${cls.teacher || 'Unknown'}</p>
-            <p class="scard-subject">${cls.subject || cls.description || 'Online Class'}</p>
-            <div class="scard-progress-row">
-                <div class="progress-track">
-                    <div class="progress-fill" style="width: ${cls.progress || 0}%"></div>
-                </div>
-                <span class="progress-pct">${cls.progress || 0}%</span>
-            </div>
-            <button class="scard-btn" onclick="window.location.href='/class/${cls.id}'">Enter Class →</button>
-        </div>
-    `).join('');
-    }
-
-    async function loadBrowseClasses() {
-        const container = document.getElementById('browseClassesGrid');
-        container.innerHTML = `
-        <div class="loading-box">
-            <div class="loading-spinner"></div>
-            <p class="loading-text">Loading available classes...</p>
-        </div>
-    `;
-
-        try {
-            const response = await fetch('/api/browse_classes');
-            const classes = await response.json();
-
-            if (!classes || classes.length === 0) {
-                container.innerHTML = `
-                <div class="empty-state-box">
-                    <div class="empty-ico">🔍</div>
-                    <h3 class="empty-heading">No classes available</h3>
-                    <p class="empty-desc">Check back later for new courses</p>
-                </div>
-            `;
-                return;
-            }
-
-            container.innerHTML = classes.map(cls => `
-            <div class="browse-class-card">
-                <div class="bcard-border"></div>
-                <h3 class="bcard-title">${cls.title}</h3>
-                <p class="bcard-instructor">Instructor: ${cls.teacher || cls.instructor || 'Unknown'}</p>
-                <p class="bcard-desc">${cls.description || 'No description available'}</p>
-                <div class="bcard-footer">
-                    <span class="bcard-students">👥 ${cls.student_count || 0} students</span>
-                    <button class="bcard-join-btn" onclick="joinClassById(${cls.id})">Join →</button>
-                </div>
-            </div>
-        `).join('');
-        } catch (error) {
-            console.error('Browse error:', error);
-            container.innerHTML = `
-            <div class="empty-state-box">
-                <div class="empty-ico">⚠️</div>
-                <h3 class="empty-heading">Failed to load classes</h3>
-                <p class="empty-desc">Please try again later</p>
-            </div>
-        `;
-        }
-    }
-
-    async function joinClassById(classId) {
-        showToast('Joining class...', 'info');
-        try {
-            const response = await fetch('/api/join_class', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ class_id: classId })
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                showToast('Successfully joined class!', 'success');
-                setTimeout(() => {
-                    switchStudentView('dashboard');
-                    loadStudentData();
-                }, 1500);
-            } else {
-                showToast(data.error || 'Failed to join class', 'error');
-            }
-        } catch (error) {
-            showToast('Network error. Please try again.', 'error');
-        }
-    }
-
-    async function loadKnowledgeGaps() {
-        const container = document.getElementById('studGapsGrid');
-        container.innerHTML = `
-            <div class="loading-box">
-                <div class="loading-spinner"></div>
-                <p class="loading-text">Analyzing your performance...</p>
-            </div>
-        `;
-
-        try {
-            const response = await fetch('/api/student/knowledge-gaps');
-            const data = await response.json();
-
-            if (!data.gaps || data.gaps.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state-box">
-                        <div class="empty-ico">🎯</div>
-                        <h3 class="empty-heading">No gaps detected yet</h3>
-                        <p class="empty-desc">Complete quizzes to identify areas for improvement</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = data.gaps.map(gap => `
-                <div class="gap-card ${gap.severity}">
-                    <div class="gap-header">
-                        <h3 class="gap-topic">${gap.topic}</h3>
-                        <span class="gap-severity ${gap.severity}">${gap.severity.toUpperCase()}</span>
-                    </div>
-                    ${gap.score > 0 ? `<div class="gap-score">Current Score: ${gap.score}%</div>` : ''}
-                    <div class="gap-section">
-                        <h4>Common Mistakes:</h4>
-                        <ul>
-                            ${gap.common_mistakes.map(m => `<li>${m}</li>`).join('')}
-                        </ul>
-                    </div>
-                    <div class="gap-section">
-                        <h4>Recommended Resources:</h4>
-                        <div class="gap-resources">
-                            ${gap.recommended_resources.map(r => `
-                                <div class="resource-item">
-                                    <span class="resource-type">${r.type}</span>
-                                    <span class="resource-title">${r.title}</span>
-                                    <span class="resource-meta">${r.duration || (r.questions ? r.questions + ' questions' : r.pages + ' pages')}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                    <div class="gap-plan">
-                        <strong>Improvement Plan:</strong>
-                        <p>${gap.improvement_plan}</p>
-                    </div>
-                </div>
-            `).join('');
-        } catch (error) {
-            console.error('Error loading knowledge gaps:', error);
-            container.innerHTML = `
-                <div class="empty-state-box">
-                    <div class="empty-ico">⚠️</div>
-                    <h3 class="empty-heading">Failed to load knowledge gaps</h3>
-                    <p class="empty-desc">Please try again later</p>
-                </div>
-            `;
-        }
-    }
-
-    async function loadRecommendations() {
-        const container = document.getElementById('studRecommendGrid');
-        container.innerHTML = `
-            <div class="loading-box">
-                <div class="loading-spinner"></div>
-                <p class="loading-text">Generating personalized recommendations...</p>
-            </div>
-        `;
-
-        try {
-            const response = await fetch('/api/student/recommendations');
-            const data = await response.json();
-
-            if (!data.recommendations || data.recommendations.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state-box">
-                        <div class="empty-ico">✨</div>
-                        <h3 class="empty-heading">Start learning to get recommendations</h3>
-                        <p class="empty-desc">Our AI will suggest personalized study paths</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = data.recommendations.map(rec => `
-                <div class="recommend-card ${rec.priority}">
-                    <div class="rec-icon">${rec.icon}</div>
-                    <div class="rec-content">
-                        <div class="rec-header">
-                            <h3 class="rec-title">${rec.title}</h3>
-                            <span class="rec-priority ${rec.priority}">${rec.priority}</span>
-                        </div>
-                        <p class="rec-description">${rec.description}</p>
-                        <div class="rec-footer">
-                            <span class="rec-time">⏱️ ${rec.estimated_time}</span>
-                            <button class="rec-action-btn" onclick="switchStudentView('browse')">${rec.action}</button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        } catch (error) {
-            console.error('Error loading recommendations:', error);
-            container.innerHTML = `
-                <div class="empty-state-box">
-                    <div class="empty-ico">⚠️</div>
-                    <h3 class="empty-heading">Failed to load recommendations</h3>
-                    <p class="empty-desc">Please try again later</p>
-                </div>
-            `;
-        }
-    }
-
-    function loadProgress() {
-        // Placeholder - would load from API
-        console.log('Loading progress');
-    }
-
-    // Init
-    document.addEventListener('DOMContentLoaded', () => {
-        loadStudentData();
-    });
+    window.__STUDENT_CLASSES__ = {{ classes | tojson }};
 </script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/learning_path.css') }}?v={{ config.APP_VERSION }}">
+<script src="{{ url_for('static', filename='js/learning_path.js') }}?v={{ config.APP_VERSION }}"></script>
+<script src="{{ url_for('static', filename='js/student-dashboard.js') }}?v={{ config.APP_VERSION }}"></script>
 
 <style>
     /* ============================================
@@ -716,12 +444,86 @@
    ============================================ */
 
     .stud-sidebar {
-        width: 220px;
+        width: 260px;
+        /* Slightly wider */
         background: #111827;
         border-right: 1px solid rgba(75, 85, 99, 0.3);
         display: flex;
         flex-direction: column;
         flex-shrink: 0;
+        transition: width 0.3s ease;
+        position: relative;
+        z-index: 50;
+    }
+
+    .stud-sidebar.collapsed {
+        width: 80px;
+    }
+
+    .stud-sidebar.collapsed .brand-title-text,
+    .stud-sidebar.collapsed .brand-role-badge,
+    .stud-sidebar.collapsed .user-info,
+    .stud-sidebar.collapsed .logout-button span,
+    .stud-sidebar.collapsed .view-sub-text,
+    .stud-sidebar.collapsed .item-label {
+        display: none;
+        opacity: 0;
+    }
+
+    .stud-sidebar.collapsed .sidebar-brand-area {
+        padding: 20px 10px;
+        justify-content: center;
+    }
+
+    .stud-sidebar.collapsed .brand-logo-img {
+        margin: 0 auto;
+    }
+
+    .stud-sidebar.collapsed .nav-menu-item {
+        justify-content: center;
+        padding: 14px 10px;
+    }
+
+    .stud-sidebar.collapsed .item-icon {
+        margin-right: 0;
+        font-size: 24px;
+    }
+
+    .stud-sidebar.collapsed .sidebar-user-profile {
+        justify-content: center;
+        padding: 16px 10px;
+    }
+
+    .stud-sidebar.collapsed .user-avatar {
+        margin: 0;
+    }
+
+    .sidebar-toggle-btn {
+        position: absolute;
+        top: 24px;
+        right: -12px;
+        width: 24px;
+        height: 24px;
+        background: #1f2937;
+        border: 1px solid rgba(75, 85, 99, 0.5);
+        border-radius: 50%;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 60;
+        transition: all 0.2s;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar-toggle-btn:hover {
+        background: #374151;
+        color: #fff;
+    }
+
+    .stud-sidebar.collapsed .sidebar-toggle-btn {
+        transform: rotate(180deg);
     }
 
     .sidebar-brand-area {
@@ -731,17 +533,26 @@
         flex-direction: column;
         align-items: center;
         gap: 8px;
+        overflow: hidden;
     }
 
     .brand-logo-img {
         width: 40px;
         height: 40px;
+        max-width: 40px;
+        max-height: 40px;
+        object-fit: contain;
+        flex-shrink: 0;
     }
 
     .brand-title-text {
         font-size: 18px;
         font-weight: 700;
         color: #60a5fa;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
     }
 
     .brand-role-badge {
@@ -779,15 +590,18 @@
     }
 
     .nav-menu-item:hover {
-        background: rgba(96, 165, 250, 0.1);
+        background: rgba(96, 165, 250, 0.12);
         color: #e5e7eb;
-        box-shadow: 0 0 12px rgba(96, 165, 250, 0.15);
+        box-shadow: 0 0 16px rgba(96, 165, 250, 0.2),
+            inset 0 0 8px rgba(96, 165, 250, 0.1);
     }
 
     .nav-menu-item.active {
-        background: rgba(96, 165, 250, 0.15);
+        background: rgba(96, 165, 250, 0.18);
         color: #60a5fa;
-        box-shadow: 0 0 16px rgba(96, 165, 250, 0.2);
+        box-shadow: 0 0 20px rgba(96, 165, 250, 0.3),
+            inset 0 0 12px rgba(96, 165, 250, 0.15);
+        border: 1px solid rgba(96, 165, 250, 0.3);
     }
 
     .item-icon {
@@ -1108,12 +922,19 @@
         background: #1f2937;
         border-radius: 14px;
         padding: 24px;
-        transition: transform 0.3s;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
 
     .stud-class-card:hover,
     .browse-class-card:hover {
-        transform: translateY(-2px);
+        transform: translateY(-4px);
+        border-color: rgba(96, 165, 250, 0.5);
+        box-shadow: 0 12px 32px rgba(96, 165, 250, 0.25),
+            0 0 24px rgba(96, 165, 250, 0.15);
     }
 
     .scard-border,
@@ -1181,6 +1002,63 @@
         white-space: nowrap;
     }
 
+    /* Glow Animation */
+    @keyframes btn-glow {
+        0% {
+            box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+        }
+
+        50% {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.8), 0 0 10px rgba(59, 130, 246, 0.4);
+        }
+
+        100% {
+            box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+        }
+    }
+
+    .btn-primary,
+    .scard-btn {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-primary:hover,
+    .scard-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        filter: brightness(1.1);
+    }
+
+    .btn-glow {
+        animation: btn-glow 2s infinite;
+    }
+
+    /* Progress Cards */
+    .progress-card {
+        background: #1f2937;
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        border-radius: 12px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .progress-chart-container {
+        width: 100%;
+        height: 300px;
+        position: relative;
+    }
+
     .scard-btn {
         width: 100%;
         padding: 12px;
@@ -1230,17 +1108,23 @@
     .loading-box {
         grid-column: 1 / -1;
         text-align: center;
-        padding: 80px 20px;
+        padding: 100px 20px;
+        background: linear-gradient(135deg, rgba(31, 41, 55, 0.5), rgba(17, 24, 39, 0.5));
+        border-radius: 16px;
+        border: 1px solid rgba(75, 85, 99, 0.3);
     }
 
     .loading-spinner {
-        width: 48px;
-        height: 48px;
-        border: 4px solid rgba(96, 165, 250, 0.2);
+        width: 64px;
+        height: 64px;
+        border: 5px solid rgba(96, 165, 250, 0.15);
         border-top-color: #60a5fa;
+        border-right-color: #60a5fa;
         border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin: 0 auto 16px;
+        animation: spin 1s ease-in-out infinite;
+        margin: 0 auto 24px;
+        box-shadow: 0 0 32px rgba(96, 165, 250, 0.3);
+        filter: drop-shadow(0 0 16px rgba(96, 165, 250, 0.4));
     }
 
     @keyframes spin {
@@ -1250,18 +1134,21 @@
     }
 
     .loading-text {
-        font-size: 15px;
-        color: #9ca3af;
+        font-size: 16px;
+        font-weight: 500;
+        color: #d1d5db;
+        letter-spacing: 0.5px;
     }
 
     /* Empty State */
     .empty-state-box {
         grid-column: 1 / -1;
         text-align: center;
-        padding: 80px 20px;
-        background: #1f2937;
-        border-radius: 12px;
-        border: 2px dashed rgba(75, 85, 99, 0.3);
+        padding: 100px 40px;
+        background: linear-gradient(135deg, rgba(31, 41, 55, 0.8), rgba(17, 24, 39, 0.6));
+        border-radius: 16px;
+        border: 2px dashed rgba(96, 165, 250, 0.25);
+        box-shadow: inset 0 2px 16px rgba(0, 0, 0, 0.3);
     }
 
     .empty-ico {
@@ -1936,6 +1823,340 @@
         color: #9ca3af;
         line-height: 1.6;
         margin: 0;
+    }
+
+    /* =========================================
+       UI OVERHAUL - GLOWING CARDS & PARTOGRAPH
+       ========================================= */
+
+    /* 1. Browse Class Grid & Cards */
+    #browseClassesGrid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        padding: 20px 0;
+    }
+
+    .browse-class-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 16px;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        min-height: 280px;
+    }
+
+    .browse-class-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.06), transparent 40%);
+        opacity: 0;
+        transition: opacity 0.5s;
+        pointer-events: none;
+    }
+
+    .browse-class-card:hover::before {
+        opacity: 1;
+    }
+
+    .browse-class-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
+        border-color: rgba(96, 165, 250, 0.4);
+    }
+
+    .bcc-header {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .bcc-badge-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 8px;
+    }
+
+    .bcc-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .bcc-badge.active {
+        background: rgba(16, 185, 129, 0.15);
+        color: #34d399;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .bcc-badge.upcoming {
+        background: rgba(245, 158, 11, 0.15);
+        color: #fbbf24;
+        border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .bcc-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #f3f4f6;
+        margin: 0;
+        line-height: 1.3;
+        background: linear-gradient(to right, #fff, #9ca3af);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .bcc-subject {
+        font-size: 13px;
+        color: #9ca3af;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .bcc-info {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: auto;
+        padding-top: 16px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .bcc-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #d1d5db;
+        font-size: 13px;
+    }
+
+    .bcc-icon {
+        opacity: 0.7;
+        font-size: 16px;
+        min-width: 20px;
+        text-align: center;
+    }
+
+    .bcc-btn {
+        width: 100%;
+        padding: 12px;
+        border-radius: 12px;
+        border: none;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        background: linear-gradient(135deg, #3b82f6, #06b6d4);
+        color: white;
+        margin-top: 16px;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .bcc-btn:hover {
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.5);
+        transform: translateY(-2px);
+        filter: brightness(1.1);
+    }
+
+    /* 2. AI Recommendation Cards */
+    #studRecommendGrid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+    }
+
+    .ai-rec-card {
+        background: rgba(17, 24, 39, 0.6);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        border-radius: 20px;
+        padding: 24px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.1);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .ai-rec-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top right, rgba(139, 92, 246, 0.15), transparent 60%);
+        pointer-events: none;
+    }
+
+    .ai-rec-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2);
+        border-color: rgba(139, 92, 246, 0.5);
+    }
+
+    .air-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .air-tag {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        background: rgba(139, 92, 246, 0.1);
+        color: #a78bfa;
+        border: 1px solid rgba(139, 92, 246, 0.2);
+    }
+
+    .air-priority {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 8px;
+        border-radius: 6px;
+    }
+
+    .air-priority.high {
+        color: #f87171;
+        background: rgba(248, 113, 113, 0.1);
+    }
+
+    .air-priority.medium {
+        color: #fbbf24;
+        background: rgba(251, 191, 36, 0.1);
+    }
+
+    .air-priority.low {
+        color: #34d399;
+        background: rgba(52, 211, 153, 0.1);
+    }
+
+    .air-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #e5e7eb;
+        margin: 0;
+    }
+
+    .air-desc {
+        font-size: 14px;
+        color: #9ca3af;
+        line-height: 1.5;
+        flex-grow: 1;
+    }
+
+    .air-action {
+        width: 100%;
+        margin-top: 12px;
+        padding: 12px;
+        text-align: center;
+        background: linear-gradient(135deg, #8b5cf6, #d946ef);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: block;
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    }
+
+    .air-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(139, 92, 246, 0.5);
+        filter: brightness(1.1);
+    }
+
+    /* 3. Partograph Container */
+    .partograph-container {
+        background: rgba(17, 24, 39, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 24px;
+        padding: 24px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 0 30px rgba(59, 130, 246, 0.15);
+        margin-bottom: 32px;
+    }
+
+    .partograph-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .partograph-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #60a5fa;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .partograph-legend {
+        display: flex;
+        gap: 16px;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: #9ca3af;
+    }
+
+    .legend-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 1024px) {
+        #browseClassesGrid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        #browseClassesGrid {
+            grid-template-columns: 1fr;
+        }
+
+        #studRecommendGrid {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 {% endblock %}

@@ -129,12 +129,24 @@ async function sendAIMessage() {
         const loadingEl = document.getElementById('ai-loading');
         if (loadingEl) loadingEl.remove();
 
+        // Validate API shape
+        if (!data || (data.success === false)) {
+            const errMsg = (data && (data.error || data.message)) || 'AI service returned an error';
+            const errorMessage = document.createElement('div');
+            errorMessage.className = 'ai-message bot';
+            errorMessage.innerHTML = `<p>${escapeHtml(errMsg)}</p>`;
+            messagesContainer.appendChild(errorMessage);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            return;
+        }
+
         // Add AI response (rendered HTML from backend includes markdown and math)
         const aiMessage = document.createElement('div');
         aiMessage.className = 'ai-message bot';
-        // Don't escape HTML since backend returns rendered markdown
+        // Backend returns rendered markdown in `reply` and raw text in `raw`
         const providerLabel = data.provider ? `<div class="ai-meta"><small>source: ${escapeHtml(data.provider)}</small></div>` : '';
-        aiMessage.innerHTML = `<div class="ai-content">${data.answer}</div>${providerLabel}`;
+        const rendered = data.reply || data.answer || '';
+        aiMessage.innerHTML = `<div class="ai-content">${rendered}</div>${providerLabel}`;
         messagesContainer.appendChild(aiMessage);
 
         // Trigger MathJax rendering for math equations
@@ -494,4 +506,163 @@ window.LearnVaultX = {
     // Voice helpers
     toggleTTS,
     speak: (text) => speakText(text)
+};
+
+// ============================================================================
+// SETTINGS & ACCESSIBILITY FEATURES
+// ============================================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Draggable Settings FAB
+    const fab = document.getElementById('settingsBtn');
+    if (fab) {
+        // Restore position
+        const savedLeft = localStorage.getItem('settingsFabLeft');
+        const savedTop = localStorage.getItem('settingsFabTop');
+        if (savedLeft && savedTop) {
+            fab.style.bottom = 'auto';
+            fab.style.right = 'auto';
+            fab.style.left = savedLeft + 'px';
+            fab.style.top = savedTop + 'px';
+        }
+
+        let isDragging = false;
+        let startX, startY;
+        let initialLeft, initialTop;
+        let diffX = 0;
+        let diffY = 0;
+
+        fab.addEventListener('mousedown', startDrag);
+        fab.addEventListener('touchstart', startDrag, { passive: false });
+
+        function startDrag(e) {
+            if (e.target.closest('.settings-close')) return;
+            isDragging = true;
+
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            const rect = fab.getBoundingClientRect();
+            // Calculate offset from top-left of button
+            diffX = clientX - rect.left;
+            diffY = clientY - rect.top;
+
+            fab.style.transition = 'none';
+            fab.style.bottom = 'auto';
+            fab.style.right = 'auto';
+            // Set initial position explicitly to current computed position
+            fab.style.left = rect.left + 'px';
+            fab.style.top = rect.top + 'px';
+
+            // Add grabbing cursor
+            fab.style.cursor = 'grabbing';
+
+            document.addEventListener('mousemove', onDrag);
+            document.addEventListener('touchmove', onDrag, { passive: false });
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchend', endDrag);
+        }
+
+        function onDrag(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            let newLeft = clientX - diffX;
+            let newTop = clientY - diffY;
+
+            // Constrain to window
+            const winWidth = window.innerWidth;
+            const winHeight = window.innerHeight;
+            const rect = fab.getBoundingClientRect();
+
+            newLeft = Math.max(10, Math.min(winWidth - rect.width - 10, newLeft));
+            newTop = Math.max(10, Math.min(winHeight - rect.height - 10, newTop));
+
+            fab.style.left = `${newLeft}px`;
+            fab.style.top = `${newTop}px`;
+        }
+
+        function endDrag() {
+            isDragging = false;
+            fab.style.transition = '';
+            fab.style.cursor = 'pointer';
+
+            // Save position
+            localStorage.setItem('settingsFabLeft', fab.style.left.replace('px', ''));
+            localStorage.setItem('settingsFabTop', fab.style.top.replace('px', ''));
+
+            document.removeEventListener('mousemove', onDrag);
+            document.removeEventListener('touchmove', onDrag);
+            document.removeEventListener('mouseup', endDrag);
+            document.removeEventListener('touchend', endDrag);
+        }
+    }
+
+    // 2. Network Speed Indicator
+    checkNetworkSpeed();
+
+    // 3. Restore Accessibility
+    const savedSize = localStorage.getItem('fontSize') || 'normal';
+    window.setFontSize(savedSize);
+    const fontSizeSelect = document.getElementById('fontSizeSelect');
+    if (fontSizeSelect) fontSizeSelect.value = savedSize;
+
+    const savedMotion = localStorage.getItem('reducedMotion') === 'true';
+    window.setReducedMotion(savedMotion);
+    // Note: reducedMotion checkbox is checked by base.html script logic, no need here?
+    // base.html script loads it into checkbox, but doesn't apply class.
+    // We applied class via window.setReducedMotion above.
+});
+
+function checkNetworkSpeed() {
+    const indicator = document.getElementById('networkSpeedIndicator');
+    if (!indicator) return;
+
+    function update() {
+        if (navigator.connection) {
+            const conn = navigator.connection;
+            const speed = conn.downlink ? conn.downlink + ' Mbps' : 'Unknown';
+            const type = conn.effectiveType ? conn.effectiveType.toUpperCase() : '4G';
+
+            indicator.innerText = `${type} (${speed})`;
+
+            if (conn.downlink >= 5) indicator.style.color = '#10b981'; // Green
+            else if (conn.downlink >= 1) indicator.style.color = '#f59e0b'; // Yellow
+            else indicator.style.color = '#ef4444'; // Red
+        } else {
+            indicator.innerText = 'Online';
+            indicator.style.color = '#10b981';
+        }
+    }
+
+    update();
+    if (navigator.connection) {
+        navigator.connection.addEventListener('change', update);
+    }
+}
+
+// Global Accessibility Setters
+window.setFontSize = function (size) {
+    const root = document.documentElement;
+    // Base font size is usually 16px (100%)
+    // But CSS var --text-base might be used?
+    // Let's set on html element which affects rem units.
+    if (size === 'large') root.style.fontSize = '18px';
+    else if (size === 'xlarge') root.style.fontSize = '20px';
+    else root.style.fontSize = '16px';
+    localStorage.setItem('fontSize', size);
+};
+
+window.setReducedMotion = function (enabled) {
+    const root = document.documentElement;
+    if (enabled) root.classList.add('reduce-motion');
+    else root.classList.remove('reduce-motion');
+    localStorage.setItem('reducedMotion', enabled);
+
+    // Also sync checkbox if called from elsewhere
+    const toggle = document.getElementById('reducedMotion');
+    if (toggle) toggle.checked = enabled;
 };

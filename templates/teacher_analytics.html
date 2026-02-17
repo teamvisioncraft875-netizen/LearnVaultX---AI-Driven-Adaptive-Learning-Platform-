@@ -2,6 +2,10 @@
 
 {% block title %}Class Analytics - LearnVaultX{% endblock %}
 
+{% block meta_robots %}noindex, nofollow{% endblock %}
+{% block meta_description %}Monitor student performance, engagement analytics, and class insights with AI-powered
+tools.{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/analytics.css') }}">
 {% endblock %}
@@ -149,14 +153,36 @@
     // Load teacher analytics
     async function loadTeacherAnalytics() {
         try {
-            const response = await fetch('/api/teacher/analytics');
-            const data = await response.json();
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
 
+            const response = await fetch('/api/teacher/analytics', {
+                method: 'GET',
+                credentials: 'same-origin',
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
             console.log('Teacher analytics data:', data);
 
             // Populate class selector
             const selector = document.getElementById('class-selector');
             selector.innerHTML = '<option value="">Select a class...</option>';
+
+            if (!data.class_analytics || data.class_analytics.length === 0) {
+                selector.innerHTML = '<option value="">No classes found</option>';
+                return;
+            }
 
             data.class_analytics.forEach(cls => {
                 const option = document.createElement('option');
@@ -174,14 +200,38 @@
 
         } catch (error) {
             console.error('Error loading teacher analytics:', error);
+
+            const selector = document.getElementById('class-selector');
+            if (error.name === 'AbortError') {
+                selector.innerHTML = '<option value="">Request timeout</option>';
+            } else {
+                selector.innerHTML = '<option value="">Failed to load classes</option>';
+            }
         }
     }
 
     async function loadClassStats(classId) {
         try {
-            const response = await fetch(`/api/teacher/class-stats/${classId}`);
-            const data = await response.json();
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
 
+            const response = await fetch(`/api/teacher/class-stats/${classId}`, {
+                method: 'GET',
+                credentials: 'same-origin',
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
             console.log('Class stats:', data);
 
             // Update stats
@@ -212,10 +262,20 @@
             displayFailedTopic(data.most_failed_topic);
 
             // Display leaderboard
-            displayLeaderboard(data.top_students);
+            if (data.top_students && data.top_students.length > 0) {
+                displayLeaderboard(data.top_students);
+            } else {
+                document.getElementById('leaderboard').innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-secondary);">No student data yet</div>';
+            }
 
         } catch (error) {
             console.error('Error loading class stats:', error);
+
+            // Show error message in stats
+            const errorMsg = error.name === 'AbortError' ? 'Request timeout' : 'Failed to load stats';
+            ['total-students', 'active-today', 'avg-class-score', 'completion-rate'].forEach(id => {
+                document.getElementById(id).textContent = '--';
+            });
         }
     }
 
@@ -261,18 +321,40 @@
     function displayLeaderboard(students) {
         const container = document.getElementById('leaderboard');
 
-        container.innerHTML = students.map(student => `
-            <div class="leaderboard-item">
-                <div class="leaderboard-rank ${student.rank === 1 ? 'top-1' : ''}">
-                    ${student.rank}
+        // Add badges logic if not present in data (fallback)
+        const getBadge = (rank) => {
+            if (rank === 1) return '🥇';
+            if (rank === 2) return '🥈';
+            if (rank === 3) return '🥉';
+            return '';
+        };
+
+        container.innerHTML = students.map((student, index) => {
+            const rank = student.rank || index + 1;
+            const badge = student.badge || getBadge(rank);
+            const efficiency = student.efficiency_score || student.efficiency || 0;
+            const score = student.composite_score || student.avg_score || 0;
+
+            return `
+            <div class="leaderboard-item" style="display:flex; align-items:center; padding:12px; border-bottom:1px solid rgba(255,255,255,0.05);">
+                <div class="leaderboard-rank ${rank === 1 ? 'top-1' : ''}" style="width:30px; font-weight:bold; color:${rank <= 3 ? '#fbbf24' : '#9ca3af'}; font-size:1.1rem;">
+                    ${rank}
                 </div>
-                <div class="leaderboard-info">
-                    <div class="leaderboard-name">${student.name}</div>
-                    <div class="leaderboard-stats">${student.quizzes_completed} quizzes completed</div>
+                <div class="leaderboard-info" style="flex:1;">
+                    <div class="leaderboard-name" style="font-weight:600; color:#f3f4f6; display:flex; align-items:center; gap:6px;">
+                        ${student.name} <span style="font-size:1.2rem;">${badge}</span>
+                    </div>
+                    <div class="leaderboard-stats" style="font-size:0.85rem; color:#9ca3af; margin-top:2px;">
+                        ${student.quizzes_completed} quizzes • ${Math.round(efficiency)}% efficiency
+                    </div>
                 </div>
-                <div class="leaderboard-score">${student.avg_score}%</div>
+                <div class="leaderboard-score" style="text-align:right;">
+                    <div style="font-size:1.1rem; font-weight:700; color:#60a5fa;">${Math.round(score)}</div>
+                    <div style="font-size:0.75rem; color:#6b7280;">Score</div>
+                </div>
             </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     // Event listener for class selector

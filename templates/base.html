@@ -4,10 +4,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="AI-powered adaptive learning platform with personalized education">
+    <meta name="description"
+        content="{% block meta_description %}AI-powered adaptive learning platform with personalized education, quizzes, and real-time analytics.{% endblock %}">
+    <meta name="keywords"
+        content="{% block meta_keywords %}LearnVaultX, AI learning, adaptive education, online quizzes, student analytics, personalized learning{% endblock %}">
+    <meta name="robots" content="{% block meta_robots %}index, follow{% endblock %}">
+    <meta name="author" content="LearnVaultX">
     <meta name="theme-color" content="#38BDF8">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    {% block canonical %}
+    <link rel="canonical" href="{{ request.url }}">{% endblock %}
+
+    <!-- OpenGraph -->
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}LearnVaultX - AI-Powered Learning{% endblock %}">
+    <meta property="og:description"
+        content="{% block og_description %}AI-powered adaptive learning platform with personalized education.{% endblock %}">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:site_name" content="LearnVaultX">
+    <meta property="og:image"
+        content="{% block og_image %}{{ url_for('static', filename='images/og-banner.png', _external=True) }}{% endblock %}">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}LearnVaultX - AI-Powered Learning{% endblock %}">
+    <meta name="twitter:description"
+        content="{% block twitter_description %}AI-powered adaptive learning platform with personalized education.{% endblock %}">
+
+    {% block structured_data %}{% endblock %}
+
     <title>{% block title %}LearnVaultX - AI-Powered Learning{% endblock %}</title>
 
     <!-- Google Fonts -->
@@ -17,19 +43,34 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
         rel="stylesheet">
 
-    <!-- Unified Design System -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/design-tokens.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/global-layout.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/unified-design-system.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive-layout.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/premium-enhancements.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/midnight-theme.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/hero-exact-clone.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth-pages-redesign.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/spacing-fixes.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout-corrections.css') }}">
-    <!-- Midnight Blue Futuristic Theme -->
+    <!-- Unified Design System with Cache Busting -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/design-tokens.css') }}?v={{ config.APP_VERSION }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global-layout.css') }}?v={{ config.APP_VERSION }}">
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/unified-design-system.css') }}?v={{ config.APP_VERSION }}">
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/responsive-layout.css') }}?v={{ config.APP_VERSION }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}?v={{ config.APP_VERSION }}">
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/premium-enhancements.css') }}?v={{ config.APP_VERSION }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/midnight-theme.css') }}?v={{ config.APP_VERSION }}">
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/glassmorphism-production.css') }}?v={{ config.APP_VERSION }}">
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/toast-notifications.css') }}?v={{ config.APP_VERSION }}">
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/neon-ui-upgrade.css') }}?v={{ config.APP_VERSION }}">
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/hero-exact-clone.css') }}?v={{ config.APP_VERSION }}">
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/auth-pages-redesign.css') }}?v={{ config.APP_VERSION }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/spacing-fixes.css') }}?v={{ config.APP_VERSION }}">
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/layout-corrections.css') }}?v={{ config.APP_VERSION }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}?v={{ config.APP_VERSION }}">
+    <!-- Responsive Master Override (loaded last) -->
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/responsive-master.css') }}?v={{ config.APP_VERSION }}">
     <!-- MathJax for math rendering -->
     <script>
         MathJax = {
@@ -133,57 +174,44 @@
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/premium-features.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/ai-features.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/panel-manager.js') }}"></script>
+    <!-- Toast Notification System -->
+    <script src="{{ url_for('static', filename='js/toast-notifications.js') }}?v={{ config.APP_VERSION }}"></script>
 
-    <!-- Theme Manager -->
+    <!-- Sidebar Toggle & UI Enhancements -->
+    <script src="{{ url_for('static', filename='js/sidebar-toggle.js') }}?v={{ config.APP_VERSION }}"></script>
+
+    <!-- Service Worker -->
+    <script src="{{ url_for('static', filename='js/sw-register.js') }}?v={{ config.APP_VERSION }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}?v={{ config.APP_VERSION }}"></script>
+    <script src="{{ url_for('static', filename='js/premium-features.js') }}?v={{ config.APP_VERSION }}"></script>
+    <script src="{{ url_for('static', filename='js/ai-features.js') }}?v={{ config.APP_VERSION }}"></script>
+    <script src="{{ url_for('static', filename='js/panel-manager.js') }}?v={{ config.APP_VERSION }}"></script>
+
+    <!-- Speed Widget -->
+    <script src="{{ url_for('static', filename='js/speed-widget.js') }}?v={{ config.APP_VERSION }}"></script>
     <script>
-        // Theme Management
         const themeToggle = {
             themes: ['futuristic', 'dark', 'light'],
-            icons: ['✨', '🌙', '☀️'],
+            icons: ['?', '??', '??'],
             currentIndex: 0,
-
             init() {
                 const saved = localStorage.getItem('theme') || 'futuristic';
                 this.currentIndex = this.themes.indexOf(saved);
                 if (this.currentIndex === -1) this.currentIndex = 0;
                 this.set(saved);
-
-                const btn = document.getElementById('themeToggle');
-                if (btn) {
-                    btn.addEventListener('click', () => this.toggle());
-                }
             },
-
-            toggle() {
-                this.currentIndex = (this.currentIndex + 1) % this.themes.length;
-                this.set(this.themes[this.currentIndex]);
-            },
-
             set(theme) {
                 document.documentElement.setAttribute('data-theme', theme);
                 localStorage.setItem('theme', theme);
-                const index = this.themes.indexOf(theme);
-                this.currentIndex = index;
-
+                this.currentIndex = this.themes.indexOf(theme);
                 const icon = document.getElementById('themeIcon');
-                if (icon) {
-                    icon.textContent = this.icons[index];
+                if (icon && this.currentIndex >= 0) {
+                    icon.textContent = this.icons[this.currentIndex];
                 }
+                window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme } }));
             }
         };
 
-        // Initialize on load
-        document.addEventListener('DOMContentLoaded', () => {
-            themeToggle.init();
-            settingsPanel.init();
-        });
-
-        // Settings Panel Management
         const settingsPanel = {
             init() {
                 const settingsBtn = document.getElementById('settingsBtn');
@@ -191,65 +219,38 @@
                 const settingsClose = document.getElementById('settingsClose');
                 const saveBtn = document.getElementById('saveSettings');
 
-                if (settingsBtn) {
-                    settingsBtn.addEventListener('click', () => this.open());
-                }
-
-                if (settingsClose) {
-                    settingsClose.addEventListener('click', () => this.close());
-                }
-
+                if (settingsBtn) settingsBtn.addEventListener('click', () => this.open());
+                if (settingsClose) settingsClose.addEventListener('click', () => this.close());
                 if (settingsModal) {
                     settingsModal.addEventListener('click', (e) => {
                         if (e.target === settingsModal) this.close();
                     });
                 }
+                if (saveBtn) saveBtn.addEventListener('click', () => this.save());
 
-                if (saveBtn) {
-                    saveBtn.addEventListener('click', () => this.save());
-                }
-
-                // Theme option buttons
                 document.querySelectorAll('.theme-option').forEach(btn => {
                     btn.addEventListener('click', () => {
-                        const theme = btn.dataset.theme;
-                        themeToggle.set(theme);
+                        themeToggle.set(btn.dataset.theme);
                         this.updateThemeButtons();
                     });
                 });
 
-                // Load saved settings
                 this.loadSettings();
                 this.updateThemeButtons();
             },
-
             open() {
-                const modal = document.getElementById('settingsModal');
-                if (modal) {
-                    modal.classList.add('active');
-                }
+                document.getElementById('settingsModal')?.classList.add('active');
             },
-
             close() {
-                const modal = document.getElementById('settingsModal');
-                if (modal) {
-                    modal.classList.remove('active');
-                }
+                document.getElementById('settingsModal')?.classList.remove('active');
             },
-
             updateThemeButtons() {
                 const currentTheme = localStorage.getItem('theme') || 'futuristic';
                 document.querySelectorAll('.theme-option').forEach(btn => {
-                    if (btn.dataset.theme === currentTheme) {
-                        btn.classList.add('active');
-                    } else {
-                        btn.classList.remove('active');
-                    }
+                    btn.classList.toggle('active', btn.dataset.theme === currentTheme);
                 });
             },
-
             loadSettings() {
-                // Load AI settings
                 const aiVerbosity = localStorage.getItem('aiVerbosity') || 'balanced';
                 const aiMode = localStorage.getItem('aiMode') || 'socratic';
                 const reducedMotion = localStorage.getItem('reducedMotion') === 'true';
@@ -257,7 +258,6 @@
                 const emailNotif = localStorage.getItem('emailNotif') !== 'false';
                 const progressNotif = localStorage.getItem('progressNotif') !== 'false';
 
-                // Apply settings
                 const aiVerbositySelect = document.getElementById('aiVerbosity');
                 const aiModeSelect = document.getElementById('aiMode');
                 const reducedMotionToggle = document.getElementById('reducedMotion');
@@ -271,16 +271,8 @@
                 if (highContrastToggle) highContrastToggle.checked = highContrast;
                 if (emailNotifToggle) emailNotifToggle.checked = emailNotif;
                 if (progressNotifToggle) progressNotifToggle.checked = progressNotif;
-
-                // Apply accessibility settings
-                if (reducedMotion) {
-                    document.documentElement.style.setProperty('--transition-all', 'none');
-                    document.documentElement.style.setProperty('--transition-base', 'none');
-                }
             },
-
             save() {
-                // Save AI settings
                 const aiVerbosity = document.getElementById('aiVerbosity')?.value;
                 const aiMode = document.getElementById('aiMode')?.value;
                 const reducedMotion = document.getElementById('reducedMotion')?.checked;
@@ -290,34 +282,27 @@
 
                 if (aiVerbosity) localStorage.setItem('aiVerbosity', aiVerbosity);
                 if (aiMode) localStorage.setItem('aiMode', aiMode);
-                localStorage.setItem('reducedMotion', reducedMotion);
-                localStorage.setItem('highContrast', highContrast);
-                localStorage.setItem('emailNotif', emailNotif);
-                localStorage.setItem('progressNotif', progressNotif);
+                localStorage.setItem('reducedMotion', String(!!reducedMotion));
+                localStorage.setItem('highContrast', String(!!highContrast));
+                localStorage.setItem('emailNotif', String(!!emailNotif));
+                localStorage.setItem('progressNotif', String(!!progressNotif));
 
-                // Apply accessibility settings
-                if (reducedMotion) {
-                    document.documentElement.style.setProperty('--transition-all', 'none');
-                    document.documentElement.style.setProperty('--transition-base', 'none');
-                } else {
-                    document.documentElement.style.setProperty('--transition-all', '0.3s ease');
-                    document.documentElement.style.setProperty('--transition-base', '0.2s ease');
-                }
-
-                // Show success message
                 const saveBtn = document.getElementById('saveSettings');
                 if (saveBtn) {
-                    const originalText = saveBtn.textContent;
-                    saveBtn.textContent = '✓ Saved!';
-                    saveBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                    const original = saveBtn.textContent;
+                    saveBtn.textContent = 'Saved';
                     setTimeout(() => {
-                        saveBtn.textContent = originalText;
-                        saveBtn.style.background = '';
+                        saveBtn.textContent = original;
                         this.close();
-                    }, 1500);
+                    }, 1000);
                 }
             }
         };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            themeToggle.init();
+            settingsPanel.init();
+        });
     </script>
 
     <style>
@@ -365,6 +350,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .fab-container .settings-fab {
+            position: static;
+            bottom: auto;
+            right: auto;
         }
 
         .settings-fab:hover {
@@ -638,6 +629,97 @@
             }
         }
     </style>
+
+    <!-- Settings FAB -->
+    <button class="settings-fab" id="settingsBtn" aria-label="Settings" title="Open Settings">
+        ⚙️
+    </button>
+
+    <!-- Settings Modal -->
+    <div class="settings-modal" id="settingsModal">
+        <div class="settings-content">
+            <div class="settings-header">
+                <h2>Settings</h2>
+                <button class="settings-close" id="settingsClose" aria-label="Close Settings">×</button>
+            </div>
+            <div class="settings-body">
+                <!-- Theme Settings -->
+                <div class="settings-section">
+                    <h3 class="settings-section-title">Theme</h3>
+                    <div class="theme-options">
+                        <div class="theme-option" data-theme="futuristic">
+                            <span class="theme-icon">🌌</span>
+                            <span class="theme-name">Futuristic</span>
+                        </div>
+                        <div class="theme-option" data-theme="dark">
+                            <span class="theme-icon">🌙</span>
+                            <span class="theme-name">Dark</span>
+                        </div>
+                        <div class="theme-option" data-theme="light">
+                            <span class="theme-icon">☀️</span>
+                            <span class="theme-name">Light</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accessibility -->
+                <div class="settings-section">
+                    <h3 class="settings-section-title">Accessibility</h3>
+                    <div class="setting-item">
+                        <label>Font Size</label>
+                        <select class="setting-select" id="fontSizeSelect">
+                            <option value="normal">Normal</option>
+                            <option value="large">Large</option>
+                            <option value="xlarge">Extra Large</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-toggle">
+                            <label>Reduced Motion</label>
+                            <input type="checkbox" class="toggle-switch" id="reducedMotion">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Preferences (Matches existing JS) -->
+                <div class="settings-section">
+                    <h3 class="settings-section-title">AI Preferences</h3>
+                    <div class="setting-item">
+                        <label>Verbosity</label>
+                        <select class="setting-select" id="aiVerbosity">
+                            <option value="balanced">Balanced</option>
+                            <option value="concise">Concise</option>
+                            <option value="detailed">Detailed</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-toggle">
+                            <label>High Contrast</label>
+                            <input type="checkbox" class="toggle-switch" id="highContrast">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Network Status -->
+                <div class="settings-section">
+                    <h3 class="settings-section-title">Network</h3>
+                    <div class="setting-item">
+                        <div class="setting-toggle">
+                            <label>Connection Speed</label>
+                            <span id="networkSpeedIndicator"
+                                style="font-weight:bold; color:var(--primary);">Checking...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-footer">
+                <button class="btn-settings-save" id="saveSettings">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <script src="{{ url_for('static', filename='js/toast-notifications.js') }}?v={{ config.APP_VERSION }}"></script>
 
     {% block extra_js %}{% endblock %}
 </body>

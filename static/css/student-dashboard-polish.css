@@ -376,7 +376,324 @@
         flex-direction: column;
     }
 
-    .class-actions .btn {
-        width: 100%;
+}
+
+/* ============================================================================
+   AI RECOMMENDATION & KNOWLEDGE GAP CARDS - GLOWING UI
+   ============================================================================ */
+
+/* AI Recommendation Card */
+.ai-rec-card {
+    background: rgba(17, 24, 39, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(96, 165, 250, 0.3);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.ai-rec-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #60a5fa, #a855f7);
+    opacity: 0.8;
+}
+
+.ai-rec-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 25px rgba(96, 165, 250, 0.25),
+        inset 0 0 20px rgba(96, 165, 250, 0.05);
+    border-color: #60a5fa;
+}
+
+.air-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.air-tag {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #93c5fd;
+    background: rgba(59, 130, 246, 0.15);
+    padding: 4px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.air-priority {
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.air-priority.high {
+    color: #f87171;
+    text-shadow: 0 0 10px rgba(248, 113, 113, 0.4);
+}
+
+.air-priority.medium {
+    color: #fbbf24;
+}
+
+.air-priority.low {
+    color: #34d399;
+}
+
+.air-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #f3f4f6;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.air-desc {
+    font-size: 0.95rem;
+    color: #9ca3af;
+    line-height: 1.6;
+    flex: 1;
+}
+
+.air-action {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+    color: #60a5fa;
+    border: 1px solid rgba(96, 165, 250, 0.4);
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.air-action:hover {
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+}
+
+/* Knowledge Gap Card - Enhanced */
+.gap-card {
+    background: rgba(17, 24, 39, 0.8) !important;
+    /* Override dashboard.css */
+    border: 1px solid rgba(248, 113, 113, 0.3) !important;
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    position: relative;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.gap-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 25px rgba(248, 113, 113, 0.2);
+    border-color: #ef4444 !important;
+}
+
+.gap-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.gap-severity {
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 800;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.gap-severity.HIGH {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+    letter-spacing: 1px;
+}
+
+.gap-severity.MEDIUM {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+}
+
+.gap-quiz {
+    font-size: 0.85rem;
+    color: #9ca3af;
+}
+
+.gap-question {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #e5e7eb;
+    margin-bottom: 20px;
+    line-height: 1.5;
+    font-style: italic;
+    opacity: 0.9;
+}
+
+.gap-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.gap-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+    border: none;
+}
+
+.gap-btn:not(.secondary) {
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    color: white;
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+}
+
+.gap-btn:not(.secondary):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(239, 68, 68, 0.4);
+}
+
+.gap-btn.secondary {
+    background: transparent;
+    border: 1px solid rgba(75, 85, 99, 0.5);
+    color: #9ca3af;
+}
+
+.gap-btn.secondary:hover {
+    border-color: #e5e7eb;
+    color: #e5e7eb;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Progress Timeline Polish */
+.progress-timeline-container {
+    padding: 20px 0;
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.progress-timeline {
+    position: relative;
+    padding-left: 40px;
+}
+
+.progress-timeline::before {
+    content: '';
+    position: absolute;
+    left: 14px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, rgba(96, 165, 250, 0) 0%, rgba(96, 165, 250, 0.5) 15%, rgba(96, 165, 250, 0.5) 85%, rgba(96, 165, 250, 0) 100%);
+}
+
+.progress-item {
+    position: relative;
+    margin-bottom: 30px;
+    opacity: 0;
+    animation: slideInRight 0.5s ease-out forwards;
+}
+
+.timeline-node {
+    position: absolute;
+    left: -40px;
+    top: 24px;
+    width: 30px;
+    height: 30px;
+    background: #1f2937;
+    border: 2px solid #3b82f6;
+    border-radius: 50%;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+    color: white;
+    font-size: 10px;
+}
+
+.timeline-node.completed {
+    background: #10b981;
+    border-color: #059669;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+}
+
+.timeline-card {
+    background: rgba(31, 41, 55, 0.8);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(75, 85, 99, 0.4);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.timeline-card:hover {
+    transform: translateX(5px);
+    border-color: rgba(96, 165, 250, 0.5);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.prog-sub-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #f3f4f6;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.prog-sub-meta {
+    font-size: 0.9rem;
+    color: #9ca3af;
+    margin-bottom: 12px;
+}
+
+.prog-bar-container {
+    height: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.prog-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    border-radius: 4px;
+    transition: width 1s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
     }
 }

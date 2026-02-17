@@ -2,11 +2,16 @@
 
 {% block title %}Teacher Dashboard - LearnVaultX{% endblock %}
 
+{% block meta_robots %}noindex, nofollow{% endblock %}
+{% block meta_description %}Manage your classes, track student performance, create quizzes, and get AI teaching
+insights.{% endblock %}
+
 {% block content %}
 <!-- TEACHER DASHBOARD - UNIFIED WITH STUDENT DASHBOARD STRUCTURE -->
 <div class="dashboard-app">
     <!-- LEFT SIDEBAR - FIXED - UNIFIED STRUCTURE -->
     <aside class="dash-sidebar" id="dashSidebar">
+        <div class="sidebar-toggle-btn" onclick="toggleDesktopSidebar()">◀</div>
         <div class="sidebar-brand-area">
             <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LearnVaultX" class="brand-logo-img">
             <span class="brand-title-text">LearnVaultX</span>
@@ -22,13 +27,21 @@
                 <span class="item-icon">◈</span>
                 <span class="item-label">My Classes</span>
             </a>
-            <a href="/teacher/analytics" class="nav-menu-item">
+            <a href="#" class="nav-menu-item" onclick="switchView('analytics'); return false;">
                 <span class="item-icon">📊</span>
                 <span class="item-label">Analytics</span>
             </a>
             <a href="#" class="nav-menu-item" onclick="switchView('students'); return false;">
                 <span class="item-icon">👥</span>
                 <span class="item-label">Students</span>
+            </a>
+            <a href="#" class="nav-menu-item" onclick="switchView('alerts'); return false;">
+                <span class="item-icon">🚨</span>
+                <span class="item-label">Alerts</span>
+            </a>
+            <a href="#" class="nav-menu-item" onclick="switchView('feedback'); return false;">
+                <span class="item-icon">💬</span>
+                <span class="item-label">Feedback</span>
             </a>
         </nav>
 
@@ -70,19 +83,28 @@
                     <h2 class="section-label">Quick Actions</h2>
                     <div class="quick-act-grid">
                         <div class="quick-act-box" onclick="showCreateClassModal()">
-                            <div class="qact-icon">+</div>
+                            <div class="qact-icon-wrapper">
+                                <div class="qact-icon">+</div>
+                            </div>
                             <h3 class="qact-title">Create Class</h3>
                             <p class="qact-text">Start a new course</p>
+                            <button class="qact-btn">Start Now</button>
                         </div>
                         <div class="quick-act-box" onclick="switchView('analytics')">
-                            <div class="qact-icon">◭</div>
+                            <div class="qact-icon-wrapper">
+                                <div class="qact-icon">◭</div>
+                            </div>
                             <h3 class="qact-title">View Analytics</h3>
                             <p class="qact-text">Track performance</p>
+                            <button class="qact-btn">Go to Analytics</button>
                         </div>
                         <div class="quick-act-box" onclick="openAI()">
-                            <div class="qact-icon">◆</div>
+                            <div class="qact-icon-wrapper">
+                                <div class="qact-icon">◆</div>
+                            </div>
                             <h3 class="qact-title">AI Assistant</h3>
                             <p class="qact-text">Get teaching insights</p>
+                            <button class="qact-btn">Ask AI</button>
                         </div>
                     </div>
                 </section>
@@ -171,6 +193,9 @@
                             {% endfor %}
                         </select>
                     </div>
+                    <div id="analyticsChartContainer" style="display:none; margin-bottom: 30px;">
+                        <canvas id="classAnalyticsChart" style="max-height: 400px;"></canvas>
+                    </div>
                     <div id="analyticsData" class="analytics-container"></div>
                 </section>
             </div>
@@ -186,6 +211,26 @@
                 <div id="studentsListContainer" class="students-grid"></div>
             </div>
         </div>
+
+        <!-- ALERTS VIEW -->
+        <div class="dash-view" id="alertsView" style="display: none;">
+            <div class="dash-view-head">
+                <h1 class="view-main-title">Student Alerts</h1>
+            </div>
+            <div class="dash-view-body">
+                <div id="alertsListContainer" class="students-grid"></div>
+            </div>
+        </div>
+
+        <!-- FEEDBACK VIEW -->
+        <div class="dash-view" id="feedbackView" style="display: none;">
+            <div class="dash-view-head">
+                <h1 class="view-main-title">Student Feedback</h1>
+            </div>
+            <div class="dash-view-body">
+                <div id="feedbackListContainer" class="students-grid"></div>
+            </div>
+        </div>
     </main>
 
     <!-- RIGHT PANEL - AI TEACHING ASSISTANT (Unified structure) -->
@@ -199,8 +244,20 @@
         </div>
 
         <div class="ai-modes">
-            <button class="mode-tab active" onclick="switchAIMode('expert')">Expert</button>
-            <button class="mode-tab" onclick="switchAIMode('coach')">Coach</button>
+            <button class="mode-tab active" data-mode="expert" onclick="switchAIMode('expert', this)">Expert</button>
+            <button class="mode-tab" data-mode="coach" onclick="switchAIMode('coach', this)">Coach</button>
+        </div>
+
+        <!-- Language Selector -->
+        <div style="padding: 12px 16px; border-bottom: 1px solid rgba(75, 85, 99, 0.3);">
+            <label for="aiLanguageTeacher"
+                style="display: block; font-size: 12px; color: #9ca3af; margin-bottom: 6px;">Language:</label>
+            <select id="aiLanguageTeacher" onchange="localStorage.setItem('learnvaultx_ai_language', this.value)"
+                style="width: 100%; padding: 8px 12px; font-size: 14px; background: #1f2937; color: #e5e7eb; border: 1px solid rgba(96, 165, 250, 0.3); border-radius: 8px;">
+                <option value="english">English</option>
+                <option value="hindi">हिंदी (Hindi)</option>
+                <option value="odia">ଓଡ଼ିଆ (Odia)</option>
+            </select>
         </div>
 
         <div class="ai-messages" id="aiMessagesContainer">
@@ -320,377 +377,15 @@
 </div>
 
 <script>
-    // State
-    let currentView = 'dashboard';
-    let currentAIMode = 'expert';
-    let aiOpen = false;
-    let questionCount = 0;
-
-    // View Navigation
-    function switchView(viewName) {
-        document.querySelectorAll('.dash-view').forEach(v => v.style.display = 'none');
-        document.getElementById(viewName + 'View').style.display = 'flex';
-
-        document.querySelectorAll('.nav-menu-item').forEach(link => {
-            link.classList.remove('active');
-        });
-        event.target.closest('.nav-menu-item')?.classList.add('active');
-
-        currentView = viewName;
-
-        if (viewName === 'students') loadStudents();
-    }
-
-    // Mobile
-    function toggleMobileSidebar() {
-        document.getElementById('dashSidebar').classList.toggle('mobile-show');
-        document.getElementById('dashOverlay').classList.add('show');
-    }
-
-    function toggleAI() {
-        if (aiOpen) closeAI();
-        else openAI();
-    }
-
-    function closeAllMobile() {
-        document.getElementById('dashSidebar').classList.remove('mobile-show');
-        document.getElementById('dashOverlay').classList.remove('show');
-    }
-
-    // AI Panel
-    function openAI() {
-        document.getElementById('dashAIPanel').classList.add('open');
-        document.getElementById('dashCenter').classList.add('ai-active');
-        document.getElementById('aiFloat').style.display = 'none';
-        aiOpen = true;
-    }
-
-    function closeAI() {
-        document.getElementById('dashAIPanel').classList.remove('open');
-        document.getElementById('dashCenter').classList.remove('ai-active');
-        document.getElementById('aiFloat').style.display = 'flex';
-        aiOpen = false;
-    }
-
-    function switchAIMode(mode) {
-        currentAIMode = mode;
-        document.querySelectorAll('.mode-tab').forEach(tab => tab.classList.remove('active'));
-        event.target.classList.add('active');
-    }
-
-    function sendAIMsg() {
-        const input = document.getElementById('aiInputField');
-        const msg = input.value.trim();
-        if (!msg) return;
-
-        const container = document.getElementById('aiMessagesContainer');
-        const welcome = container.querySelector('.ai-welcome');
-        if (welcome) welcome.remove();
-
-        // User message
-        const userDiv = document.createElement('div');
-        userDiv.className = 'ai-msg user-msg';
-        userDiv.innerHTML = `<div class="msg-avatar">👤</div><div class="msg-text">${escapeHtml(msg)}</div>`;
-        container.appendChild(userDiv);
-
-        input.value = '';
-        container.scrollTop = container.scrollHeight;
-
-        // AI Response
-        fetch('/api/chatbot', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: msg, mode: currentAIMode })
-        })
-            .then(res => res.json())
-            .then(data => {
-                const aiDiv = document.createElement('div');
-                aiDiv.className = 'ai-msg ai-msg-bot';
-                aiDiv.innerHTML = `<div class="msg-avatar">🤖</div><div class="msg-text">${data.response || data.answer}</div>`;
-                container.appendChild(aiDiv);
-                container.scrollTop = container.scrollHeight;
-            })
-            .catch(err => console.error('AI error:', err));
-    }
-
-    document.getElementById('aiInputField')?.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendAIMsg();
-        }
-    });
-
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    // Modals
-    function showCreateClassModal() {
-        document.getElementById('createClassModal').style.display = 'flex';
-    }
-
-    function showUploadLectureModal(classId, classTitle) {
-        document.getElementById('uploadClassId').value = classId;
-        document.getElementById('uploadClassTitle').textContent = 'Class: ' + classTitle;
-        document.getElementById('uploadLectureModal').style.display = 'flex';
-    }
-
-    function showCreateQuizModal(classId, classTitle) {
-        document.getElementById('quizClassId').value = classId;
-        document.getElementById('quizClassTitle').textContent = 'Class: ' + classTitle;
-        document.getElementById('questionsContainer').innerHTML = '';
-        questionCount = 0;
-        addQuestion();
-        document.getElementById('createQuizModal').style.display = 'flex';
-    }
-
-    function closeModal(modalId) {
-        document.getElementById(modalId).style.display = 'none';
-    }
-
-    // Create Class
-    async function createClass(event) {
-        event.preventDefault();
-        const title = document.getElementById('className').value;
-        const description = document.getElementById('classDescription').value;
-
-        try {
-            const response = await fetch('/api/create_class', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, description })
-            });
-
-            if (response.ok) {
-                alert('Class created successfully!');
-                closeModal('createClassModal');
-                location.reload();
-            } else {
-                const data = await response.json();
-                alert(data.error || 'Failed to create class');
-            }
-        } catch (error) {
-            alert('Error: ' + error.message);
-        }
-    }
-
-    // Upload Lecture
-    async function uploadLecture(event) {
-        event.preventDefault();
-        const classId = document.getElementById('uploadClassId').value;
-        const file = document.getElementById('lectureFile').files[0];
-
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('class_id', classId);
-
-        try {
-            const response = await fetch('/api/upload_lecture', {
-                method: 'POST',
-                body: formData
-            });
-
-            if (response.ok) {
-                alert('Lecture uploaded successfully!');
-                closeModal('uploadLectureModal');
-                document.getElementById('uploadLectureForm').reset();
-            } else {
-                const data = await response.json();
-                alert(data.error || 'Failed to upload lecture');
-            }
-        } catch (error) {
-            alert('Error: ' + error.message);
-        }
-    }
-
-    // Quiz Management
-    function addQuestion() {
-        questionCount++;
-        const container = document.getElementById('questionsContainer');
-        const questionDiv = document.createElement('div');
-        questionDiv.className = 'question-block';
-        questionDiv.innerHTML = `
-        <div class="question-header">
-            <strong class="question-num">Question ${questionCount}</strong>
-            <button type="button" class="btn-remove" onclick="this.closest('.question-block').remove()">Remove</button>
-        </div>
-        <div class="form-group">
-            <label class="form-label">Question Text*</label>
-            <input type="text" class="form-input question-text" required placeholder="Enter your question...">
-        </div>
-        <div class="form-group">
-            <label class="form-label">Options (4 required)*</label>
-            <input type="text" class="form-input question-option" required placeholder="Option 1">
-            <input type="text" class="form-input question-option" required placeholder="Option 2" style="margin-top: 8px;">
-            <input type="text" class="form-input question-option" required placeholder="Option 3" style="margin-top: 8px;">
-            <input type="text" class="form-input question-option" required placeholder="Option 4" style="margin-top: 8px;">
-        </div>
-        <div class="form-group">
-            <label class="form-label">Correct Answer (0-3)*</label>
-            <select class="form-input question-correct" required>
-                <option value="0">Option 1</option>
-                <option value="1">Option 2</option>
-                <option value="2">Option 3</option>
-                <option value="3">Option 4</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label class="form-label">Explanation (Optional)</label>
-            <textarea class="form-input question-explanation" rows="2" placeholder="Explain why this is correct..."></textarea>
-        </div>
-    `;
-        container.appendChild(questionDiv);
-    }
-
-    async function createQuiz(event) {
-        event.preventDefault();
-        const classId = document.getElementById('quizClassId').value;
-        const title = document.getElementById('quizTitle').value;
-        const description = document.getElementById('quizDescription').value;
-
-        const questionBlocks = document.querySelectorAll('.question-block');
-        const questions = [];
-
-        questionBlocks.forEach(block => {
-            const options = Array.from(block.querySelectorAll('.question-option')).map(o => o.value);
-            questions.push({
-                question: block.querySelector('.question-text').value,
-                options: options,
-                correct: parseInt(block.querySelector('.question-correct').value),
-                explanation: block.querySelector('.question-explanation').value
-            });
-        });
-
-        if (questions.length === 0) {
-            alert('Please add at least one question');
-            return;
-        }
-
-        try {
-            const response = await fetch('/api/create_quiz', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ class_id: classId, title, description, questions })
-            });
-
-            if (response.ok) {
-                alert('Quiz created successfully!');
-                closeModal('createQuizModal');
-                document.getElementById('createQuizForm').reset();
-            } else {
-                const data = await response.json();
-                alert(data.error || 'Failed to create quiz');
-            }
-        } catch (error) {
-            alert('Error: ' + error.message);
-        }
-    }
-
-    // Analytics
-    async function loadClassAnalytics(classId) {
-        if (!classId) {
-            document.getElementById('analyticsData').innerHTML = '';
-            return;
-        }
-
-        try {
-            const response = await fetch(`/api/analytics?class_id=${classId}`);
-            const metrics = await response.json();
-
-            const container = document.getElementById('analyticsData');
-            if (metrics.length === 0) {
-                container.innerHTML = '<div class="empty-state"><p class="empty-text">No student data yet</p></div>';
-                return;
-            }
-
-            let html = '<div class="analytics-grid">';
-            metrics.forEach(metric => {
-                html += `
-                <div class="analytics-card">
-                    <h4 class="analytics-name">${metric.student_name}</h4>
-                    <div class="analytics-stats">
-                        <div class="analytics-stat">
-                            <span class="stat-label">Avg Score:</span>
-                            <span class="stat-value">${metric.score_avg?.toFixed(1) || 'N/A'}%</span>
-                        </div>
-                        <div class="analytics-stat">
-                            <span class="stat-label">Avg Time:</span>
-                            <span class="stat-value">${metric.avg_time || 0}s</span>
-                        </div>
-                        <div class="analytics-stat">
-                            <span class="stat-label">Rating:</span>
-                            <span class="stat-value">${metric.rating?.toFixed(1) || 'N/A'}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-            });
-            html += '</div>';
-            container.innerHTML = html;
-        } catch (error) {
-            console.error('Error loading analytics:', error);
-        }
-    }
-
-    // Students
-    async function loadStudents() {
-        try {
-            const response = await fetch('/api/teacher/students');
-            const students = await response.json();
-
-            const container = document.getElementById('studentsListContainer');
-            if (students.length === 0) {
-                container.innerHTML = '<div class="empty-state"><p class="empty-text">No students enrolled yet</p></div>';
-                return;
-            }
-
-            let html = '';
-            students.forEach(student => {
-                html += `
-                <div class="student-card">
-                    <div class="student-avatar">${student.name[0]}</div>
-                    <h4 class="student-name">${student.name}</h4>
-                    <p class="student-email">${student.email}</p>
-                    <p class="student-meta">Quizzes taken: ${student.quizzes_taken || 0}</p>
-                </div>
-            `;
-            });
-            container.innerHTML = html;
-        } catch (error) {
-            console.error('Error loading students:', error);
-        }
-    }
-
-
-    // Load Stats
-    window.addEventListener('DOMContentLoaded', async () => {
-        try {
-            const classes = {{ classes | tojson
-        }};
-    let totalStudents = 0;
-    let totalLectures = 0;
-
-    classes.forEach(c => {
-        totalStudents += c.student_count || 0;
-        totalLectures += c.lecture_count || 0;
-    });
-
-    document.getElementById('totalStudents').textContent = totalStudents;
-    document.getElementById('totalLectures').textContent = totalLectures;
-        } catch (error) {
-        console.error('Error loading stats:', error);
-    }
-    });
-
+    window.__TEACHER_CLASSES__ = {{ classes | tojson }};
 </script>
+<script src="{{ url_for('static', filename='js/teacher-dashboard.js') }}?v={{ config.APP_VERSION }}"></script>
 
 <style>
     /* ============================================
-   UNIFIED DASHBOARD STYLES - TEACHER VERSION
-   (Matches student dashboard structure exactly)
-   ============================================ */
+        UNIFIED DASHBOARD STYLES - TEACHER VERSION
+        (Matches student dashboard structure exactly)
+        ============================================ */
 
     * {
         margin: 0;
@@ -714,8 +409,8 @@
     }
 
     /* ============================================
-   LEFT SIDEBAR - FIXED (UNIFIED)
-   ============================================ */
+       LEFT SIDEBAR - FIXED (UNIFIED)
+       ============================================ */
 
     .dash-sidebar {
         width: 220px;
@@ -733,17 +428,26 @@
         flex-direction: column;
         align-items: center;
         gap: 8px;
+        overflow: hidden;
     }
 
     .brand-logo-img {
         width: 40px;
         height: 40px;
+        max-width: 40px;
+        max-height: 40px;
+        object-fit: contain;
+        flex-shrink: 0;
     }
 
     .brand-title-text {
         font-size: 18px;
         font-weight: 700;
         color: #60a5fa;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
     }
 
     .brand-role-badge {
@@ -881,8 +585,8 @@
     }
 
     /* ============================================
-   CENTER CONTENT - ADAPTIVE (UNIFIED)
-   ============================================ */
+       CENTER CONTENT - ADAPTIVE (UNIFIED)
+       ============================================ */
 
     .dash-center {
         flex: 1;
@@ -1289,8 +993,8 @@
     }
 
     /* ============================================
-   RIGHT AI PANEL (UNIFIED)
-   ============================================ */
+       RIGHT AI PANEL (UNIFIED)
+       ============================================ */
 
     .dash-ai {
         position: fixed;
@@ -1491,8 +1195,8 @@
     }
 
     /* ============================================
-   MODALS (UNIFIED)
-   ============================================ */
+       MODALS (UNIFIED)
+       ============================================ */
 
     .modal-overlay {
         display: none;
@@ -1662,8 +1366,8 @@
     }
 
     /* ============================================
-   MOBILE RESPONSIVE
-   ============================================ */
+       MOBILE RESPONSIVE
+       ============================================ */
 
     .dash-overlay {
         display: none;
@@ -1740,6 +1444,85 @@
         .dash-center.ai-active {
             margin-right: 0;
         }
+    }
+
+    /* Sidebar Toggle Styles */
+    .dash-sidebar {
+        width: 260px;
+        /* Enhanced width */
+        transition: width 0.3s ease;
+        position: relative;
+        z-index: 50;
+    }
+
+    .dash-sidebar.collapsed {
+        width: 80px;
+    }
+
+    .dash-sidebar.collapsed .brand-title-text,
+    .dash-sidebar.collapsed .brand-role-badge,
+    .dash-sidebar.collapsed .user-info,
+    .dash-sidebar.collapsed .logout-button span,
+    .dash-sidebar.collapsed .view-sub-text,
+    .dash-sidebar.collapsed .item-label {
+        display: none;
+        opacity: 0;
+    }
+
+    .dash-sidebar.collapsed .sidebar-brand-area {
+        padding: 20px 10px;
+        justify-content: center;
+    }
+
+    .dash-sidebar.collapsed .brand-logo-img {
+        margin: 0 auto;
+    }
+
+    .dash-sidebar.collapsed .nav-menu-item {
+        justify-content: center;
+        padding: 14px 10px;
+    }
+
+    .dash-sidebar.collapsed .item-icon {
+        margin-right: 0;
+        font-size: 24px;
+    }
+
+    .dash-sidebar.collapsed .sidebar-user-profile {
+        justify-content: center;
+        padding: 16px 10px;
+    }
+
+    .dash-sidebar.collapsed .user-avatar {
+        margin: 0;
+    }
+
+    .sidebar-toggle-btn {
+        position: absolute;
+        top: 24px;
+        right: -12px;
+        width: 24px;
+        height: 24px;
+        background: #1f2937;
+        border: 1px solid rgba(75, 85, 99, 0.5);
+        border-radius: 50%;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 60;
+        transition: all 0.2s;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar-toggle-btn:hover {
+        background: #374151;
+        color: #fff;
+    }
+
+    .dash-sidebar.collapsed .sidebar-toggle-btn {
+        transform: rotate(180deg);
     }
 </style>
 {% endblock %}

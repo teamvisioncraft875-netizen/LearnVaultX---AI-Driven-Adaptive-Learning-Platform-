@@ -1,0 +1,469 @@
+/* ============================================
+   GLASSMORPHISM THEME - Dark Neon Production
+   LearnVaultX - Consolidated Styles
+   ============================================ */
+
+/* ============================================
+   CORE GLASSMORPHISM UTILITIES
+   ============================================ */
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(0, 255, 136, 0.2);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+    border-color: rgba(0, 255, 136, 0.4);
+    box-shadow: 0 12px 40px rgba(0, 255, 136, 0.2);
+    transform: translateY(-2px);
+}
+
+.glass-panel {
+    background: rgba(16, 22, 51, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(77, 163, 255, 0.3);
+}
+
+.glass-modal {
+    background: rgba(16, 22, 51, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(77, 163, 255, 0.4);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 20px rgba(77, 163, 255, 0.3);
+}
+
+/* ============================================
+   NEON GLOW EFFECTS
+   ============================================ */
+
+.glow-green {
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+}
+
+.glow-green-strong {
+    box-shadow: 0 0 30px rgba(0, 255, 136, 0.6);
+}
+
+.glow-blue {
+    box-shadow: 0 0 20px rgba(77, 163, 255, 0.4);
+}
+
+.glow-blue-strong {
+    box-shadow: 0 0 30px rgba(77, 163, 255, 0.6);
+}
+
+.glow-cyan {
+    box-shadow: 0 0 20px rgba(103, 232, 249, 0.4);
+}
+
+.glow-pink {
+    box-shadow: 0 0 20px rgba(255, 0, 110, 0.4);
+}
+
+/* ============================================
+   GRADIENT TEXT
+   ============================================ */
+
+.text-gradient-green {
+    background: linear-gradient(135deg, #00ff88, #00e5ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.text-gradient-blue {
+    background: linear-gradient(135deg, #4DA3FF, #67E8F9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.text-gradient-pink {
+    background: linear-gradient(135deg, #ff006e, #ff4d94);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ============================================
+   BUTTONS - NEON GLASSMORPHISM
+   ============================================ */
+
+.btn-glass-primary {
+    background: linear-gradient(135deg, #1E40AF, #1E3A8A);
+    border: 2px solid #67E8F9;
+    color: #FFFFFF;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 30px rgba(103, 232, 249, 0.5);
+}
+
+.btn-glass-primary:hover {
+    background: linear-gradient(135deg, #2563EB, #1E40AF);
+    box-shadow: 0 0 40px rgba(103, 232, 249, 0.7);
+    transform: translateY(-2px) scale(1.02);
+}
+
+.btn-glass-secondary {
+    background: rgba(10, 14, 39, 0.6);
+    border: 1.5px solid rgba(103, 232, 249, 0.3);
+    color: #FFFFFF;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-glass-secondary:hover {
+    border-color: rgba(103, 232, 249, 0.5);
+    background: rgba(10, 14, 39, 0.8);
+    box-shadow: 0 0 25px rgba(103, 232, 249, 0.3);
+}
+
+.btn-glass-success {
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 229, 255, 0.2));
+    border: 2px solid #00ff88;
+    color: #00ff88;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+}
+
+.btn-glass-success:hover {
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.3), rgba(0, 229, 255, 0.3));
+    box-shadow: 0 0 25px rgba(0, 255, 136, 0.4);
+    transform: translateY(-2px);
+}
+
+.btn-glass-danger {
+    background: linear-gradient(135deg, rgba(255, 0, 110, 0.2), rgba(255, 77, 148, 0.2));
+    border: 2px solid #ff006e;
+    color: #ff006e;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+}
+
+.btn-glass-danger:hover {
+    background: linear-gradient(135deg, rgba(255, 0, 110, 0.3), rgba(255, 77, 148, 0.3));
+    box-shadow: 0 0 25px rgba(255, 0, 110, 0.4);
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   FORM INPUTS - GLASSMORPHISM
+   ============================================ */
+
+.input-glass {
+    background: rgba(16, 22, 51, 0.6);
+    border: 1px solid rgba(77, 163, 255, 0.2);
+    color: #EAF0FF;
+    padding: 12px 16px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.input-glass:focus {
+    border-color: #4DA3FF;
+    background: rgba(16, 22, 51, 0.8);
+    box-shadow: 0 0 0 3px rgba(77, 163, 255, 0.2), 0 0 20px rgba(77, 163, 255, 0.3);
+    outline: none;
+}
+
+.input-glass::placeholder {
+    color: #A8B0D8;
+    opacity: 0.6;
+}
+
+.textarea-glass {
+    background: rgba(16, 22, 51, 0.6);
+    border: 1px solid rgba(77, 163, 255, 0.2);
+    color: #EAF0FF;
+    padding: 12px 16px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 100px;
+}
+
+.textarea-glass:focus {
+    border-color: #4DA3FF;
+    background: rgba(16, 22, 51, 0.8);
+    box-shadow: 0 0 0 3px rgba(77, 163, 255, 0.2), 0 0 20px rgba(77, 163, 255, 0.3);
+    outline: none;
+}
+
+.select-glass {
+    background: rgba(16, 22, 51, 0.6);
+    border: 1px solid rgba(77, 163, 255, 0.2);
+    color: #EAF0FF;
+    padding: 12px 16px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.select-glass:focus {
+    border-color: #4DA3FF;
+    background: rgba(16, 22, 51, 0.8);
+    box-shadow: 0 0 0 3px rgba(77, 163, 255, 0.2);
+    outline: none;
+}
+
+/* ============================================
+   METRIC CARDS - DASHBOARD
+   ============================================ */
+
+.metric-card-glass {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(77, 163, 255, 0.3);
+    border-radius: 16px;
+    padding: 24px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.metric-card-glass:hover {
+    border-color: rgba(77, 163, 255, 0.5);
+    box-shadow: 0 8px 24px rgba(77, 163, 255, 0.2);
+    transform: translateY(-4px);
+}
+
+.metric-value {
+    font-size: 36px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #4DA3FF, #67E8F9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+}
+
+.metric-label {
+    font-size: 14px;
+    color: #A8B0D8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ============================================
+   PROGRESS BARS - NEON
+   ============================================ */
+
+.progress-container-glass {
+    background: rgba(16, 22, 51, 0.5);
+    border: 1px solid rgba(77, 163, 255, 0.2);
+    border-radius: 8px;
+    height: 12px;
+    overflow: hidden;
+}
+
+.progress-bar-neon {
+    background: linear-gradient(90deg, #00ff88, #00e5ff);
+    height: 100%;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+    transition: width 0.5s ease;
+}
+
+.progress-bar-blue {
+    background: linear-gradient(90deg, #4DA3FF, #67E8F9);
+    height: 100%;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(77, 163, 255, 0.5);
+    transition: width 0.5s ease;
+}
+
+/* ============================================
+   BADGES - GLASSMORPHISM
+   ============================================ */
+
+.badge-glass {
+    background: rgba(77, 163, 255, 0.15);
+    border: 1px solid rgba(77, 163, 255, 0.3);
+    color: #4DA3FF;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    backdrop-filter: blur(8px);
+    display: inline-block;
+}
+
+.badge-glass-success {
+    background: rgba(0, 255, 136, 0.15);
+    border: 1px solid rgba(0, 255, 136, 0.3);
+    color: #00ff88;
+}
+
+.badge-glass-warning {
+    background: rgba(255, 165, 0, 0.15);
+    border: 1px solid rgba(255, 165, 0, 0.3);
+    color: #ffa500;
+}
+
+.badge-glass-danger {
+    background: rgba(255, 0, 110, 0.15);
+    border: 1px solid rgba(255, 0, 110, 0.3);
+    color: #ff006e;
+}
+
+/* ============================================
+   MODALS - GLASSMORPHISM
+   ============================================ */
+
+.modal-backdrop-glass {
+    background: rgba(10, 14, 39, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.modal-content-glass {
+    background: rgba(16, 22, 51, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(77, 163, 255, 0.4);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(77, 163, 255, 0.3);
+}
+
+/* ============================================
+   TABS - GLASSMORPHISM
+   ============================================ */
+
+.tab-glass {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(77, 163, 255, 0.2);
+    color: #A8B0D8;
+    padding: 12px 24px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.tab-glass:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(77, 163, 255, 0.3);
+    color: #EAF0FF;
+}
+
+.tab-glass.active {
+    background: linear-gradient(135deg, rgba(77, 163, 255, 0.2), rgba(103, 232, 249, 0.2));
+    border-color: #4DA3FF;
+    color: #FFFFFF;
+    box-shadow: 0 0 20px rgba(77, 163, 255, 0.3);
+}
+
+/* ============================================
+   TOOLTIPS - GLASSMORPHISM
+   ============================================ */
+
+.tooltip-glass {
+    background: rgba(16, 22, 51, 0.95);
+    border: 1px solid rgba(77, 163, 255, 0.3);
+    color: #EAF0FF;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================
+   SKELETON LOADERS
+   ============================================ */
+
+.skeleton-glass {
+    background: linear-gradient(90deg,
+        rgba(255, 255, 255, 0.05) 0%,
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 255, 255, 0.05) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+    border-radius: 8px;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+    .glass-card {
+        border-radius: 12px;
+        padding: 16px;
+    }
+
+    .metric-card-glass {
+        padding: 16px;
+    }
+
+    .metric-value {
+        font-size: 28px;
+    }
+
+    .btn-glass-primary,
+    .btn-glass-secondary,
+    .btn-glass-success,
+    .btn-glass-danger {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .glass-card,
+    .btn-glass-primary,
+    .btn-glass-secondary,
+    .tab-glass,
+    .progress-bar-neon,
+    .progress-bar-blue {
+        transition: none;
+        animation: none;
+    }
+}
+
+/* Focus visible for keyboard navigation */
+.btn-glass-primary:focus-visible,
+.btn-glass-secondary:focus-visible,
+.input-glass:focus-visible,
+.tab-glass:focus-visible {
+    outline: 2px solid #4DA3FF;
+    outline-offset: 2px;
+}

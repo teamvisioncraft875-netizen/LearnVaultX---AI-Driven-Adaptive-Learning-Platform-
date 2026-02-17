@@ -1,0 +1,1056 @@
+{% extends "base.html" %}
+
+{% block title %}AI Tutor - LearnVaultX{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ═══════════════════════════════════════════════
+   AI TUTOR PAGE — PREMIUM LAYOUT
+   ═══════════════════════════════════════════════ */
+    :root {
+        --tutor-bg: #0a0e1a;
+        --tutor-surface: #111827;
+        --tutor-card: #1f2937;
+        --tutor-border: rgba(75, 85, 99, 0.3);
+        --tutor-primary: #60a5fa;
+        --tutor-secondary: #a78bfa;
+        --tutor-accent: #34d399;
+        --tutor-text: #e5e7eb;
+        --tutor-muted: #9ca3af;
+        --tutor-glow: rgba(96, 165, 250, 0.15);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .tutor-page {
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+        background: var(--tutor-bg);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        color: var(--tutor-text);
+    }
+
+    /* ── BACK NAV ─────────────────────────────── */
+    .tutor-back-nav {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 18px;
+        background: rgba(17, 24, 39, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--tutor-border);
+        border-radius: 14px;
+        color: var(--tutor-text);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+
+    .tutor-back-nav:hover {
+        background: rgba(96, 165, 250, 0.15);
+        border-color: var(--tutor-primary);
+        box-shadow: 0 0 20px var(--tutor-glow);
+    }
+
+    .tutor-back-nav .back-arrow {
+        font-size: 18px;
+    }
+
+    .tutor-back-nav .back-text {
+        white-space: nowrap;
+    }
+
+    /* ── LEFT: AVATAR PANEL ───────────────────── */
+    .tutor-avatar-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        position: relative;
+        background: linear-gradient(180deg, #0d1117 0%, #0a0e1a 100%);
+    }
+
+    .avatar-viewport {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+    }
+
+    #avatarCanvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+
+    .avatar-status-bar {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: rgba(17, 24, 39, 0.9);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--tutor-border);
+        border-radius: 24px;
+        font-size: 13px;
+        color: var(--tutor-muted);
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--tutor-accent);
+        animation: statusPulse 2s ease-in-out infinite;
+    }
+
+    .status-dot.talking {
+        background: var(--tutor-primary);
+    }
+
+    .status-dot.thinking {
+        background: #f59e0b;
+    }
+
+    @keyframes statusPulse {
+
+        0%,
+        100% {
+            opacity: 0.5;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 1;
+            transform: scale(1.3);
+        }
+    }
+
+    /* ── RIGHT: CHAT + INFO ───────────────────── */
+    .tutor-chat-panel {
+        width: 440px;
+        display: flex;
+        flex-direction: column;
+        background: var(--tutor-surface);
+        border-left: 1px solid var(--tutor-border);
+        flex-shrink: 0;
+    }
+
+    .chat-header {
+        padding: 24px;
+        border-bottom: 1px solid var(--tutor-border);
+        background: linear-gradient(135deg, rgba(96, 165, 250, 0.08), rgba(167, 139, 250, 0.08));
+    }
+
+    .chat-header-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 4px;
+    }
+
+    .chat-header-title h2 {
+        font-size: 20px;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--tutor-primary), var(--tutor-secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .chat-header-title .header-icon {
+        font-size: 24px;
+    }
+
+    .chat-header-subtitle {
+        font-size: 13px;
+        color: var(--tutor-muted);
+        margin-left: 36px;
+    }
+
+    /* Summary Strip */
+    .summary-strip {
+        padding: 16px 24px;
+        border-bottom: 1px solid var(--tutor-border);
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .summary-strip::-webkit-scrollbar {
+        display: none;
+    }
+
+    .summary-chip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        background: var(--tutor-card);
+        border: 1px solid var(--tutor-border);
+        border-radius: 12px;
+        white-space: nowrap;
+        font-size: 13px;
+        flex-shrink: 0;
+        transition: all 0.2s;
+    }
+
+    .summary-chip:hover {
+        border-color: var(--tutor-primary);
+        background: rgba(96, 165, 250, 0.08);
+    }
+
+    .chip-icon {
+        font-size: 16px;
+    }
+
+    .chip-value {
+        font-weight: 600;
+        color: var(--tutor-primary);
+    }
+
+    /* Chat Messages Area */
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        scroll-behavior: smooth;
+    }
+
+    .chat-messages::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+        background: rgba(96, 165, 250, 0.3);
+        border-radius: 4px;
+    }
+
+    .chat-msg {
+        max-width: 92%;
+        animation: msgSlide 0.3s ease;
+    }
+
+    .chat-msg.user-msg {
+        align-self: flex-end;
+    }
+
+    .chat-msg.ai-msg {
+        align-self: flex-start;
+    }
+
+    @keyframes msgSlide {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .msg-bubble {
+        padding: 14px 18px;
+        border-radius: 16px;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .user-msg .msg-bubble {
+        background: linear-gradient(135deg, var(--tutor-primary), var(--tutor-secondary));
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+
+    .ai-msg .msg-bubble {
+        background: var(--tutor-card);
+        border: 1px solid var(--tutor-border);
+        border-bottom-left-radius: 4px;
+        color: var(--tutor-text);
+    }
+
+    .ai-msg .msg-bubble h1,
+    .ai-msg .msg-bubble h2,
+    .ai-msg .msg-bubble h3,
+    .ai-msg .msg-bubble strong {
+        color: var(--tutor-primary);
+    }
+
+    .ai-msg .msg-bubble ul,
+    .ai-msg .msg-bubble ol {
+        padding-left: 20px;
+        margin: 8px 0;
+    }
+
+    .ai-msg .msg-bubble li {
+        margin-bottom: 4px;
+    }
+
+    .ai-msg .msg-bubble code {
+        background: rgba(96, 165, 250, 0.1);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 13px;
+    }
+
+    .msg-time {
+        font-size: 11px;
+        color: var(--tutor-muted);
+        margin-top: 4px;
+        padding: 0 4px;
+    }
+
+    .user-msg .msg-time {
+        text-align: right;
+    }
+
+    /* Typing Indicator */
+    .typing-indicator {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 14px 18px;
+        background: var(--tutor-card);
+        border: 1px solid var(--tutor-border);
+        border-radius: 16px;
+        border-bottom-left-radius: 4px;
+        width: fit-content;
+    }
+
+    .typing-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--tutor-muted);
+        border-radius: 50%;
+        animation: typingBounce 1.4s ease-in-out infinite;
+    }
+
+    .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    @keyframes typingBounce {
+
+        0%,
+        60%,
+        100% {
+            transform: translateY(0);
+            opacity: 0.4;
+        }
+
+        30% {
+            transform: translateY(-6px);
+            opacity: 1;
+        }
+    }
+
+    /* Quick Prompts */
+    .quick-prompts {
+        padding: 12px 24px;
+        border-top: 1px solid var(--tutor-border);
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .quick-prompts::-webkit-scrollbar {
+        display: none;
+    }
+
+    .quick-prompt-btn {
+        padding: 8px 14px;
+        background: var(--tutor-card);
+        border: 1px solid var(--tutor-border);
+        border-radius: 20px;
+        color: var(--tutor-text);
+        font-size: 12px;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: all 0.2s;
+        flex-shrink: 0;
+    }
+
+    .quick-prompt-btn:hover {
+        background: rgba(96, 165, 250, 0.12);
+        border-color: var(--tutor-primary);
+        color: var(--tutor-primary);
+    }
+
+    /* Chat Input Area */
+    .chat-input-area {
+        padding: 16px 24px;
+        border-top: 1px solid var(--tutor-border);
+        background: var(--tutor-surface);
+    }
+
+    .chat-input-wrapper {
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+        background: var(--tutor-card);
+        border: 1px solid var(--tutor-border);
+        border-radius: 16px;
+        padding: 8px 12px;
+        transition: all 0.2s;
+    }
+
+    .chat-input-wrapper:focus-within {
+        border-color: var(--tutor-primary);
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+    }
+
+    .chat-input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: var(--tutor-text);
+        font-size: 14px;
+        resize: none;
+        max-height: 120px;
+        padding: 8px 4px;
+        font-family: inherit;
+        line-height: 1.5;
+    }
+
+    .chat-input::placeholder {
+        color: var(--tutor-muted);
+    }
+
+    .chat-send-btn {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, var(--tutor-primary), var(--tutor-secondary));
+        border: none;
+        border-radius: 12px;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        flex-shrink: 0;
+    }
+
+    .chat-send-btn:hover {
+        transform: scale(1.08);
+        box-shadow: 0 4px 16px rgba(96, 165, 250, 0.4);
+    }
+
+    .chat-send-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* ── RECOMMENDED ACTIONS PANEL ────────────── */
+    .actions-panel {
+        padding: 16px 24px;
+        border-top: 1px solid var(--tutor-border);
+        max-height: 180px;
+        overflow-y: auto;
+    }
+
+    .actions-panel-title {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--tutor-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+    }
+
+    .action-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        background: rgba(52, 211, 153, 0.06);
+        border: 1px solid rgba(52, 211, 153, 0.15);
+        border-radius: 10px;
+        margin-bottom: 6px;
+        font-size: 13px;
+        color: var(--tutor-accent);
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .action-item:hover {
+        background: rgba(52, 211, 153, 0.12);
+        border-color: rgba(52, 211, 153, 0.3);
+    }
+
+    .action-item .action-icon {
+        font-size: 14px;
+    }
+
+    /* ── RESPONSIVE ───────────────────────────── */
+    @media (max-width: 900px) {
+        .tutor-page {
+            flex-direction: column;
+        }
+
+        .tutor-avatar-panel {
+            height: 35vh;
+            min-height: 200px;
+        }
+
+        .tutor-chat-panel {
+            width: 100%;
+            flex: 1;
+            border-left: none;
+            border-top: 1px solid var(--tutor-border);
+        }
+
+        .tutor-back-nav {
+            top: 10px;
+            left: 10px;
+            padding: 8px 14px;
+            font-size: 13px;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .summary-strip {
+            padding: 12px 16px;
+        }
+
+        .chat-messages {
+            padding: 16px;
+        }
+
+        .chat-input-area {
+            padding: 12px 16px;
+        }
+
+        .chat-header {
+            padding: 16px;
+        }
+
+        .quick-prompts {
+            padding: 8px 16px;
+        }
+    }
+
+    /* Welcome state */
+    .welcome-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        text-align: center;
+        gap: 12px;
+    }
+
+    .welcome-state .welcome-emoji {
+        font-size: 48px;
+    }
+
+    .welcome-state h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--tutor-text);
+    }
+
+    .welcome-state p {
+        font-size: 14px;
+        color: var(--tutor-muted);
+        max-width: 300px;
+    }
+
+    /* ── VOICE CONTROLS ───────────────────────── */
+    .voice-controls-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0 0 8px 0;
+    }
+
+    .voice-ctrl-btn {
+        width: 36px;
+        height: 36px;
+        background: var(--tutor-card);
+        border: 1px solid var(--tutor-border);
+        border-radius: 10px;
+        color: var(--tutor-muted);
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.25s ease;
+        flex-shrink: 0;
+        position: relative;
+    }
+
+    .voice-ctrl-btn:hover {
+        background: rgba(96, 165, 250, 0.1);
+        border-color: var(--tutor-primary);
+        color: var(--tutor-text);
+    }
+
+    .voice-ctrl-btn.voice-active {
+        background: rgba(52, 211, 153, 0.12);
+        border-color: var(--tutor-accent);
+        color: var(--tutor-accent);
+        box-shadow: 0 0 12px rgba(52, 211, 153, 0.2);
+    }
+
+    .voice-ctrl-btn.mic-recording {
+        background: rgba(239, 68, 68, 0.15);
+        border-color: #ef4444;
+        color: #f87171;
+        animation: micPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes micPulse {
+
+        0%,
+        100% {
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.3);
+        }
+
+        50% {
+            box-shadow: 0 0 12px 4px rgba(239, 68, 68, 0.15);
+        }
+    }
+
+    .voice-label {
+        font-size: 11px;
+        color: var(--tutor-muted);
+        margin-left: auto;
+        white-space: nowrap;
+    }
+
+    .voice-label.listening {
+        color: #f87171;
+        font-weight: 600;
+        animation: labelPulse 1s ease-in-out infinite;
+    }
+
+    @keyframes labelPulse {
+
+        0%,
+        100% {
+            opacity: 0.7;
+        }
+
+        50% {
+            opacity: 1;
+        }
+    }
+
+    /* Voice Settings Popover */
+    .voice-settings-popover {
+        display: none;
+        position: absolute;
+        bottom: calc(100% + 12px);
+        left: 0;
+        right: 0;
+        background: var(--tutor-surface);
+        border: 1px solid var(--tutor-border);
+        border-radius: 14px;
+        padding: 18px;
+        z-index: 50;
+        box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(12px);
+    }
+
+    .voice-settings-popover.open {
+        display: block;
+    }
+
+    .voice-settings-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--tutor-text);
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .voice-setting-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+
+    .voice-setting-row label {
+        font-size: 12px;
+        color: var(--tutor-muted);
+        min-width: 50px;
+    }
+
+    .voice-setting-row input[type='range'] {
+        flex: 1;
+        height: 4px;
+        accent-color: var(--tutor-primary);
+        cursor: pointer;
+    }
+
+    .voice-setting-row .setting-value {
+        font-size: 12px;
+        color: var(--tutor-primary);
+        min-width: 30px;
+        text-align: right;
+        font-weight: 600;
+    }
+
+    .voice-setting-row select {
+        flex: 1;
+        padding: 6px 10px;
+        background: var(--tutor-card);
+        border: 1px solid var(--tutor-border);
+        border-radius: 8px;
+        color: var(--tutor-text);
+        font-size: 12px;
+        cursor: pointer;
+    }
+
+    /* ── MEMORY SETTINGS ─────────────────────────── */
+    .memory-settings-btn {
+        background: rgba(96, 165, 250, 0.1);
+        border: 1px solid var(--tutor-border);
+        border-radius: 10px;
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+    .memory-settings-btn:hover {
+        background: rgba(96, 165, 250, 0.2);
+        border-color: var(--tutor-primary);
+    }
+
+    .memory-dropdown {
+        display: none;
+        position: absolute;
+        top: calc(100% + 6px);
+        right: 0;
+        background: var(--tutor-surface);
+        border: 1px solid var(--tutor-border);
+        border-radius: 12px;
+        overflow: hidden;
+        z-index: 100;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        min-width: 180px;
+    }
+
+    .memory-dropdown.open {
+        display: block;
+    }
+
+    .memory-dropdown-item {
+        display: block;
+        width: 100%;
+        background: none;
+        border: none;
+        color: var(--tutor-text);
+        padding: 12px 16px;
+        font-size: 13px;
+        cursor: pointer;
+        text-align: left;
+        transition: background 0.2s;
+    }
+
+    .memory-dropdown-item:hover {
+        background: rgba(96, 165, 250, 0.12);
+    }
+
+    .weak-summary-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .weak-summary-card {
+        background: var(--tutor-surface);
+        border: 1px solid var(--tutor-border);
+        border-radius: 16px;
+        padding: 24px;
+        max-width: 400px;
+        width: 90%;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .weak-summary-card h3 {
+        font-size: 16px;
+        color: var(--tutor-text);
+        margin-bottom: 16px;
+    }
+
+    .weak-topic-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 12px;
+        background: rgba(245, 158, 11, 0.08);
+        border-radius: 8px;
+        margin-bottom: 6px;
+        font-size: 13px;
+        color: var(--tutor-text);
+    }
+
+    .weak-topic-accuracy {
+        color: #f59e0b;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="tutor-page">
+    <!-- Back Navigation -->
+    <a href="/student/dashboard" class="tutor-back-nav">
+        <span class="back-arrow">←</span>
+        <span class="back-text">Dashboard</span>
+    </a>
+
+    <!-- LEFT: Avatar Panel -->
+    <div class="tutor-avatar-panel">
+        <div class="avatar-viewport">
+            <canvas id="avatarCanvas"></canvas>
+        </div>
+        <div class="avatar-status-bar">
+            <div class="status-dot" id="avatarStatusDot"></div>
+            <span id="avatarStatusText">Ready to help</span>
+        </div>
+    </div>
+
+    <!-- RIGHT: Chat + Info Panel -->
+    <div class="tutor-chat-panel">
+        <!-- Header -->
+        <div class="chat-header">
+            <div class="chat-header-title">
+                <span class="header-icon">🧠</span>
+                <h2>KyKnoX AI Tutor</h2>
+                <div class="memory-settings-wrapper" style="margin-left:auto;position:relative;">
+                    <button class="memory-settings-btn" onclick="toggleMemoryMenu()" title="Memory Settings">⚙️</button>
+                    <div class="memory-dropdown" id="memoryDropdown">
+                        <button class="memory-dropdown-item" onclick="clearChatMemory()">🗑️ Clear Memory</button>
+                        <button class="memory-dropdown-item" onclick="showWeakSummary()">📊 Weak Topics</button>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-header-subtitle">Your personalized learning assistant</div>
+        </div>
+
+        <!-- Summary Strip (populated by JS) -->
+        <div class="summary-strip" id="summaryStrip">
+            <div class="summary-chip">
+                <span class="chip-icon">📊</span>
+                <span>Progress: </span>
+                <span class="chip-value" id="chipProgress">--</span>
+            </div>
+            <div class="summary-chip">
+                <span class="chip-icon">📝</span>
+                <span>Quizzes: </span>
+                <span class="chip-value" id="chipQuizzes">--</span>
+            </div>
+            <div class="summary-chip">
+                <span class="chip-icon">🎯</span>
+                <span>Avg Score: </span>
+                <span class="chip-value" id="chipAvgScore">--</span>
+            </div>
+            <div class="summary-chip" id="chipNextModule" style="display:none">
+                <span class="chip-icon">🚀</span>
+                <span>Next: </span>
+                <span class="chip-value" id="chipNextText">--</span>
+            </div>
+        </div>
+
+        <!-- Chat Messages -->
+        <div class="chat-messages" id="chatMessages">
+            <div class="welcome-state" id="welcomeState">
+                <span class="welcome-emoji">🎓</span>
+                <h3>Hello! I'm KyKnoX</h3>
+                <p>Your AI tutor. Ask me anything about your courses, get personalized study advice, or explore your
+                    learning path.</p>
+            </div>
+        </div>
+
+        <!-- Quick Prompts -->
+        <div class="quick-prompts" id="quickPrompts">
+            <button class="quick-prompt-btn" onclick="sendQuickPrompt(this)">📚 What should I study next?</button>
+            <button class="quick-prompt-btn" onclick="sendQuickPrompt(this)">📊 Show my performance</button>
+            <button class="quick-prompt-btn" onclick="sendQuickPrompt(this)">🧩 Explain my weak topics</button>
+            <button class="quick-prompt-btn" onclick="sendQuickPrompt(this)">📋 Make a revision plan</button>
+            <button class="quick-prompt-btn" onclick="sendQuickPrompt(this)">💡 Give me practice tips</button>
+        </div>
+
+        <!-- Recommended Actions (populated on AI response) -->
+        <div class="actions-panel" id="actionsPanel" style="display: none;">
+            <div class="actions-panel-title">✨ Recommended Actions</div>
+            <div id="actionsList"></div>
+        </div>
+
+        <!-- Chat Input -->
+        <div class="chat-input-area" style="position: relative;">
+            <!-- Voice Settings Popover -->
+            <div class="voice-settings-popover" id="voiceSettingsPanel">
+                <div class="voice-settings-title">⚙️ Voice Settings</div>
+                <div class="voice-setting-row">
+                    <label>Voice</label>
+                    <select id="voiceSelect" onchange="VoiceEngine.setVoice(this.value)"></select>
+                </div>
+                <div class="voice-setting-row">
+                    <label>Speed</label>
+                    <input type="range" min="0.5" max="2.0" step="0.1" value="1.0" id="voiceRateSlider"
+                        oninput="VoiceEngine.setRate(this.value); document.getElementById('voiceRateVal').textContent=this.value+'x'">
+                    <span class="setting-value" id="voiceRateVal">1.0x</span>
+                </div>
+                <div class="voice-setting-row">
+                    <label>Pitch</label>
+                    <input type="range" min="0.5" max="2.0" step="0.1" value="1.0" id="voicePitchSlider"
+                        oninput="VoiceEngine.setPitch(this.value); document.getElementById('voicePitchVal').textContent=this.value">
+                    <span class="setting-value" id="voicePitchVal">1.0</span>
+                </div>
+            </div>
+
+            <!-- Voice Controls Row -->
+            <div class="voice-controls-row">
+                <button class="voice-ctrl-btn" id="voiceToggleBtn" onclick="VoiceEngine.toggle()"
+                    title="Toggle voice output">
+                    🔇
+                </button>
+                <button class="voice-ctrl-btn" id="micToggleBtn" onclick="toggleMicInput()" title="Voice input">
+                    🎤
+                </button>
+                <button class="voice-ctrl-btn" id="voiceSettingsBtn" onclick="VoiceEngine.toggleSettings()"
+                    title="Voice settings">
+                    ⚙️
+                </button>
+                <span class="voice-label" id="voiceStatusLabel"></span>
+            </div>
+
+            <!-- Text Input -->
+            <div class="chat-input-wrapper">
+                <textarea class="chat-input" id="chatInput" placeholder="Ask KyKnoX anything..." rows="1"
+                    onkeydown="handleChatKey(event)"></textarea>
+                <button class="chat-send-btn" id="chatSendBtn" onclick="sendMessage()">➤</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="{{ url_for('static', filename='js/avatar.js') }}?v={{ config.APP_VERSION }}"></script>
+<script src="{{ url_for('static', filename='js/lip_sync.js') }}?v={{ config.APP_VERSION }}"></script>
+<script src="{{ url_for('static', filename='js/voice_engine.js') }}?v={{ config.APP_VERSION }}"></script>
+<script src="{{ url_for('static', filename='js/ai_tutor_ui.js') }}?v={{ config.APP_VERSION }}"></script>
+<script>
+    function toggleMemoryMenu() {
+        const dd = document.getElementById('memoryDropdown');
+        dd.classList.toggle('open');
+        // Close on outside click
+        if (dd.classList.contains('open')) {
+            setTimeout(() => {
+                document.addEventListener('click', function closeMenu(e) {
+                    if (!e.target.closest('.memory-settings-wrapper')) {
+                        dd.classList.remove('open');
+                        document.removeEventListener('click', closeMenu);
+                    }
+                });
+            }, 10);
+        }
+    }
+
+    async function clearChatMemory() {
+        document.getElementById('memoryDropdown').classList.remove('open');
+        if (!confirm('Clear all chat memory? KyKnoX will forget past conversations.')) return;
+        try {
+            const resp = await fetch('/api/tutor/clear-memory', {
+                method: 'POST',
+                credentials: 'include'
+            });
+            const json = await resp.json();
+            if (json.success) {
+                alert('\u2705 Chat memory cleared!');
+            } else {
+                alert('Failed: ' + (json.error || 'Unknown error'));
+            }
+        } catch (err) {
+            console.error('Clear memory error:', err);
+            alert('Network error');
+        }
+    }
+
+    async function showWeakSummary() {
+        document.getElementById('memoryDropdown').classList.remove('open');
+        try {
+            const resp = await fetch('/api/tutor/weak-summary', { credentials: 'include' });
+            const json = await resp.json();
+            if (json.success && json.data) {
+                const d = json.data;
+                let html = '<div class="weak-summary-overlay" onclick="if(event.target===this)this.remove()">';
+                html += '<div class="weak-summary-card">';
+                html += '<h3>\ud83d\udcca Weak Topics Summary</h3>';
+                html += `<p style="font-size:13px;color:#9ca3af;margin-bottom:12px;">Performance: <strong>${d.overall_performance}</strong> (Avg: ${d.avg_score}%)</p>`;
+                if (d.weak_topics && d.weak_topics.length > 0) {
+                    d.weak_topics.forEach(t => {
+                        html += `<div class="weak-topic-item"><span>${t.topic} <small>(${t.class})</small></span><span class="weak-topic-accuracy">${t.accuracy}%</span></div>`;
+                    });
+                } else {
+                    html += '<p style="color:#34d399;font-size:13px;">\u2705 No weak topics detected!</p>';
+                }
+                if (d.recent_conversation_topics && d.recent_conversation_topics.length > 0) {
+                    html += '<h3 style="margin-top:16px;">\ud83d\udcac Recent Topics</h3>';
+                    html += '<p style="font-size:13px;color:#9ca3af;">' + d.recent_conversation_topics.join(', ') + '</p>';
+                }
+                html += '<button onclick="this.closest(\'.weak-summary-overlay\').remove()" style="margin-top:16px;padding:8px 20px;background:rgba(96,165,250,0.15);border:1px solid rgba(96,165,250,0.3);border-radius:8px;color:#60a5fa;cursor:pointer;">Close</button>';
+                html += '</div></div>';
+                document.body.insertAdjacentHTML('beforeend', html);
+            }
+        } catch (err) {
+            console.error('Weak summary error:', err);
+        }
+    }
+</script>
+{% endblock %}

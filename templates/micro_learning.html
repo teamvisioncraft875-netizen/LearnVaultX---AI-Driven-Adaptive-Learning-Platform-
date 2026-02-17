@@ -1,0 +1,458 @@
+{% extends "base.html" %}
+
+{% block title %}Micro-Learning - LearnVaultX{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='css/student-dashboard-polish.css') }}?v={{ config.APP_VERSION }}">
+<style>
+    /* Micro-Learning Specific Styles */
+    .ml-container {
+        padding: 40px;
+        max-width: 1200px;
+        margin: 0 auto;
+        color: #e5e7eb;
+    }
+
+    .ml-header {
+        margin-bottom: 40px;
+    }
+
+    .ml-title {
+        font-size: 32px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #60a5fa, #c084fc);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 8px;
+    }
+
+    .ml-subtitle {
+        color: #9ca3af;
+        font-size: 16px;
+    }
+
+    /* Progress Section */
+    .ml-progress-card {
+        background: rgba(31, 41, 55, 0.6);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(75, 85, 99, 0.4);
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 40px;
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .ml-prog-ring {
+        position: relative;
+        width: 100px;
+        height: 100px;
+    }
+
+    .ml-prog-text {
+        flex: 1;
+    }
+
+    .ml-prog-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #fff;
+    }
+
+    .ml-prog-desc {
+        color: #9ca3af;
+        font-size: 14px;
+    }
+
+    /* Task Grid */
+    .ml-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 24px;
+    }
+
+    .ml-card {
+        background: rgba(17, 24, 39, 0.7);
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        border-radius: 16px;
+        padding: 24px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ml-card:hover {
+        transform: translateY(-5px);
+        border-color: #8b5cf6;
+        box-shadow: 0 10px 30px rgba(139, 92, 246, 0.15);
+    }
+
+    .ml-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #60a5fa, #8b5cf6);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .ml-card:hover::before {
+        opacity: 1;
+    }
+
+    .ml-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 16px;
+    }
+
+    .ml-badge {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        border-radius: 20px;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-flashcard {
+        background: rgba(59, 130, 246, 0.2);
+        color: #60a5fa;
+    }
+
+    .badge-coding {
+        background: rgba(16, 185, 129, 0.2);
+        color: #34d399;
+    }
+
+    .badge-quiz {
+        background: rgba(245, 158, 11, 0.2);
+        color: #fbbf24;
+    }
+
+    .ml-card-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #e5e7eb;
+        margin-bottom: 12px;
+        line-height: 1.4;
+    }
+
+    /* Flashcard Specific */
+    .flashcard-content {
+        perspective: 1000px;
+        height: 160px;
+        cursor: pointer;
+    }
+
+    .flashcard-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        transition: transform 0.6s;
+        transform-style: preserve-3d;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(31, 41, 55, 0.5);
+        border-radius: 12px;
+        padding: 16px;
+    }
+
+    .flashcard-content.flipped .flashcard-inner {
+        transform: rotateY(180deg);
+    }
+
+    .fc-front,
+    .fc-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    .fc-back {
+        transform: rotateY(180deg);
+        background: rgba(75, 85, 99, 0.2);
+        border-radius: 12px;
+    }
+
+    .fc-hint {
+        font-size: 11px;
+        color: #6b7280;
+        margin-top: 8px;
+    }
+
+    /* Actions */
+    .ml-actions {
+        margin-top: 20px;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .btn-ml-complete {
+        background: transparent;
+        border: 1px solid #4b5563;
+        color: #9ca3af;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-ml-complete:hover {
+        border-color: #10b981;
+        color: #10b981;
+        background: rgba(16, 185, 129, 0.1);
+    }
+
+    .btn-ml-complete.completed {
+        background: #10b981;
+        border-color: #10b981;
+        color: #fff;
+        cursor: default;
+    }
+
+    /* Coding & Quiz Specific */
+    .code-preview {
+        background: #111827;
+        padding: 12px;
+        border-radius: 8px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        color: #a5b4fc;
+        margin-bottom: 12px;
+        border: 1px solid rgba(75, 85, 99, 0.5);
+    }
+
+    .quiz-options {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .quiz-opt-btn {
+        background: rgba(55, 65, 81, 0.5);
+        border: 1px solid rgba(75, 85, 99, 0.5);
+        padding: 10px;
+        border-radius: 8px;
+        text-align: left;
+        color: #d1d5db;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .quiz-opt-btn:hover {
+        background: rgba(96, 165, 250, 0.2);
+        border-color: #60a5fa;
+    }
+
+    .quiz-opt-btn.correct {
+        background: rgba(16, 185, 129, 0.2) !important;
+        border-color: #10b981 !important;
+    }
+
+    .quiz-opt-btn.wrong {
+        background: rgba(239, 68, 68, 0.2) !important;
+        border-color: #ef4444 !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ml-container">
+    <div class="ml-header">
+        <h1 class="ml-title">Daily Micro-Learning</h1>
+        <p class="ml-subtitle">Small steps lead to big progress. Complete your daily set!</p>
+    </div>
+
+    {% if data %}
+    <!-- Progress Card -->
+    <div class="ml-progress-card">
+        <div class="ml-prog-ring">
+            <svg width="100" height="100" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#374151" stroke-width="8"></circle>
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#8b5cf6" stroke-width="8" stroke-dasharray="251.2"
+                    stroke-dashoffset="{{ 251.2 - (251.2 * data.stats.percent / 100) }}" stroke-linecap="round"
+                    transform="rotate(-90 50 50)"></circle>
+                <text x="50" y="55" text-anchor="middle" fill="#fff" font-size="20" font-weight="bold">{{
+                    data.stats.completed }}/{{ data.stats.total }}</text>
+            </svg>
+        </div>
+        <div class="ml-prog-text">
+            <h3 class="ml-prog-title">Today's Progress</h3>
+            <p class="ml-prog-desc">You've completed {{ data.stats.percent }}% of your daily tasks. Keep going!</p>
+        </div>
+    </div>
+
+    <div class="ml-grid">
+        <!-- Flashcards -->
+        {% for card in data.flashcards %}
+        <div class="ml-card">
+            <div class="ml-card-header">
+                <span class="ml-badge badge-flashcard">Flashcard</span>
+            </div>
+            <div class="flashcard-content" onclick="this.classList.toggle('flipped')">
+                <div class="flashcard-inner">
+                    <div class="fc-front">
+                        <div style="font-size: 16px; font-weight: 500;">{{ card.front.split(':')[1] if ':' in card.front
+                            else card.front }}</div>
+                        <div class="fc-hint">Click to flip</div>
+                    </div>
+                    <div class="fc-back">
+                        <div style="font-size: 15px;">{{ card.back }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="ml-actions">
+                <button class="btn-ml-complete {% if card.is_completed %}completed{% endif %}"
+                    onclick="markComplete('flashcard', {{ card.id }}, {{ data.meta.id }}, this)" {% if card.is_completed
+                    %}disabled{% endif %}>
+                    {% if card.is_completed %}✓ Completed{% else %}Mark Done{% endif %}
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Coding -->
+        {% for code in data.coding %}
+        <div class="ml-card">
+            <div class="ml-card-header">
+                <span class="ml-badge badge-coding">Mini Coding</span>
+            </div>
+            <div class="ml-card-title">{{ code.prompt }}</div>
+            <div class="code-preview">{{ code.starter_code }}</div>
+            <div class="ml-actions">
+                <!-- Simulating a coding environment for micro-task -->
+                <button class="btn-ml-complete {% if code.is_completed %}completed{% endif %}"
+                    onclick="markComplete('coding', {{ code.id }}, {{ data.meta.id }}, this)" {% if code.is_completed
+                    %}disabled{% endif %}>
+                    {% if code.is_completed %}✓ Completed{% else %}I Solved It{% endif %}
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Quiz Booster -->
+        {% for q in data.quiz %}
+        <div class="ml-card" id="quiz-card-{{ q.id }}">
+            <div class="ml-card-header">
+                <span class="ml-badge badge-quiz">Quiz Booster</span>
+            </div>
+            <div class="ml-card-title">{{ q.question }}</div>
+            <div class="quiz-options">
+                <!-- Data attributes for checking answer in JS -->
+                {% set options = q.options | from_json %}
+                {% for opt in options %}
+                <button class="quiz-opt-btn"
+                    onclick="checkQuizAnswer(this, '{{ opt }}', '{{ q.correct_answer }}', {{ q.id }}, {{ data.meta.id }})"
+                    {% if q.is_completed %}disabled{% endif %}>{{ opt }}</button>
+                {% endfor %}
+            </div>
+            <div class="ml-actions">
+                <span id="quiz-status-{{ q.id }}"
+                    style="color: #10b981; font-size: 13px; font-weight: 600; display: {% if q.is_completed %}block{% else %}none{% endif %};">✓
+                    Completed</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="empty-state-box" style="margin-top: 60px;">
+        <h3 class="empty-heading">All caught up!</h3>
+        <p class="empty-desc">Check back tomorrow for more micro-learning tasks.</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    async function markComplete(type, id, taskId, btn) {
+        if (btn.classList.contains('completed')) return;
+
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '...';
+
+        try {
+            const response = await fetch('/api/micro-learning/complete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type, id, task_id: taskId })
+            });
+            const res = await response.json();
+
+            if (res.success) {
+                btn.classList.add('completed');
+                btn.innerHTML = '✓ Completed';
+                btn.disabled = true;
+
+                // Update specific item UI if needed
+                if (type === 'quiz') {
+                    document.getElementById(`quiz-status-${id}`).style.display = 'block';
+                }
+
+                showToast('Task completed!', 'success');
+                setTimeout(() => location.reload(), 1000); // Reload to update progress ring
+            } else {
+                btn.innerHTML = originalText;
+                showToast(res.message || 'Failed', 'error');
+            }
+        } catch (e) {
+            console.error(e);
+            btn.innerHTML = originalText;
+            showToast('Error completing task', 'error');
+        }
+    }
+
+    function checkQuizAnswer(btn, selected, correct, id, taskId) {
+        const card = document.getElementById(`quiz-card-${id}`);
+        const buttons = card.querySelectorAll('.quiz-opt-btn');
+
+        if (selected === correct) {
+            btn.classList.add('correct');
+            buttons.forEach(b => b.disabled = true);
+            // Auto complete in DB
+            markComplete('quiz', id, taskId, { classList: { contains: () => false }, innerHTML: '' }); // Mock btn object
+        } else {
+            btn.classList.add('wrong');
+            showToast('Incorrect, try again!', 'error');
+        }
+    }
+
+    function showToast(msg, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast-notification ${type}`;
+        toast.textContent = msg;
+        toast.style.position = 'fixed';
+        toast.style.bottom = '20px';
+        toast.style.right = '20px';
+        toast.style.background = '#1f2937';
+        toast.style.color = '#fff';
+        toast.style.padding = '12px 24px';
+        toast.style.borderRadius = '8px';
+        toast.style.border = '1px solid #4b5563';
+        toast.style.zIndex = '9999';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+</script>
+{% endblock %}
