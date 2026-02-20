@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="arena-container">
+    <div class="header-section">
+        <a href="{{ url_for('arena.session_result', session_id=attempt.id) }}" class="back-btn">← Back to Result</a>
+        <h1>Review Attempt #{{ attempt.id }}</h1>
+    </div>
+
+    <div class="review-grid">
+        {% for ans in answers %}
+        <div class="review-card {{ 'correct' if ans.is_correct else 'incorrect' }}">
+            <div class="question-header">
+                <span class="q-num">Question {{ loop.index }}</span>
+                <span class="status-badge {{ 'success' if ans.is_correct else 'danger' }}">
+                    {{ 'Correct' if ans.is_correct else 'Incorrect' }}
+                </span>
+            </div>
+
+            <div class="question-text">
+                {{ ans.question_text }}
+            </div>
+
+            <div class="options-list">
+                <!-- Option A -->
+                <div class="review-option 
+                    {{ 'correct-answer' if ans.correct_option == 'A' }}
+                    {{ 'user-selected' if ans.selected_option == 'A' }}
+                ">
+                    <span class="opt-label">A</span> {{ ans.option_a }}
+                </div>
+
+                <!-- Option B -->
+                <div class="review-option 
+                    {{ 'correct-answer' if ans.correct_option == 'B' }}
+                    {{ 'user-selected' if ans.selected_option == 'B' }}
+                ">
+                    <span class="opt-label">B</span> {{ ans.option_b }}
+                </div>
+
+                <!-- Option C -->
+                <div class="review-option 
+                    {{ 'correct-answer' if ans.correct_option == 'C' }}
+                    {{ 'user-selected' if ans.selected_option == 'C' }}
+                ">
+                    <span class="opt-label">C</span> {{ ans.option_c }}
+                </div>
+
+                <!-- Option D -->
+                <div class="review-option 
+                    {{ 'correct-answer' if ans.correct_option == 'D' }}
+                    {{ 'user-selected' if ans.selected_option == 'D' }}
+                ">
+                    <span class="opt-label">D</span> {{ ans.option_d }}
+                </div>
+            </div>
+
+            <div class="explanation-box">
+                <strong>💡 Explanation:</strong> <br>
+                {{ ans.explanation }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .arena-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem;
+        color: white;
+    }
+
+    .header-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .back-btn {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+
+    .back-btn:hover {
+        color: white;
+    }
+
+    .review-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .review-card.correct {
+        border-left: 4px solid #00E676;
+    }
+
+    .review-card.incorrect {
+        border-left: 4px solid #FF5252;
+    }
+
+    .question-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+
+    .q-num {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .status-badge {
+        padding: 0.2rem 0.6rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .status-badge.success {
+        background: rgba(0, 230, 118, 0.2);
+        color: #00E676;
+    }
+
+    .status-badge.danger {
+        background: rgba(255, 82, 82, 0.2);
+        color: #FF5252;
+    }
+
+    .question-text {
+        font-size: 1.1rem;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+    }
+
+    .options-list {
+        display: grid;
+        gap: 0.8rem;
+    }
+
+    .review-option {
+        padding: 1rem;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid transparent;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    /* Highlight Logic */
+    .review-option.correct-answer {
+        background: rgba(0, 230, 118, 0.15);
+        border-color: #00E676;
+        color: #00E676;
+    }
+
+    .review-option.user-selected:not(.correct-answer) {
+        background: rgba(255, 82, 82, 0.15);
+        border-color: #FF5252;
+        color: #FF5252;
+    }
+
+    .opt-label {
+        width: 30px;
+        height: 30px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+
+    .explanation-box {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        background: rgba(100, 181, 246, 0.1);
+        border-left: 3px solid #64B5F6;
+        border-radius: 8px;
+        color: #ddd;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+</style>
+{% endblock %}

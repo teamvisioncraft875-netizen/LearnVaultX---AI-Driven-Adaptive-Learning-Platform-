@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz - Exam Arena | LearnVaultX{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/arena.css') }}?v={{ config.get('APP_VERSION','2') }}">
+<meta name="robots" content="noindex, nofollow">
+{% endblock %}
+
+{% block content %}
+<main class="arena-main arena-quiz-main">
+    {% if error %}
+    <div class="arena-error-container">
+        <div class="arena-card">
+            <div class="arena-card-header">
+                <span class="arena-card-icon">⚠️</span>
+                <h2>{{ error }}</h2>
+            </div>
+            <div class="arena-card-body">
+                <a href="/arena" class="arena-btn arena-btn-start">← Back to Arena</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- Quiz Header -->
+    <header class="quiz-header gamified-header">
+        <div class="quiz-progress-container">
+            <div class="quiz-progress-track">
+                <div class="quiz-progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="headers-row">
+            <div class="quiz-header-left">
+                <span class="quiz-type-badge">{{ quiz_type|upper }}</span>
+                <span class="quiz-subject">{{ exam }} · {{ subject }}</span>
+            </div>
+            <div class="quiz-timer" id="quizTimer">
+                <span class="timer-icon">⏱</span>
+                <span id="timerDisplay">{{ (time_limit // 60) }}:00</span>
+            </div>
+            <div class="quiz-header-right">
+                <span id="questionCounter">1/{{ questions|length }}</span>
+                {% if difficulty is defined and difficulty %}
+                <span class="quiz-difficulty-badge diff-{{ difficulty|lower }}">{{ difficulty }}</span>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Question Area -->
+    <div class="quiz-body" id="quizBody">
+        {% for q in questions %}
+        <div class="quiz-question" data-index="{{ loop.index0 }}" data-qid="{{ q.id }}"
+            style="{% if not loop.first %}display:none{% endif %}">
+            <div class="question-number">Question {{ loop.index }} of {{ questions|length }}</div>
+            <div class="question-text">{{ q.question_text }}</div>
+            <div class="quiz-options">
+                <button class="quiz-option" data-option="A" onclick="selectOption(this, {{ loop.index0 }})">
+                    <span class="option-letter">A</span>
+                    <span class="option-text">{{ q.option_a }}</span>
+                </button>
+                <button class="quiz-option" data-option="B" onclick="selectOption(this, {{ loop.index0 }})">
+                    <span class="option-letter">B</span>
+                    <span class="option-text">{{ q.option_b }}</span>
+                </button>
+                <button class="quiz-option" data-option="C" onclick="selectOption(this, {{ loop.index0 }})">
+                    <span class="option-letter">C</span>
+                    <span class="option-text">{{ q.option_c }}</span>
+                </button>
+                <button class="quiz-option" data-option="D" onclick="selectOption(this, {{ loop.index0 }})">
+                    <span class="option-letter">D</span>
+                    <span class="option-text">{{ q.option_d }}</span>
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Start Overlay -->
+    <div id="startOverlay" class="quiz-overlay">
+        <div class="quiz-start-card">
+            <div class="quiz-icon">📝</div>
+            <h2>Ready to start?</h2>
+            <p>You have <strong>{{ (time_limit // 60) }} minutes</strong> to answer <strong>{{ questions|length }}
+                    questions</strong>.</p>
+            <button class="arena-btn arena-btn-submit" onclick="startQuiz()">Start Quiz</button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="quiz-nav">
+        <button class="arena-btn arena-btn-nav" id="prevBtn" onclick="prevQuestion()" disabled>← Previous</button>
+        <div class="quiz-dots" id="quizDots">
+            {% for q in questions %}
+            <span class="quiz-dot {% if loop.first %}active{% endif %}" onclick="goToQuestion({{ loop.index0 }})">{{
+                loop.index }}</span>
+            {% endfor %}
+        </div>
+        <button class="arena-btn arena-btn-nav" id="nextBtn" onclick="nextQuestion()">Next →</button>
+        <button class="arena-btn arena-btn-submit" id="submitBtn" onclick="submitQuiz()" style="display:none">
+            🚀 Submit Quiz
+        </button>
+    </div>
+    {% endif %}
+</main>
+
+<script>
+    window.QUIZ_DATA = {
+        questions: {{ questions | tojson if questions else '[]' }},
+    quizType: {{ quiz_type | tojson }},
+    exam: {{ (exam | default ('')) | tojson }},
+    subject: {{ (subject | default ('')) | tojson }},
+    timeLimit: {{ time_limit | default (600) }},
+    totalQuestions: {{ questions | length if questions else 0 }}};
+</script>
+<script src="{{ url_for('static', filename='js/arena_quiz.js') }}?v={{ config.get('APP_VERSION','2') }}"></script>
+{% endblock %}

@@ -126,7 +126,7 @@ class EmailService:
                 traceback.print_exc() 
                 
                 # Production safety: if not in dev mode, fail hard
-                is_dev = os.environ.get('FLASK_ENV') == 'development' or os.environ.get('FLASK_DEBUG') == '1' or app.debug
+                is_dev = os.environ.get('FLASK_ENV') == 'development' or os.environ.get('FLASK_DEBUG') == '1'
                 
                 if not is_dev:
                     return False

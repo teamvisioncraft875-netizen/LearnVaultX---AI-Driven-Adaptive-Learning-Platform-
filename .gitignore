@@ -55,6 +55,3 @@ htmlcov/
 .pytest_cache/
 nosetests.xml
 coverage.xml
-
-# Video assets (too large for git)
-hero.mp4

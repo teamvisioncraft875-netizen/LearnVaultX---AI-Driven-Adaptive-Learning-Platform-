@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Scoped CSS for this page only -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/arena_progress.css') }}">
+
+<div class="ap-container">
+
+    <!-- Header -->
+    <div class="ap-header">
+        <div>
+            <a href="{{ url_for('arena.arena_dashboard') }}" class="ap-back">← Back to Arena</a>
+            <h1>📊 Performance Analytics</h1>
+        </div>
+    </div>
+
+    {% if total_attempts == 0 %}
+    <!-- ═══ EMPTY STATE ═══ -->
+    <div class="ap-glass-card ap-empty-state">
+        <div class="empty-icon">🎯</div>
+        <h2>No Attempts Yet</h2>
+        <p>Start a mock test or daily challenge to see your progress here.</p>
+        <a href="{{ url_for('arena.arena_dashboard') }}" class="ap-cta-btn">Go to Arena</a>
+    </div>
+
+    {% else %}
+    <!-- ═══ SUMMARY CARDS ═══ -->
+    <div class="ap-summary-grid">
+        <div class="ap-stat-card">
+            <div class="ap-stat-icon">📝</div>
+            <div class="ap-stat-value">{{ total_attempts }}</div>
+            <div class="ap-stat-label">Total Attempts</div>
+        </div>
+        <div class="ap-stat-card">
+            <div class="ap-stat-icon">🎯</div>
+            <div class="ap-stat-value">{{ avg_score }}%</div>
+            <div class="ap-stat-label">Avg Score</div>
+        </div>
+        <div class="ap-stat-card">
+            <div class="ap-stat-icon">⚡</div>
+            <div class="ap-stat-value">{{ avg_speed }}s</div>
+            <div class="ap-stat-label">Avg Speed</div>
+        </div>
+        <div class="ap-stat-card">
+            <div class="ap-stat-icon">🚀</div>
+            <div class="ap-stat-value">{{ readiness }}%</div>
+            <div class="ap-stat-label">Readiness</div>
+        </div>
+    </div>
+
+    <!-- ═══ CHARTS (Pure CSS — No Chart.js, No Canvas) ═══ -->
+    <div class="ap-charts-row">
+
+        <!-- Score Trend -->
+        <div class="ap-glass-card">
+            <h3>📈 Score Trend (Last 7 Attempts)</h3>
+            <div class="ap-css-chart" style="height:280px;">
+                <div class="ap-chart-y-axis">
+                    <span>100%</span><span>75%</span><span>50%</span><span>25%</span><span>0%</span>
+                </div>
+                <div class="ap-chart-bars">
+                    {% for i in range(chart_scores|length) %}
+                    <div class="ap-bar-group">
+                        <div class="ap-bar-wrap">
+                            <div class="ap-bar ap-bar-purple" style="height: {{ chart_scores[i] }}%;"
+                                title="{{ chart_scores[i] }}%">
+                                <span class="ap-bar-val">{{ chart_scores[i]|round|int }}%</span>
+                            </div>
+                        </div>
+                        <div class="ap-bar-label">{{ chart_labels[i] }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Speed Trend -->
+        <div class="ap-glass-card">
+            <h3>⏱️ Avg Time per Question (Last 7)</h3>
+            {% set max_speed = chart_speeds|max if chart_speeds|length > 0 else 60 %}
+            <div class="ap-css-chart" style="height:280px;">
+                <div class="ap-chart-y-axis">
+                    <span>{{ max_speed|round|int }}s</span>
+                    <span>{{ (max_speed * 0.75)|round|int }}s</span>
+                    <span>{{ (max_speed * 0.5)|round|int }}s</span>
+                    <span>{{ (max_speed * 0.25)|round|int }}s</span>
+                    <span>0s</span>
+                </div>
+                <div class="ap-chart-bars">
+                    {% for i in range(chart_speeds|length) %}
+                    <div class="ap-bar-group">
+                        <div class="ap-bar-wrap">
+                            {% set pct = (chart_speeds[i] / max_speed * 100) if max_speed > 0 else 0 %}
+                            <div class="ap-bar ap-bar-amber" style="height: {{ pct|round|int }}%;"
+                                title="{{ chart_speeds[i] }}s">
+                                <span class="ap-bar-val">{{ chart_speeds[i] }}s</span>
+                            </div>
+                        </div>
+                        <div class="ap-bar-label">{{ chart_labels[i] }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ STRENGTHS / WEAKNESSES ═══ -->
+    <div class="ap-insights-row">
+        <div class="ap-insight-card">
+            <div class="insight-icon">💪</div>
+            <div class="insight-label">Strongest Area</div>
+            <div class="insight-value">{{ strongest_subject }}</div>
+        </div>
+        <div class="ap-insight-card">
+            <div class="insight-icon">🔧</div>
+            <div class="insight-label">Weakest Area</div>
+            <div class="insight-value">{{ weakest_subject }}</div>
+        </div>
+        <div class="ap-insight-card">
+            <div class="insight-icon">💡</div>
+            <div class="insight-label">Improvement Tip</div>
+            <div class="insight-tip">{{ improvement_tip }}</div>
+        </div>
+    </div>
+
+    <!-- ═══ ATTEMPTS TABLE ═══ -->
+    <div class="ap-glass-card">
+        <h3>📋 Recent Attempts</h3>
+        <div class="ap-table-wrap">
+            <table class="ap-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Type</th>
+                        <th>Subject</th>
+                        <th>Score</th>
+                        <th>Accuracy</th>
+                        <th>Avg Time</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for h in history %}
+                    <tr>
+                        <td>{{ h.id }}</td>
+                        <td><span class="ap-badge">{{ h.attempt_type }}</span></td>
+                        <td>{{ h.subject }}</td>
+                        <td>{{ h.score }} / {{ h.total_questions }}</td>
+                        <td>
+                            <div class="ap-acc-bar">
+                                <div class="ap-acc-bar-track">
+                                    <div class="ap-acc-bar-fill"
+                                        style="width: {{ h.accuracy_percent|default(0)|round|int }}%"></div>
+                                </div>
+                                <span>{{ h.accuracy_percent|default(0)|round|int }}%</span>
+                            </div>
+                        </td>
+                        <td>{{ h.avg_time_per_question|default(0)|round(1) }}s</td>
+                        <td>{{ h.created_at.split(' ')[0] if h.created_at else 'N/A' }}</td>
+                        <td>
+                            <a href="{{ url_for('arena.review_attempt', session_id=h.id) }}"
+                                class="ap-btn-sm">Review</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

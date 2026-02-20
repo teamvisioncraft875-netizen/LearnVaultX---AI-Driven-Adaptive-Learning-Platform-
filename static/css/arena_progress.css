@@ -1,0 +1,398 @@
+/* ═══════════════════════════════════════════════════════════
+   ARENA PROGRESS PAGE — Scoped CSS
+   Only affects /arena/progress. Does NOT touch global layout.
+   NO Chart.js. NO Canvas. Pure CSS charts.
+   ═══════════════════════════════════════════════════════════ */
+
+.ap-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    color: #e0e0e0;
+}
+
+/* ── Header ── */
+.ap-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.ap-header h1 {
+    font-size: 1.6rem;
+    color: #fff;
+    margin: 0;
+}
+
+.ap-back {
+    color: rgba(255, 255, 255, 0.5);
+    text-decoration: none;
+    font-size: 0.85rem;
+    display: block;
+    margin-bottom: 0.3rem;
+    transition: color 0.2s;
+}
+
+.ap-back:hover {
+    color: #fff;
+}
+
+/* ── Summary Cards ── */
+.ap-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+    .ap-summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .ap-summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ap-stat-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 1.2rem 1rem;
+    text-align: center;
+    backdrop-filter: blur(12px);
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.ap-stat-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(108, 93, 211, 0.3);
+}
+
+.ap-stat-card .ap-stat-icon {
+    font-size: 1.6rem;
+    margin-bottom: 0.3rem;
+}
+
+.ap-stat-card .ap-stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+}
+
+.ap-stat-card .ap-stat-label {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 0.2rem;
+}
+
+/* ── Glass Card (generic) ── */
+.ap-glass-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 1.5rem;
+    backdrop-filter: blur(12px);
+}
+
+.ap-glass-card h3 {
+    font-size: 1rem;
+    color: #ccc;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+/* ── Chart Section Grid ── */
+.ap-charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+    .ap-charts-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PURE CSS BAR CHART — No canvas, no Chart.js, no height bug
+   ═══════════════════════════════════════════════════════════ */
+
+.ap-css-chart {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    overflow: hidden;
+    /* CRITICAL: prevents any child from growing past this */
+}
+
+.ap-chart-y-axis {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-right: 8px;
+    padding-bottom: 28px;
+    min-width: 40px;
+    text-align: right;
+}
+
+.ap-chart-y-axis span {
+    font-size: 0.68rem;
+    color: rgba(255, 255, 255, 0.35);
+    line-height: 1;
+}
+
+.ap-chart-bars {
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0 4px;
+    padding-bottom: 28px;
+    /* space for labels */
+    position: relative;
+}
+
+.ap-bar-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+    position: relative;
+    height: 100%;
+}
+
+.ap-bar-wrap {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.ap-bar {
+    width: 70%;
+    max-width: 48px;
+    min-height: 4px;
+    border-radius: 4px 4px 0 0;
+    position: relative;
+    transition: height 0.3s ease;
+}
+
+.ap-bar-purple {
+    background: linear-gradient(180deg, #8B5CF6, #6C5DD3);
+    box-shadow: 0 0 8px rgba(108, 93, 211, 0.3);
+}
+
+.ap-bar-amber {
+    background: linear-gradient(180deg, #FFAB00, #FF8F00);
+    box-shadow: 0 0 8px rgba(255, 171, 0, 0.3);
+}
+
+.ap-bar:hover {
+    filter: brightness(1.2);
+}
+
+.ap-bar-val {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.7);
+    white-space: nowrap;
+}
+
+.ap-bar-label {
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.4);
+    white-space: nowrap;
+}
+
+/* ── Strength / Weakness Section ── */
+.ap-insights-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+    .ap-insights-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ap-insight-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 1.2rem;
+    text-align: center;
+    backdrop-filter: blur(12px);
+}
+
+.ap-insight-card .insight-icon {
+    font-size: 2rem;
+    margin-bottom: 0.4rem;
+}
+
+.ap-insight-card .insight-label {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.3rem;
+}
+
+.ap-insight-card .insight-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.ap-insight-card .insight-tip {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.45);
+    margin-top: 0.4rem;
+    line-height: 1.4;
+}
+
+/* ── Attempts Table ── */
+.ap-table-wrap {
+    overflow-x: auto;
+}
+
+.ap-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+}
+
+.ap-table th {
+    text-align: left;
+    padding: 0.8rem 0.75rem;
+    color: rgba(255, 255, 255, 0.45);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    white-space: nowrap;
+}
+
+.ap-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: #ddd;
+    white-space: nowrap;
+}
+
+.ap-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.ap-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: rgba(108, 93, 211, 0.2);
+    border: 1px solid rgba(108, 93, 211, 0.3);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: #b8a9ff;
+    text-transform: capitalize;
+}
+
+.ap-btn-sm {
+    display: inline-block;
+    padding: 4px 12px;
+    background: linear-gradient(135deg, #6C5DD3, #8B5CF6);
+    color: #fff;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.8rem;
+    transition: opacity 0.2s;
+}
+
+.ap-btn-sm:hover {
+    opacity: 0.85;
+}
+
+/* ── Accuracy bar ── */
+.ap-acc-bar {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ap-acc-bar-track {
+    width: 50px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.ap-acc-bar-fill {
+    height: 100%;
+    background: #00E676;
+    border-radius: 3px;
+}
+
+/* ── Empty State ── */
+.ap-empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.ap-empty-state .empty-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+}
+
+.ap-empty-state h2 {
+    font-size: 1.3rem;
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+.ap-empty-state p {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
+.ap-empty-state .ap-cta-btn {
+    display: inline-block;
+    padding: 10px 28px;
+    background: linear-gradient(135deg, #6C5DD3, #8B5CF6);
+    color: #fff;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ap-empty-state .ap-cta-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(108, 93, 211, 0.4);
+}

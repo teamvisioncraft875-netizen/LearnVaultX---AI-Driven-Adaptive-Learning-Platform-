@@ -27,10 +27,10 @@ from modules.leaderboard_engine import LeaderboardEngine
 
 # Initialize Flask app
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'your-secret-key-change-in-production')
 
 # App version for cache busting
-app.config['APP_VERSION'] = '2.0.0'
+app.config['APP_VERSION'] = '2.0.1'
 
 # Configure Session Cookies
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
@@ -45,6 +45,11 @@ app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100 MB Limit
 
 # Initialize Services
 db = db_manager.DatabaseManager('education.db')
+
+# Ensure all required tables & columns exist (safe to re-run)
+from ensure_schema import ensure_schema
+ensure_schema('education.db')
+
 adaptive = adaptive_learning_new.AdaptiveEngine(db)
 micro_learning = MicroLearningManager(db, adaptive)
 kyknox = kyknox_ai_new.KyKnoX()
@@ -63,6 +68,12 @@ badge_service = badges.BadgeService(db)
 from routes.ai_tutor import ai_tutor_bp, init_ai_tutor
 init_ai_tutor(db, adaptive, kyknox, learning_path_service)
 app.register_blueprint(ai_tutor_bp)
+
+# Initialize Exam Arena Blueprint
+from routes.arena import arena_bp, init_arena
+init_arena(db, kyknox)
+app.register_blueprint(arena_bp)
+
 
 # Custom Jinja Filters
 app.jinja_env.filters['from_json'] = json.loads
@@ -136,7 +147,7 @@ def login_required(f):
         if 'user_id' not in session:
             if request.is_json or request.path.startswith('/api/'):
                 return jsonify({'success': False, 'error': 'Authentication required'}), 401
-            return redirect(url_for('login'))
+            return redirect(url_for('login', next=request.path))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -335,10 +346,11 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    next_url = request.args.get('next', '')
     if request.method == 'POST':
         # Handled by API
-        return render_template('login.html')
-    return render_template('login.html')
+        return render_template('login.html', next=next_url)
+    return render_template('login.html', next=next_url)
 
 @app.route('/api/login', methods=['POST'])
 @rate_limit(calls=6, period=60)
@@ -360,6 +372,10 @@ def api_login():
 
     # Check if user is verified
     if not user.get('is_verified'):
+        # Store next parameter for OTP flow
+        next_url = data.get('next', '')
+        if next_url:
+            session['login_next'] = next_url
         return json_error('Please verify your email first. Sign up again to receive a new verification code.', status=403)
 
     # Credentials valid + verified → Log in directly (Bypass OTP)
@@ -368,8 +384,21 @@ def api_login():
     session['role'] = user['role']
     session['email'] = user['email']
 
-    redirect_url = '/teacher/dashboard' if user['role'] == 'teacher' else '/student/dashboard'
-    logger.info(f"[LOGIN] User {email} logged in successfully (OTP bypassed)")
+    # Honor next parameter for post-login redirect (e.g. /arena)
+    next_url = data.get('next', '')
+    # Handle both full URLs and relative paths
+    if next_url:
+        from urllib.parse import urlparse
+        parsed = urlparse(next_url)
+        # Extract just the path portion for safety
+        safe_next = parsed.path if parsed.path else ''
+        if safe_next and safe_next.startswith('/'):
+            redirect_url = safe_next
+        else:
+            redirect_url = '/teacher/dashboard' if user['role'] == 'teacher' else '/student/dashboard'
+    else:
+        redirect_url = '/teacher/dashboard' if user['role'] == 'teacher' else '/student/dashboard'
+    logger.info(f"[LOGIN] User {email} logged in successfully (OTP bypassed), redirect={redirect_url}")
     
     return jsonify({
         'success': True,
@@ -643,11 +672,22 @@ def api_verify_login_otp():
     session['role'] = role
     session['email'] = email
 
-    # Clear OTP session keys
+    # Clear OTP session keys and retrieve preserved next URL
+    next_url = session.pop('login_next', '')
     for key in ['login_otp_email', 'login_otp_user_id', 'login_otp_name', 'login_otp_role']:
         session.pop(key, None)
 
-    redirect_url = '/teacher/dashboard' if role == 'teacher' else '/student/dashboard'
+    # Honor next parameter for post-login redirect (e.g. /arena)
+    if next_url:
+        from urllib.parse import urlparse
+        parsed = urlparse(next_url)
+        safe_next = parsed.path if parsed.path else ''
+        if safe_next and safe_next.startswith('/'):
+            redirect_url = safe_next
+        else:
+            redirect_url = '/teacher/dashboard' if role == 'teacher' else '/student/dashboard'
+    else:
+        redirect_url = '/teacher/dashboard' if role == 'teacher' else '/student/dashboard'
     logger.info(f"[LOGIN] Login OTP verified for {email}, redirecting to {redirect_url}")
     return jsonify({
         'success': True,
@@ -757,215 +797,260 @@ def reset_password_page():
 @rate_limit(calls=5, period=120)
 def send_password_reset_otp():
     """Send OTP for password reset."""
-    data = get_json_payload()
-    if data is None:
-        return json_error('Invalid JSON payload', status=400)
+    try:
+        logger.info("[FORGOT-PW] Forgot password request received")
 
-    email = data.get('email', '').lower().strip()
+        data = get_json_payload()
+        if data is None:
+            return json_error('Invalid JSON payload', status=400)
 
-    if not email or not validate_email(email):
-        return json_error('Valid email address required', status=400)
+        email = data.get('email', '').lower().strip()
+        logger.info(f"[FORGOT-PW] Email received: {email}")
 
-    # Check if user exists
-    user = db.execute_one('SELECT id FROM users WHERE email = ?', (email,))
-    if not user:
-        # Security: don't reveal whether email exists
-        return json_success('If this email is registered, an OTP has been sent.')
+        if not email or not validate_email(email):
+            return json_error('Valid email address required', status=400)
 
-    # Rate-limit: prevent spam — check last OTP sent time
-    last_otp = db.execute_one(
-        'SELECT created_at FROM password_reset_otp WHERE email = ? ORDER BY created_at DESC LIMIT 1',
-        (email,)
-    )
-    if last_otp:
-        try:
-            last_time = datetime.fromisoformat(str(last_otp['created_at']))
-            if (datetime.now() - last_time).total_seconds() < 60:
-                return json_error('Please wait before requesting another OTP', status=429)
-        except (ValueError, TypeError):
-            pass  # Proceed if timestamp parsing fails
+        # Check if user exists
+        user = db.execute_one('SELECT id FROM users WHERE email = ?', (email,))
+        if not user:
+            logger.info(f"[FORGOT-PW] Email not found in DB: {email}")
+            # Security: don't reveal whether email exists
+            return json_success('If this email is registered, an OTP has been sent.')
 
-    # Generate OTP
-    otp = email_service.generate_otp()
-    otp_hash = email_service.hash_otp(otp)
-    expires_at = email_service.get_otp_expiry()
+        logger.info(f"[FORGOT-PW] User found for {email}")
 
-    # Invalidate old OTPs for this email
-    db.execute_update(
-        'UPDATE password_reset_otp SET used = 1 WHERE email = ? AND used = 0',
-        (email,)
-    )
+        # Rate-limit: prevent spam — check last OTP sent time
+        last_otp = db.execute_one(
+            'SELECT created_at FROM password_reset_otp WHERE email = ? ORDER BY created_at DESC LIMIT 1',
+            (email,)
+        )
+        if last_otp:
+            try:
+                last_time = datetime.fromisoformat(str(last_otp['created_at']))
+                if (datetime.now() - last_time).total_seconds() < 60:
+                    return json_error('Please wait before requesting another OTP', status=429)
+            except (ValueError, TypeError):
+                pass  # Proceed if timestamp parsing fails
 
-    # Store hashed OTP
-    db.execute_insert(
-        'INSERT INTO password_reset_otp (email, otp, expires_at, used, attempts) VALUES (?, ?, ?, 0, 0)',
-        (email, otp_hash, expires_at)
-    )
+        # Generate OTP
+        otp = email_service.generate_otp()
+        otp_hash = email_service.hash_otp(otp)
+        expires_at = email_service.get_otp_expiry()
+        logger.info(f"[FORGOT-PW] OTP generated for {email}")
 
-    # Send email (real SMTP or console fallback)
-    if email_service.send_otp_email(email, otp):
-        # Store email in session for flow continuity
-        session['reset_email'] = email
-        session.pop('otp_verified', None)
-        logger.info(f"[OTP] Password reset OTP sent to {email}")
-        return json_success('OTP sent to your email address')
-    else:
-        return json_error('Failed to send email. Please try again later.', status=500)
+        # Invalidate old OTPs for this email
+        db.execute_update(
+            'UPDATE password_reset_otp SET used = 1 WHERE email = ? AND used = 0',
+            (email,)
+        )
+
+        # Store hashed OTP
+        db.execute_insert(
+            'INSERT INTO password_reset_otp (email, otp, expires_at, used, attempts) VALUES (?, ?, ?, 0, 0)',
+            (email, otp_hash, expires_at)
+        )
+        logger.info(f"[FORGOT-PW] OTP stored in DB for {email}")
+
+        # Send email (real SMTP or console fallback)
+        logger.info(f"[FORGOT-PW] Sending OTP email to {email}...")
+        if email_service.send_otp_email(email, otp):
+            # Store email in session for flow continuity
+            session['reset_email'] = email
+            session.pop('otp_verified', None)
+            logger.info(f"[FORGOT-PW] OTP email sent successfully to {email}")
+            return json_success('OTP sent to your email address')
+        else:
+            logger.error(f"[FORGOT-PW] Failed to send OTP email to {email}")
+            return json_error('Failed to send email. Please check SMTP configuration or try again later.', status=500)
+
+    except Exception as e:
+        logger.error(f"[FORGOT-PW] Unexpected error in send_password_reset_otp: {e}")
+        import traceback
+        traceback.print_exc()
+        return json_error(f'Server error: {str(e)}', status=500)
 
 
 @app.route('/api/forgot-password/verify-otp', methods=['POST'])
 @rate_limit(calls=10, period=120)
 def verify_password_reset_otp():
     """Verify OTP code."""
-    data = get_json_payload()
-    if data is None:
-        return json_error('Invalid JSON payload', status=400)
-
-    email = session.get('reset_email', '')
-    otp = data.get('otp', '').strip()
-
-    if not email:
-        return json_error('Session expired. Please start over.', status=400)
-    if not otp or len(otp) != 6:
-        return json_error('Please enter a valid 6-digit OTP', status=400)
-
-    # Get the latest unused OTP for this email
-    otp_record = db.execute_one(
-        'SELECT * FROM password_reset_otp WHERE email = ? AND used = 0 ORDER BY created_at DESC LIMIT 1',
-        (email,)
-    )
-
-    if not otp_record:
-        return json_error('No active OTP found. Please request a new one.', status=400)
-
-    # Check attempt limit (max 5)
-    attempts = otp_record.get('attempts', 0) or 0
-    if attempts >= 5:
-        # Check lockout duration (10 minutes from last attempt)
-        db.execute_update('UPDATE password_reset_otp SET used = 1 WHERE id = ?', (otp_record['id'],))
-        return json_error('Too many attempts. Please request a new OTP.', status=429)
-
-    # Check expiry
     try:
-        expires_at = datetime.fromisoformat(str(otp_record['expires_at']))
-        if datetime.now() > expires_at:
+        logger.info("[FORGOT-PW] OTP verification request received")
+
+        data = get_json_payload()
+        if data is None:
+            return json_error('Invalid JSON payload', status=400)
+
+        email = session.get('reset_email', '')
+        otp = data.get('otp', '').strip()
+
+        if not email:
+            return json_error('Session expired. Please start over.', status=400)
+        if not otp or len(otp) != 6:
+            return json_error('Please enter a valid 6-digit OTP', status=400)
+
+        # Get the latest unused OTP for this email
+        otp_record = db.execute_one(
+            'SELECT * FROM password_reset_otp WHERE email = ? AND used = 0 ORDER BY created_at DESC LIMIT 1',
+            (email,)
+        )
+
+        if not otp_record:
+            return json_error('No active OTP found. Please request a new one.', status=400)
+
+        # Check attempt limit (max 5)
+        attempts = otp_record.get('attempts', 0) or 0
+        if attempts >= 5:
             db.execute_update('UPDATE password_reset_otp SET used = 1 WHERE id = ?', (otp_record['id'],))
-            return json_error('OTP has expired. Please request a new one.', status=400)
-    except (ValueError, TypeError):
-        return json_error('OTP record invalid. Please request a new one.', status=400)
+            return json_error('Too many attempts. Please request a new OTP.', status=429)
 
-    # Increment attempt counter
-    db.execute_update(
-        'UPDATE password_reset_otp SET attempts = ? WHERE id = ?',
-        (attempts + 1, otp_record['id'])
-    )
+        # Check expiry
+        try:
+            expires_at = datetime.fromisoformat(str(otp_record['expires_at']))
+            if datetime.now() > expires_at:
+                db.execute_update('UPDATE password_reset_otp SET used = 1 WHERE id = ?', (otp_record['id'],))
+                return json_error('OTP has expired. Please request a new one.', status=400)
+        except (ValueError, TypeError):
+            return json_error('OTP record invalid. Please request a new one.', status=400)
 
-    # Verify OTP hash
-    if not email_service.verify_otp(otp_record['otp'], otp):
-        remaining = 4 - attempts
-        if remaining > 0:
-            return json_error(f'Incorrect OTP. {remaining} attempt(s) remaining.', status=400)
-        else:
-            db.execute_update('UPDATE password_reset_otp SET used = 1 WHERE id = ?', (otp_record['id'],))
-            return json_error('Too many failed attempts. Please request a new OTP.', status=429)
+        # Increment attempt counter
+        db.execute_update(
+            'UPDATE password_reset_otp SET attempts = ? WHERE id = ?',
+            (attempts + 1, otp_record['id'])
+        )
 
-    # OTP verified — mark as used and set session flag
-    db.execute_update('UPDATE password_reset_otp SET used = 1 WHERE id = ?', (otp_record['id'],))
-    session['otp_verified'] = True
-    logger.info(f"[OTP] OTP verified for {email}")
-    return json_success('OTP verified successfully')
+        # Verify OTP hash
+        if not email_service.verify_otp(otp_record['otp'], otp):
+            remaining = 4 - attempts
+            if remaining > 0:
+                return json_error(f'Incorrect OTP. {remaining} attempt(s) remaining.', status=400)
+            else:
+                db.execute_update('UPDATE password_reset_otp SET used = 1 WHERE id = ?', (otp_record['id'],))
+                return json_error('Too many failed attempts. Please request a new OTP.', status=429)
+
+        # OTP verified — mark as used and set session flag
+        db.execute_update('UPDATE password_reset_otp SET used = 1 WHERE id = ?', (otp_record['id'],))
+        session['otp_verified'] = True
+        logger.info(f"[FORGOT-PW] OTP verified for {email}")
+        return json_success('OTP verified successfully')
+
+    except Exception as e:
+        logger.error(f"[FORGOT-PW] Unexpected error in verify_password_reset_otp: {e}")
+        import traceback
+        traceback.print_exc()
+        return json_error(f'Server error: {str(e)}', status=500)
 
 
 @app.route('/api/forgot-password/resend-otp', methods=['POST'])
 @rate_limit(calls=3, period=120)
 def resend_password_reset_otp():
     """Resend OTP with 60-second cooldown."""
-    email = session.get('reset_email', '')
-    if not email:
-        return json_error('Session expired. Please start over.', status=400)
+    try:
+        logger.info("[FORGOT-PW] Resend OTP request received")
 
-    # 60-second cooldown check
-    last_otp = db.execute_one(
-        'SELECT created_at FROM password_reset_otp WHERE email = ? ORDER BY created_at DESC LIMIT 1',
-        (email,)
-    )
-    if last_otp:
-        try:
-            last_time = datetime.fromisoformat(str(last_otp['created_at']))
-            elapsed = (datetime.now() - last_time).total_seconds()
-            if elapsed < 60:
-                wait = int(60 - elapsed)
-                return json_error(f'Please wait {wait} seconds before resending', status=429)
-        except (ValueError, TypeError):
-            pass
+        email = session.get('reset_email', '')
+        if not email:
+            return json_error('Session expired. Please start over.', status=400)
 
-    # Check user still exists
-    user = db.execute_one('SELECT id FROM users WHERE email = ?', (email,))
-    if not user:
-        return json_error('Account not found', status=400)
+        # 60-second cooldown check
+        last_otp = db.execute_one(
+            'SELECT created_at FROM password_reset_otp WHERE email = ? ORDER BY created_at DESC LIMIT 1',
+            (email,)
+        )
+        if last_otp:
+            try:
+                last_time = datetime.fromisoformat(str(last_otp['created_at']))
+                elapsed = (datetime.now() - last_time).total_seconds()
+                if elapsed < 60:
+                    wait = int(60 - elapsed)
+                    return json_error(f'Please wait {wait} seconds before resending', status=429)
+            except (ValueError, TypeError):
+                pass
 
-    # Invalidate old OTPs
-    db.execute_update(
-        'UPDATE password_reset_otp SET used = 1 WHERE email = ? AND used = 0',
-        (email,)
-    )
+        # Check user still exists
+        user = db.execute_one('SELECT id FROM users WHERE email = ?', (email,))
+        if not user:
+            return json_error('Account not found', status=400)
 
-    # Generate and store new OTP
-    otp = email_service.generate_otp()
-    otp_hash = email_service.hash_otp(otp)
-    expires_at = email_service.get_otp_expiry()
+        # Invalidate old OTPs
+        db.execute_update(
+            'UPDATE password_reset_otp SET used = 1 WHERE email = ? AND used = 0',
+            (email,)
+        )
 
-    db.execute_insert(
-        'INSERT INTO password_reset_otp (email, otp, expires_at, used, attempts) VALUES (?, ?, ?, 0, 0)',
-        (email, otp_hash, expires_at)
-    )
+        # Generate and store new OTP
+        otp = email_service.generate_otp()
+        otp_hash = email_service.hash_otp(otp)
+        expires_at = email_service.get_otp_expiry()
 
-    if email_service.send_otp_email(email, otp):
-        session.pop('otp_verified', None)
-        logger.info(f"[OTP] Resent OTP to {email}")
-        return json_success('New OTP sent to your email')
-    else:
-        return json_error('Failed to send email', status=500)
+        db.execute_insert(
+            'INSERT INTO password_reset_otp (email, otp, expires_at, used, attempts) VALUES (?, ?, ?, 0, 0)',
+            (email, otp_hash, expires_at)
+        )
+        logger.info(f"[FORGOT-PW] New OTP generated and stored for {email}")
+
+        if email_service.send_otp_email(email, otp):
+            session.pop('otp_verified', None)
+            logger.info(f"[FORGOT-PW] Resent OTP to {email}")
+            return json_success('New OTP sent to your email')
+        else:
+            logger.error(f"[FORGOT-PW] Failed to resend OTP email to {email}")
+            return json_error('Failed to send email. Please try again later.', status=500)
+
+    except Exception as e:
+        logger.error(f"[FORGOT-PW] Unexpected error in resend_password_reset_otp: {e}")
+        import traceback
+        traceback.print_exc()
+        return json_error(f'Server error: {str(e)}', status=500)
 
 
 @app.route('/api/forgot-password/reset-password', methods=['POST'])
 @rate_limit(calls=5, period=120)
 def reset_password_submit():
     """Reset password after OTP verification."""
-    if not session.get('otp_verified'):
-        return json_error('OTP not verified. Please verify your OTP first.', status=403)
+    try:
+        logger.info("[FORGOT-PW] Password reset submission received")
 
-    data = get_json_payload()
-    if data is None:
-        return json_error('Invalid JSON payload', status=400)
+        if not session.get('otp_verified'):
+            return json_error('OTP not verified. Please verify your OTP first.', status=403)
 
-    email = session.get('reset_email', '')
-    new_password = data.get('new_password', '')
-    confirm_password = data.get('confirm_password', '')
+        data = get_json_payload()
+        if data is None:
+            return json_error('Invalid JSON payload', status=400)
 
-    if not email:
-        return json_error('Session expired. Please start over.', status=400)
+        email = session.get('reset_email', '')
+        new_password = data.get('new_password', '')
+        confirm_password = data.get('confirm_password', '')
 
-    if not new_password or not confirm_password:
-        return json_error('Both password fields are required', status=400)
+        if not email:
+            return json_error('Session expired. Please start over.', status=400)
 
-    if new_password != confirm_password:
-        return json_error('Passwords do not match', status=400)
+        if not new_password or not confirm_password:
+            return json_error('Both password fields are required', status=400)
 
-    is_valid, error_msg = validate_password(new_password)
-    if not is_valid:
-        return json_error(error_msg, status=400)
+        if new_password != confirm_password:
+            return json_error('Passwords do not match', status=400)
 
-    # Update password
-    password_hash = hash_password(new_password)
-    db.execute_update('UPDATE users SET password_hash = ? WHERE email = ?', (password_hash, email))
+        is_valid, error_msg = validate_password(new_password)
+        if not is_valid:
+            return json_error(error_msg, status=400)
 
-    # Clear session
-    session.pop('reset_email', None)
-    session.pop('otp_verified', None)
+        # Update password
+        password_hash = hash_password(new_password)
+        db.execute_update('UPDATE users SET password_hash = ? WHERE email = ?', (password_hash, email))
 
-    logger.info(f"[RESET] Password reset successful for {email}")
-    return json_success('Password reset successful! You can now log in with your new password.')
+        # Clear session
+        session.pop('reset_email', None)
+        session.pop('otp_verified', None)
+
+        logger.info(f"[FORGOT-PW] Password reset successful for {email}")
+        return json_success('Password reset successful! You can now log in with your new password.')
+
+    except Exception as e:
+        logger.error(f"[FORGOT-PW] Unexpected error in reset_password_submit: {e}")
+        import traceback
+        traceback.print_exc()
+        return json_error(f'Server error: {str(e)}', status=500)
 
 
 # ============================================================================
@@ -1046,27 +1131,34 @@ def get_teacher_classes():
 @api_teacher_required
 def create_class():
     """Create a new class"""
-    data = request.json
-    title = sanitize_input(data.get('title', ''))
-    description = sanitize_input(data.get('description', ''), max_length=2000)
-    
-    if not title:
-        return json_error('Title is required', status=400)
-    
-    # Generate unique class code
-    class_code = generate_class_code()
-    
-    # Ensure code uniqueness (simple check, retry loop could be added but unlikely to collide with 6 chars)
-    while db.execute_one('SELECT id FROM classes WHERE code = ?', (class_code,)):
+    try:
+        data = request.get_json(silent=True)
+        if not data:
+            return json_error('Invalid JSON payload', status=400)
+        
+        title = sanitize_input(data.get('title', ''))
+        description = sanitize_input(data.get('description', ''), max_length=2000)
+        
+        if not title:
+            return json_error('Title is required', status=400)
+        
+        # Generate unique class code
         class_code = generate_class_code()
+        
+        # Ensure code uniqueness
+        while db.execute_one('SELECT id FROM classes WHERE code = ?', (class_code,)):
+            class_code = generate_class_code()
 
-    class_id = db.execute_insert(
-        'INSERT INTO classes (title, description, teacher_id, code) VALUES (?, ?, ?, ?)',
-        (title, description, get_current_user_id(), class_code)
-    )
-    
-    logger.info(f"Class created: {title} (ID: {class_id})")
-    return json_success('Class created', data={'class_id': class_id}, status=201, class_id=class_id)
+        class_id = db.execute_insert(
+            'INSERT INTO classes (title, description, teacher_id, code) VALUES (?, ?, ?, ?)',
+            (title, description, get_current_user_id(), class_code)
+        )
+        
+        logger.info(f"Class created: {title} (ID: {class_id})")
+        return json_success('Class created', data={'class_id': class_id, 'code': class_code}, status=201, class_id=class_id)
+    except Exception as e:
+        logger.error(f"Error creating class: {e}")
+        return json_error(f'Failed to create class: {str(e)}', status=500)
 
 @app.route('/api/student/classes')
 @api_login_required
@@ -2025,6 +2117,15 @@ def get_class_quizzes(class_id):
     )
     return jsonify(quizzes)
 
+@app.route('/quiz/<int:quiz_id>')
+@login_required
+def quiz_page(quiz_id):
+    """Render the quiz-taking page."""
+    quiz = db.execute_one('SELECT * FROM quizzes WHERE id = ?', (quiz_id,))
+    if not quiz:
+        return 'Quiz not found', 404
+    return render_template('quiz_view.html', quiz_id=quiz_id)
+
 @app.route('/api/quiz/<int:quiz_id>')
 @api_login_required
 def get_quiz(quiz_id):
@@ -2076,6 +2177,10 @@ def get_quiz(quiz_id):
             q['options'] = json.loads(q.get('options') or '[]')
         except Exception:
             q['options'] = []
+        # SECURITY: Strip explanation until attempt 3+
+        # attempts_taken < 2 means this will be attempt 1 or 2 → hide explanation
+        if attempts_taken < 2:
+            q.pop('explanation', None)
     
     return jsonify({'success': True, 'data': quiz_data}), 200
 
@@ -2234,6 +2339,17 @@ def _handle_quiz_submission(data, user_id):
                 'user_option_index': user_idx,
                 'correct_option_index': correct_idx
             })
+
+        # ── ATTEMPT-GATED ANSWER VISIBILITY ──
+        # attempt_number = attempts_count + 1 (computed below)
+        current_attempt = attempts_count + 1
+        show_answers = current_attempt >= 3
+
+        # SECURITY: Strip correct answers from response for attempts 1-2
+        if not show_answers:
+            for dr in detailed_results:
+                dr.pop('correct_answer', None)
+                dr.pop('correct_option_index', None)
         
         logger.info(f"[SCORE_DEBUG] Final score: {score}/{total}")
 
@@ -2330,26 +2446,31 @@ def _handle_quiz_submission(data, user_id):
             logger.error(f"Adaptive update failed for user={user_id} quiz={quiz_id}: {e}")
             awarded_badges = [] # Ensure defined via fallback if outer except catches
 
+        # SECURITY: Strip mistake notes for attempts 1-2 (they contain correct answers)
+        safe_mistake_notes = mistake_notes_data if show_answers else []
+
         return json_success(
             message='Quiz submitted successfully',
             data={
                 'score': score,
                 'total': total,
                 'percentage': percentage,
-                'attempt_number': attempts_count + 1,
+                'attempt_number': current_attempt,
+                'show_answers': show_answers,
                 'adaptive_insights': adaptive_insights,
                 'question_results': detailed_results,
                 'badges': awarded_badges,
-                'mistake_notes': mistake_notes_data
+                'mistake_notes': safe_mistake_notes
             },
             score=score,
             total=total,
             percentage=percentage,
-            attempt_number=attempts_count + 1,
+            attempt_number=current_attempt,
+            show_answers=show_answers,
             adaptive_insights=adaptive_insights,
             question_results=detailed_results,
             badges=awarded_badges,
-            mistake_notes=mistake_notes_data
+            mistake_notes=safe_mistake_notes
         )
     except Exception as e:
         logger.exception('Unhandled error in quiz submission')
@@ -2551,7 +2672,7 @@ def get_student_knowledge_gaps():
     # Limit to top 10
     return jsonify({'success': True, 'gaps': all_gaps[:10]})
 
-@app.route('/api/student/analytics')
+@app.route('/api/student/analytics-overview')
 @login_required
 def get_student_analytics_overview():
     """Get aggregated analytics for the student dashboard"""
@@ -2632,7 +2753,7 @@ def get_available_classes():
     
     # Get all classes except those the student is already enrolled in
     query = '''
-        SELECT c.id, c.title, c.subject, u.name as teacher_name
+        SELECT c.id, c.title, c.subject, c.code, u.name as teacher_name
         FROM classes c
         JOIN users u ON c.teacher_id = u.id
         WHERE c.id NOT IN (
@@ -3373,24 +3494,21 @@ if __name__ == '__main__':
     initialize_database()
     
     # Run server
-    port = int(os.getenv('PORT', 5000))
+    port = int(os.getenv('PORT', 5050))
     logger.info(f"Starting LearnVaultX server on port {port}")
     
     # Print localhost URL clearly
     print("\n" + "="*60)
     print(f"?? LearnVaultX is running!")
     print(f"?? Open in browser: http://127.0.0.1:{port}")
-    print(f"?? Or use: http://localhost:{port}")
     print("="*60 + "\n")
     
-    # Run SocketIO server with use_reloader=False to prevent double start
-    # debug=True enables debug mode but use_reloader=False prevents the reloader from starting a second process
     try:
         socketio.run(
             app,
             host='0.0.0.0',
             port=port,
-            debug=True,
+            debug=False,
             use_reloader=False,
             log_output=True,
             allow_unsafe_werkzeug=True

@@ -280,7 +280,8 @@ insights.{% endblock %}
     </button>
 
     <!-- Mobile Overlay -->
-    <div class="dash-overlay" id="dashOverlay" onclick="closeAllMobile()"></div>
+    <div class="dash-overlay" id="dashOverlay" onclick="closeDashMobileOverlay()">
+    </div>
 </div>
 
 <!-- MODALS -->
@@ -378,10 +379,37 @@ insights.{% endblock %}
 
 <script>
     window.__TEACHER_CLASSES__ = {{ classes | tojson }};
+
+    // Close mobile sidebar overlay cleanly
+    function closeDashMobileOverlay() {
+        var s = document.getElementById('dashSidebar');
+        if (s) { s.classList.remove('mobile-show', 'active', 'mobile-open'); }
+        var o = document.getElementById('dashOverlay');
+        if (o) { o.classList.remove('show', 'active'); o.style.display = ''; }
+    }
 </script>
 <script src="{{ url_for('static', filename='js/teacher-dashboard.js') }}?v={{ config.APP_VERSION }}"></script>
 
 <style>
+    /* ============================================
+        MOBILE OVERLAY FIX
+        ============================================ */
+
+    /* Overlay: hidden by default, shown when sidebar opens on mobile */
+    .dash-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: 900;
+        cursor: pointer;
+    }
+
+    .dash-overlay.show,
+    .dash-overlay.active {
+        display: block !important;
+    }
+
     /* ============================================
         UNIFIED DASHBOARD STYLES - TEACHER VERSION
         (Matches student dashboard structure exactly)
@@ -594,6 +622,7 @@ insights.{% endblock %}
         flex-direction: column;
         overflow: hidden;
         transition: margin-right 0.3s ease;
+        min-width: 0;
     }
 
     .dash-center.ai-active {
@@ -625,6 +654,10 @@ insights.{% endblock %}
         font-weight: 700;
         color: #e5e7eb;
         margin-bottom: 4px;
+        max-width: 70%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .view-sub-text {
@@ -636,7 +669,11 @@ insights.{% endblock %}
         flex: 1;
         padding: 32px 40px;
         overflow-y: auto;
+        overflow-x: hidden;
         background: #0a0e1a;
+        width: 100%;
+        max-width: 1600px;
+        margin: 0 auto;
     }
 
     .view-section {
@@ -653,8 +690,9 @@ insights.{% endblock %}
     /* Quick Actions Grid */
     .quick-act-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(3, 1fr);
         gap: 20px;
+        max-width: 100%;
     }
 
     .quick-act-box {
@@ -665,6 +703,11 @@ insights.{% endblock %}
         cursor: pointer;
         transition: all 0.2s;
         text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 180px;
     }
 
     .quick-act-box:hover {
@@ -688,12 +731,44 @@ insights.{% endblock %}
     .qact-text {
         font-size: 14px;
         color: #9ca3af;
+        margin-bottom: 16px;
+    }
+
+    .qact-icon-wrapper {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        background: rgba(96, 165, 250, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 14px;
+    }
+
+    .qact-btn {
+        display: inline-block;
+        width: 100%;
+        padding: 10px 24px;
+        background: linear-gradient(135deg, #60a5fa, #8b5cf6);
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        margin-top: auto;
+    }
+
+    .qact-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba(96, 165, 250, 0.35);
     }
 
     /* Stats Grid */
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(4, 1fr);
         gap: 20px;
     }
 
@@ -1381,6 +1456,15 @@ insights.{% endblock %}
         display: block;
     }
 
+    /* Tablet breakpoint */
+    @media (max-width: 1024px) {
+
+        .quick-act-grid,
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
     @media (max-width: 768px) {
         .dash-sidebar {
             position: fixed;
@@ -1443,6 +1527,21 @@ insights.{% endblock %}
 
         .dash-center.ai-active {
             margin-right: 0;
+        }
+
+        /* Overlay for mobile sidebar */
+        .dash-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 95;
+            transition: opacity 0.3s;
+        }
+
+        .dash-overlay.show {
+            display: block;
         }
     }
 

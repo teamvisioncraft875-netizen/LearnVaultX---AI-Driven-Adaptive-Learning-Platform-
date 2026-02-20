@@ -1,0 +1,62 @@
+﻿============================================================
+LEARNVAULTX ù COMPREHENSIVE AUDIT
+============================================================
+
+DATABASE TABLES (22):
+  ai_queries: ['id', 'user_id', 'prompt', 'response', 'provider', 'mode', 'created_at']
+  classes: ['id', 'title', 'description', 'teacher_id', 'created_at', 'code']
+  enrollments: ['id', 'student_id', 'class_id', 'enrolled_at']
+  feedback: ['id', 'user_id', 'rating', 'message', 'created_at']
+  knowledge_gaps: ['id', 'user_id', 'topic_id', 'mastery_level', 'questions_attempted', 'questions_correct', 'last_assessed']
+  learning_modules: ['id', 'class_id', 'title', 'description', 'order_index', 'created_at']
+  lectures: ['id', 'class_id', 'filename', 'filepath', 'file_size', 'uploaded_at']
+  live_sessions: ['id', 'class_id', 'room_name', 'started_by', 'started_at', 'ended_at', 'is_active']
+  otp_requests: ['id', 'email', 'otp_hash', 'otp_type', 'expires_at', 'is_used', 'attempts', 'created_at']
+  password_reset_otp: ['id', 'email', 'otp', 'expires_at', 'used', 'created_at']
+  question_topics: ['question_id', 'topic_id']
+  quiz_questions: ['id', 'quiz_id', 'question_text', 'options', 'correct_option_index', 'explanation', 'topic_tag', 'difficulty']
+  quiz_submissions: ['id', 'quiz_id', 'student_id', 'score', 'total', 'answers', 'duration_seconds', 'submitted_at']
+  quizzes: ['id', 'class_id', 'title', 'description', 'created_at', 'difficulty_level', 'generated_by', 'module_id']
+  recommendations: ['id', 'user_id', 'title', 'description', 'resource_url', 'type', 'priority', 'is_completed', 'created_at']
+  skill_tree_nodes: ['id', 'class_id', 'title', 'description', 'icon', 'position_order', 'prerequisite_node_id', 'created_at']
+  skill_tree_progress: ['id', 'student_id', 'node_id', 'status', 'score', 'updated_at']
+  student_metrics: ['id', 'user_id', 'class_id', 'attendance_score', 'quiz_score', 'participation_score', 'rating', 'updated_at']
+  student_module_progress: ['id', 'user_id', 'module_id', 'status', 'completion_percent', 'quiz_score_avg', 'completed_at']
+  teacher_interventions: ['id', 'student_id', 'teacher_id', 'class_id', 'alert_type', 'message', 'is_resolved', 'created_at', 'resolved_at']
+  topics: ['id', 'class_id', 'topic_name', 'description', 'created_at']
+  users: ['id', 'name', 'email', 'password_hash', 'role', 'created_at', 'is_verified', 'verified_at']
+
+============================================================
+QUERY TESTS
+============================================================
+  Passed: 30
+python : Traceback (most recent call 
+last):
+At line:1 char:1
++ python _audit.py 2>&1 | Out-File 
+-FilePath _audit_results.txt -Encodi 
+...
++ ~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpe 
+   cified: (Traceback (most recent   
+  call last)::String) [], RemoteEx   
+ ception
+    + FullyQualifiedErrorId : Native 
+   CommandError
+ 
+  File "C:\Users\subha\Desktop\Projec
+tLVX1\_audit.py", line 242, in 
+<module>
+    main()
+  File "C:\Users\subha\Desktop\Projec
+tLVX1\_audit.py", line 202, in main
+    print(f"    \u2713 {p}")
+  File "C:\Users\subha\AppData\Local\
+Programs\Python\Python310\lib\encodin
+gs\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(inpu
+t,self.errors,encoding_table)[0]
+UnicodeEncodeError: 'charmap' codec 
+can't encode character '\u2713' in 
+position 4: character maps to 
+<undefined>

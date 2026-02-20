@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block title %}Result - Arena | LearnVaultX{% endblock %}
+
+{% block extra_css %}
+<style>
+    .result-container {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        color: white;
+    }
+
+    .score-card {
+        background: rgba(10, 15, 30, 0.7);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 3rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .score-ring {
+        width: 200px;
+        height: 200px;
+        margin: 0 auto 1.5rem;
+        position: relative;
+        border-radius: 50%;
+
+        background: conic-gradient(#00f260 {
+                    {
+                    attempt.accuracy_percent
+                }
+            }
+
+            %,
+            rgba(255, 255, 255, 0.1) 0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .score-ring::before {
+        content: '';
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        background: #0a0f1e;
+        border-radius: 50%;
+    }
+
+    .score-text {
+        position: relative;
+        z-index: 2;
+    }
+
+    .score-big {
+        font-size: 3.5rem;
+        font-weight: 800;
+        color: white;
+        line-height: 1;
+    }
+
+    .score-label {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .stat-box {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 1rem;
+        border-radius: 12px;
+    }
+
+    .stat-val {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0575e6;
+    }
+
+    .stat-lbl {
+        font-size: 0.8rem;
+        color: #aaa;
+    }
+
+    .xp-gained {
+        color: #ffd700;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-top: 1rem;
+        animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+        0% {
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .ai-notes-section {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+
+    .note-card {
+        background: rgba(255, 71, 87, 0.1);
+        border-left: 4px solid #ff4757;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 0 8px 8px 0;
+    }
+
+    .actions {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 3rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #00f260, #0575e6);
+        padding: 1rem 3rem;
+        border-radius: 30px;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        box-shadow: 0 10px 20px rgba(5, 117, 230, 0.3);
+    }
+
+    .btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 1rem 3rem;
+        border-radius: 30px;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="result-container">
+
+    <div class="score-card">
+        <div class="score-ring">
+            <div class="score-text">
+                <div class="score-big">{{ attempt.score }}/{{ attempt.total_questions }}</div>
+                <div class="score-label">Score</div>
+            </div>
+        </div>
+
+        <div class="xp-gained">+{{ attempt.xp_earned }} XP Earned!</div>
+
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-val">{{ attempt.accuracy_percent }}%</div>
+                <div class="stat-lbl">Accuracy</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-val">{{ attempt.avg_time_per_question }}s</div>
+                <div class="stat-lbl">Avg Time</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-val">{{ rank.rank_name }}</div>
+                <div class="stat-lbl">Rank</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-val">{{ rank.streak_days }}</div>
+                <div class="stat-lbl">Streak</div>
+            </div>
+        </div>
+    </div>
+
+    {% if ai_notes %}
+    <div class="ai-notes-section">
+        <h3>🤖 AI Coach Insights</h3>
+        <p style="color:#aaa; margin-bottom:1.5rem;">Based on your mistakes, here's what you should focus on:</p>
+
+        {% for note in ai_notes %}
+        <div class="note-card">
+            <h4 style="color:#ff4757; margin-bottom:0.5rem;">{{ note.topic_tag }} Mistake</h4>
+            <p>{{ note.quick_fix }}</p>
+            <small style="display:block; margin-top:0.5rem; color:#ccc;"><strong>Memory Trick:</strong> {{
+                note.memory_trick }}</small>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="actions">
+        <a href="/arena" class="btn-secondary">Back to Arena</a>
+        <a href="{{ url_for('arena.review_attempt', session_id=attempt.id) }}" class="btn-primary">Review Answers</a>
+        <!-- <a href="/arena/start/mock" class="btn-primary">Try Again</a> -->
+        <!-- Post request needed for try again now, or just link to arena -->
+    </div>
+
+    <!-- Badge Popup -->
+    {% if new_badges %}
+    <div id="badge-popup"
+        style="position:fixed; bottom:20px; right:20px; background:linear-gradient(45deg, #FFD700, #FFA500); padding:1.5rem; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.5); z-index:100; animation: slideUp 0.5s;">
+        <h4 style="margin:0; color:black;">🏆 New Badge Unlocked!</h4>
+        {% for b in new_badges %}
+        <div style="display:flex; align-items:center; margin-top:0.5rem; color:black;">
+            <span style="font-size:2rem; margin-right:1rem;">{{ b.icon }}</span>
+            <div>
+                <strong style="display:block;">{{ b.title }}</strong>
+                <small>{{ b.description }}</small>
+            </div>
+        </div>
+        {% endfor %}
+        <button onclick="document.getElementById('badge-popup').remove()"
+            style="background:none; border:none; position:absolute; top:5px; right:5px; cursor:pointer;">✖</button>
+    </div>
+    {% endif %}
+
+</main>
+{% endblock %}

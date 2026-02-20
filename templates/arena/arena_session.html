@@ -1,0 +1,413 @@
+{% extends "base.html" %}
+
+{% block title %}Exam Session | Arena{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Session Specific Styles */
+    .session-container {
+        max-width: 1000px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        color: var(--text-primary);
+    }
+
+    .session-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 1rem 2rem;
+        background: rgba(10, 15, 30, 0.6);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+    }
+
+    .timer-box {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #ff4757;
+        background: rgba(255, 71, 87, 0.1);
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 71, 87, 0.3);
+    }
+
+    .progress-track {
+        flex-grow: 1;
+        margin: 0 2rem;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #00f260, #0575e6);
+        width: 0%;
+        transition: width 0.3s ease;
+    }
+
+    .question-card {
+        background: rgba(10, 15, 30, 0.8);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 3rem;
+        min-height: 400px;
+        position: relative;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    }
+
+    .question-meta {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .question-text {
+        font-size: 1.4rem;
+        line-height: 1.6;
+        margin-bottom: 2.5rem;
+        font-weight: 500;
+    }
+
+    .options-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .option-btn {
+        display: flex;
+        align-items: center;
+        padding: 1.2rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: left;
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+    }
+
+    .option-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateX(5px);
+    }
+
+    .option-btn.selected {
+        background: rgba(5, 117, 230, 0.2);
+        border-color: #0575e6;
+        color: white;
+        box-shadow: 0 0 15px rgba(5, 117, 230, 0.3);
+    }
+
+    .option-marker {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+
+    .option-btn.selected .option-marker {
+        background: #0575e6;
+        color: white;
+    }
+
+    .controls {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 2rem;
+    }
+
+    .nav-btn {
+        padding: 0.8rem 2rem;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .nav-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .nav-btn.submit {
+        background: linear-gradient(135deg, #00f260, #0575e6);
+        box-shadow: 0 0 20px rgba(5, 117, 230, 0.4);
+    }
+
+    .nav-btn.submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 30px rgba(5, 117, 230, 0.6);
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    /* Review Overlay (optional) */
+    .review-panel {
+        display: none;
+        /* Implement if time permits */
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="session-container" data-session-id="{{ session.id }}" data-start-time="{{ session.created_at }}">
+
+    <!-- HUD -->
+    <div class="session-header">
+        <div class="q-counter">Question <span id="qCurrent">1</span>/{{ questions|length }}</div>
+        <div class="progress-track">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+        <div class="timer-box" id="timer">00:00</div>
+    </div>
+
+    <!-- Questions Wrapper -->
+    <div id="quizForm">
+        {% for q in questions %}
+        <div class="question-card {{ 'hidden' if not loop.first else 'active-card' }}" data-qid="{{ q.id }}"
+            data-index="{{ loop.index0 }}">
+
+            <div class="question-meta">
+                <span>{{ q.topic_tag or 'General' }}</span>
+                <span>{{ q.difficulty or 'Medium' }}</span>
+            </div>
+
+            <h3 class="question-text">{{ q.question_text | default('Question text not available.', true) }}</h3>
+
+            <div class="options-grid">
+                <div class="option-btn" onclick="selectOption(this, '{{ q.id }}', 'A')">
+                    <span class="option-marker">A</span> {{ q.option_a | default('Option A', true) }}
+                </div>
+                <div class="option-btn" onclick="selectOption(this, '{{ q.id }}', 'B')">
+                    <span class="option-marker">B</span> {{ q.option_b | default('Option B', true) }}
+                </div>
+                <div class="option-btn" onclick="selectOption(this, '{{ q.id }}', 'C')">
+                    <span class="option-marker">C</span> {{ q.option_c | default('Option C', true) }}
+                </div>
+                <div class="option-btn" onclick="selectOption(this, '{{ q.id }}', 'D')">
+                    <span class="option-marker">D</span> {{ q.option_d | default('Option D', true) }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Navigation -->
+    <div class="controls">
+        <button class="nav-btn" id="prevBtn" onclick="prevQuestion()" disabled>Previous</button>
+        <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">Next</button>
+        <button class="nav-btn submit hidden" id="submitBtn" onclick="submitQuiz()">Submit Test</button>
+    </div>
+
+</div>
+
+<!-- Auto-Submit Form (Hidden) -->
+<form id="hiddenSubmitForm" action="/arena/submit_attempt" method="POST" style="display:none;"></form>
+
+<script>
+    // State
+    const TOTAL_QUESTIONS = {{ questions| length }};
+    let currentIndex = 0;
+    const answers = {}; // {qid: {selected: 'A', time: 10}}
+    const questionStartTimes = {};
+    let sessionStartTime = Date.now();
+    let timeLeft = {{ time_limit }}; // Seconds
+    const SESSION_ID = {{ session.id }};
+
+    // Timer Logic
+    const timerEl = document.getElementById('timer');
+    const timerInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            timerEl.innerText = "00:00";
+            alert("Time's up! Submitting automatically.");
+            submitQuiz(true);
+            return;
+        }
+
+        const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+        const s = (timeLeft % 60).toString().padStart(2, '0');
+        timerEl.innerText = `${m}:${s}`;
+
+        // Timer color warning
+        if (timeLeft < 60) timerEl.style.color = '#ff0000';
+    }, 1000);
+
+    // Initial Start Time for Q1
+    questionStartTimes[0] = Date.now();
+
+    function updateUI() {
+        // Hide all cards
+        document.querySelectorAll('.question-card').forEach(el => el.classList.add('hidden'));
+
+        // Show current
+        const currentCard = document.querySelector(`.question-card[data-index="${currentIndex}"]`);
+        if (currentCard) currentCard.classList.remove('hidden');
+
+        // Update Counter
+        document.getElementById('qCurrent').innerText = currentIndex + 1;
+
+        // Update Progress
+        const pct = ((currentIndex + 1) / TOTAL_QUESTIONS) * 100;
+        document.getElementById('progressBar').style.width = `${pct}%`;
+
+        // Update Buttons
+        document.getElementById('prevBtn').disabled = currentIndex === 0;
+
+        if (currentIndex === TOTAL_QUESTIONS - 1) {
+            document.getElementById('nextBtn').classList.add('hidden');
+            document.getElementById('submitBtn').classList.remove('hidden');
+        } else {
+            document.getElementById('nextBtn').classList.remove('hidden');
+            document.getElementById('submitBtn').classList.add('hidden');
+        }
+
+        // Record start time for this question
+        if (!questionStartTimes[currentIndex]) {
+            questionStartTimes[currentIndex] = Date.now();
+        }
+    }
+
+    function nextQuestion() {
+        if (currentIndex < TOTAL_QUESTIONS - 1) {
+            captureTime(currentIndex);
+            currentIndex++;
+            updateUI();
+        }
+    }
+
+    function prevQuestion() {
+        if (currentIndex > 0) {
+            captureTime(currentIndex);
+            currentIndex--;
+            updateUI();
+        }
+    }
+
+    function captureTime(index) {
+        // Simple time tracking: just accum difference since last switch
+        // Real implementation might be more complex to handle jumping back and forth
+        // For simplicity, we just mark time on submission based on total session time divided? 
+        // No, let's try to track "active time" on a question if possible, or just default.
+        // Let's rely on basic timestamps.
+        const now = Date.now();
+        const start = questionStartTimes[index];
+        if (start) {
+            const elapsed = (now - start) / 1000;
+            // Store cumulatively in answers?
+            // Actually, best to just track 'time_taken' when selecting answer OR leaving question.
+            // We'll update the answer object for this QID.
+            const card = document.querySelector(`.question-card[data-index="${index}"]`);
+            const qid = card.dataset.qid;
+
+            if (!answers[qid]) answers[qid] = { selected: null, time_taken: 0 };
+            answers[qid].time_taken += elapsed;
+
+            // Reset start time for next visit to avoid double counting?
+            questionStartTimes[index] = null;
+        }
+    }
+
+    // When switching to a new question, set its start time
+    // This is handled in updateUI()
+
+    function selectOption(btn, qid, option) {
+        // Visual Selection
+        const card = btn.closest('.question-card');
+        card.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+
+        // Logic
+        if (!answers[qid]) answers[qid] = { selected: null, time_taken: 0 };
+        answers[qid].selected = option;
+    }
+
+    function submitQuiz(force = false) {
+        if (!force && !confirm('Are you sure you want to submit?')) return;
+
+        clearInterval(timerInterval);
+
+        // Capture final time for current question
+        captureTime(currentIndex);
+
+        const payload = {
+            session_id: SESSION_ID,
+            total_time: (Date.now() - sessionStartTime) / 1000,
+            answers: []
+        };
+
+        // Convert answers object to array
+        document.querySelectorAll('.question-card').forEach(card => {
+            const qid = card.dataset.qid;
+            const ans = answers[qid] || { selected: null, time_taken: 0 };
+
+            // Allow unselected answers
+            payload.answers.push({
+                question_id: qid,
+                selected_option: ans.selected,
+                time_taken: ans.time_taken
+            });
+        });
+
+        // Send
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.innerText = 'Submitting...';
+        submitBtn.disabled = true;
+
+        fetch('/arena/submit_attempt', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+            .then(res => {
+                if (!res.ok) {
+                    return res.text().then(text => { throw new Error(`Server Error (${res.status}): ${text.substring(0, 50)}...`) });
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (data.success && data.redirect) {
+                    window.location.href = data.redirect;
+                } else {
+                    alert('Submission failed: ' + (data.error || 'Unknown error'));
+                    submitBtn.innerText = 'Submit Test';
+                    submitBtn.disabled = false;
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Submission Error: ' + err.message);
+                submitBtn.innerText = 'Submit Test';
+                submitBtn.disabled = false;
+            });
+    }
+
+    // Initialize
+    updateUI();
+</script>
+{% endblock %}

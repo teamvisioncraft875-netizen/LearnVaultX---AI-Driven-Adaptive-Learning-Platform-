@@ -5,37 +5,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="{% block meta_description %}AI-powered adaptive learning platform with personalized education, quizzes, and real-time analytics.{% endblock %}">
+        content="AI-powered adaptive learning platform with personalized education, quizzes, and real-time analytics.">
     <meta name="keywords"
-        content="{% block meta_keywords %}LearnVaultX, AI learning, adaptive education, online quizzes, student analytics, personalized learning{% endblock %}">
-    <meta name="robots" content="{% block meta_robots %}index, follow{% endblock %}">
+        content="LearnVaultX, AI learning, adaptive education, online quizzes, student analytics, personalized learning">
+    <meta name="robots" content="index, follow">
     <meta name="author" content="LearnVaultX">
     <meta name="theme-color" content="#38BDF8">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    {% block canonical %}
-    <link rel="canonical" href="{{ request.url }}">{% endblock %}
+    
+    <link rel="canonical" href="http://127.0.0.1:5000/arena/daily_challenge">
 
     <!-- OpenGraph -->
-    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
-    <meta property="og:title" content="{% block og_title %}LearnVaultX - AI-Powered Learning{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="LearnVaultX - AI-Powered Learning">
     <meta property="og:description"
-        content="{% block og_description %}AI-powered adaptive learning platform with personalized education.{% endblock %}">
-    <meta property="og:url" content="{{ request.url }}">
+        content="AI-powered adaptive learning platform with personalized education.">
+    <meta property="og:url" content="http://127.0.0.1:5000/arena/daily_challenge">
     <meta property="og:site_name" content="LearnVaultX">
     <meta property="og:image"
-        content="{% block og_image %}{{ url_for('static', filename='images/og-banner.png', _external=True) }}{% endblock %}">
+        content="http://127.0.0.1:5000/static/images/og-banner.png">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{% block twitter_title %}LearnVaultX - AI-Powered Learning{% endblock %}">
+    <meta name="twitter:title" content="LearnVaultX - AI-Powered Learning">
     <meta name="twitter:description"
-        content="{% block twitter_description %}AI-powered adaptive learning platform with personalized education.{% endblock %}">
+        content="AI-powered adaptive learning platform with personalized education.">
 
-    {% block structured_data %}{% endblock %}
+    
 
-    <title>{% block title %}LearnVaultX - AI-Powered Learning{% endblock %}</title>
+    <title>Quiz - Exam Arena | LearnVaultX</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -45,33 +44,33 @@
         rel="stylesheet">
 
     <!-- Unified Design System with Cache Busting -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/design-tokens.css') }}?v={{ config.APP_VERSION }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/global-layout.css') }}?v={{ config.APP_VERSION }}">
+    <link rel="stylesheet" href="/static/css/design-tokens.css?v=2.0.0">
+    <link rel="stylesheet" href="/static/css/global-layout.css?v=2.0.0">
     <link rel="stylesheet"
-        href="{{ url_for('static', filename='css/unified-design-system.css') }}?v={{ config.APP_VERSION }}">
+        href="/static/css/unified-design-system.css?v=2.0.0">
     <link rel="stylesheet"
-        href="{{ url_for('static', filename='css/responsive-layout.css') }}?v={{ config.APP_VERSION }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}?v={{ config.APP_VERSION }}">
+        href="/static/css/responsive-layout.css?v=2.0.0">
+    <link rel="stylesheet" href="/static/css/components.css?v=2.0.0">
     <link rel="stylesheet"
-        href="{{ url_for('static', filename='css/premium-enhancements.css') }}?v={{ config.APP_VERSION }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/midnight-theme.css') }}?v={{ config.APP_VERSION }}">
+        href="/static/css/premium-enhancements.css?v=2.0.0">
+    <link rel="stylesheet" href="/static/css/midnight-theme.css?v=2.0.0">
     <link rel="stylesheet"
-        href="{{ url_for('static', filename='css/glassmorphism-production.css') }}?v={{ config.APP_VERSION }}">
+        href="/static/css/glassmorphism-production.css?v=2.0.0">
     <link rel="stylesheet"
-        href="{{ url_for('static', filename='css/toast-notifications.css') }}?v={{ config.APP_VERSION }}">
+        href="/static/css/toast-notifications.css?v=2.0.0">
     <link rel="stylesheet"
-        href="{{ url_for('static', filename='css/neon-ui-upgrade.css') }}?v={{ config.APP_VERSION }}">
+        href="/static/css/neon-ui-upgrade.css?v=2.0.0">
     <link rel="stylesheet"
-        href="{{ url_for('static', filename='css/hero-exact-clone.css') }}?v={{ config.APP_VERSION }}">
+        href="/static/css/hero-exact-clone.css?v=2.0.0">
     <link rel="stylesheet"
-        href="{{ url_for('static', filename='css/auth-pages-redesign.css') }}?v={{ config.APP_VERSION }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/spacing-fixes.css') }}?v={{ config.APP_VERSION }}">
+        href="/static/css/auth-pages-redesign.css?v=2.0.0">
+    <link rel="stylesheet" href="/static/css/spacing-fixes.css?v=2.0.0">
     <link rel="stylesheet"
-        href="{{ url_for('static', filename='css/layout-corrections.css') }}?v={{ config.APP_VERSION }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}?v={{ config.APP_VERSION }}">
+        href="/static/css/layout-corrections.css?v=2.0.0">
+    <link rel="stylesheet" href="/static/css/theme.css?v=2.0.0">
     <!-- Responsive Master Override (loaded last) -->
     <link rel="stylesheet"
-        href="{{ url_for('static', filename='css/responsive-master.css') }}?v={{ config.APP_VERSION }}">
+        href="/static/css/responsive-master.css?v=2.0.0">
     <!-- MathJax for math rendering -->
     <script>
         MathJax = {
@@ -87,11 +86,334 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
 
-    {% block extra_css %}{% endblock %}
+    
+<link rel="stylesheet" href="/static/css/arena.css?v=2.0.0">
+<meta name="robots" content="noindex, nofollow">
+
 </head>
 
 <body>
-    {% block content %}{% endblock %}
+    
+<main class="arena-main arena-quiz-main">
+    
+    <!-- Quiz Header -->
+    <header class="quiz-header">
+        <div class="quiz-header-left">
+            <span class="quiz-type-badge">DAILY</span>
+            <span class="quiz-subject">JEE · Physics</span>
+        </div>
+        <div class="quiz-timer" id="quizTimer">
+            <span class="timer-icon">⏱</span>
+            <span id="timerDisplay">10:00</span>
+        </div>
+        <div class="quiz-header-right">
+            <span id="questionCounter">1/10</span>
+            
+        </div>
+    </header>
+
+    <!-- Question Area -->
+    <div class="quiz-body" id="quizBody">
+        
+        <div class="quiz-question" data-index="0" data-qid="6"
+            style="">
+            <div class="question-number">Question 1 of 10</div>
+            <div class="question-text">A block of mass 5 kg is placed on a frictionless inclined plane of angle 30°. What is the acceleration of the block?</div>
+            <div class="quiz-options">
+                <button class="quiz-option" data-option="A" onclick="selectOption(this, 0)">
+                    <span class="option-letter">A</span>
+                    <span class="option-text">4.9 m/s²</span>
+                </button>
+                <button class="quiz-option" data-option="B" onclick="selectOption(this, 0)">
+                    <span class="option-letter">B</span>
+                    <span class="option-text">9.8 m/s²</span>
+                </button>
+                <button class="quiz-option" data-option="C" onclick="selectOption(this, 0)">
+                    <span class="option-letter">C</span>
+                    <span class="option-text">2.45 m/s²</span>
+                </button>
+                <button class="quiz-option" data-option="D" onclick="selectOption(this, 0)">
+                    <span class="option-letter">D</span>
+                    <span class="option-text">7.35 m/s²</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="quiz-question" data-index="1" data-qid="23"
+            style="display:none">
+            <div class="question-number">Question 2 of 10</div>
+            <div class="question-text">For an adiabatic process, if γ=1.4 and volume is halved, the temperature ratio T₂/T₁ is:</div>
+            <div class="quiz-options">
+                <button class="quiz-option" data-option="A" onclick="selectOption(this, 1)">
+                    <span class="option-letter">A</span>
+                    <span class="option-text">1.32</span>
+                </button>
+                <button class="quiz-option" data-option="B" onclick="selectOption(this, 1)">
+                    <span class="option-letter">B</span>
+                    <span class="option-text">2.0</span>
+                </button>
+                <button class="quiz-option" data-option="C" onclick="selectOption(this, 1)">
+                    <span class="option-letter">C</span>
+                    <span class="option-text">1.4</span>
+                </button>
+                <button class="quiz-option" data-option="D" onclick="selectOption(this, 1)">
+                    <span class="option-letter">D</span>
+                    <span class="option-text">0.76</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="quiz-question" data-index="2" data-qid="8"
+            style="display:none">
+            <div class="question-number">Question 3 of 10</div>
+            <div class="question-text">Two masses 3 kg and 5 kg are connected by a string over a pulley. Find the acceleration.</div>
+            <div class="quiz-options">
+                <button class="quiz-option" data-option="A" onclick="selectOption(this, 2)">
+                    <span class="option-letter">A</span>
+                    <span class="option-text">2.45 m/s²</span>
+                </button>
+                <button class="quiz-option" data-option="B" onclick="selectOption(this, 2)">
+                    <span class="option-letter">B</span>
+                    <span class="option-text">4.9 m/s²</span>
+                </button>
+                <button class="quiz-option" data-option="C" onclick="selectOption(this, 2)">
+                    <span class="option-letter">C</span>
+                    <span class="option-text">1.225 m/s²</span>
+                </button>
+                <button class="quiz-option" data-option="D" onclick="selectOption(this, 2)">
+                    <span class="option-letter">D</span>
+                    <span class="option-text">3.675 m/s²</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="quiz-question" data-index="3" data-qid="3"
+            style="display:none">
+            <div class="question-number">Question 4 of 10</div>
+            <div class="question-text">Two masses 3 kg and 5 kg are connected by a string over a pulley. Find the acceleration.</div>
+            <div class="quiz-options">
+                <button class="quiz-option" data-option="A" onclick="selectOption(this, 3)">
+                    <span class="option-letter">A</span>
+                    <span class="option-text">2.45 m/s²</span>
+                </button>
+                <button class="quiz-option" data-option="B" onclick="selectOption(this, 3)">
+                    <span class="option-letter">B</span>
+                    <span class="option-text">4.9 m/s²</span>
+                </button>
+                <button class="quiz-option" data-option="C" onclick="selectOption(this, 3)">
+                    <span class="option-letter">C</span>
+                    <span class="option-text">1.225 m/s²</span>
+                </button>
+                <button class="quiz-option" data-option="D" onclick="selectOption(this, 3)">
+                    <span class="option-letter">D</span>
+                    <span class="option-text">3.675 m/s²</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="quiz-question" data-index="4" data-qid="42"
+            style="display:none">
+            <div class="question-number">Question 5 of 10</div>
+            <div class="question-text">A capacitor of 10 μF is charged to 100V. The energy stored is:</div>
+            <div class="quiz-options">
+                <button class="quiz-option" data-option="A" onclick="selectOption(this, 4)">
+                    <span class="option-letter">A</span>
+                    <span class="option-text">0.05 J</span>
+                </button>
+                <button class="quiz-option" data-option="B" onclick="selectOption(this, 4)">
+                    <span class="option-letter">B</span>
+                    <span class="option-text">0.5 J</span>
+                </button>
+                <button class="quiz-option" data-option="C" onclick="selectOption(this, 4)">
+                    <span class="option-letter">C</span>
+                    <span class="option-text">0.1 J</span>
+                </button>
+                <button class="quiz-option" data-option="D" onclick="selectOption(this, 4)">
+                    <span class="option-letter">D</span>
+                    <span class="option-text">1 J</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="quiz-question" data-index="5" data-qid="22"
+            style="display:none">
+            <div class="question-number">Question 6 of 10</div>
+            <div class="question-text">The efficiency of a Carnot engine operating between 500K and 300K is:</div>
+            <div class="quiz-options">
+                <button class="quiz-option" data-option="A" onclick="selectOption(this, 5)">
+                    <span class="option-letter">A</span>
+                    <span class="option-text">40%</span>
+                </button>
+                <button class="quiz-option" data-option="B" onclick="selectOption(this, 5)">
+                    <span class="option-letter">B</span>
+                    <span class="option-text">60%</span>
+                </button>
+                <button class="quiz-option" data-option="C" onclick="selectOption(this, 5)">
+                    <span class="option-letter">C</span>
+                    <span class="option-text">50%</span>
+                </button>
+                <button class="quiz-option" data-option="D" onclick="selectOption(this, 5)">
+                    <span class="option-letter">D</span>
+                    <span class="option-text">30%</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="quiz-question" data-index="6" data-qid="44"
+            style="display:none">
+            <div class="question-number">Question 7 of 10</div>
+            <div class="question-text">The electric potential at a distance r from a point charge q is:</div>
+            <div class="quiz-options">
+                <button class="quiz-option" data-option="A" onclick="selectOption(this, 6)">
+                    <span class="option-letter">A</span>
+                    <span class="option-text">kq/r</span>
+                </button>
+                <button class="quiz-option" data-option="B" onclick="selectOption(this, 6)">
+                    <span class="option-letter">B</span>
+                    <span class="option-text">kq/r²</span>
+                </button>
+                <button class="quiz-option" data-option="C" onclick="selectOption(this, 6)">
+                    <span class="option-letter">C</span>
+                    <span class="option-text">kq²/r</span>
+                </button>
+                <button class="quiz-option" data-option="D" onclick="selectOption(this, 6)">
+                    <span class="option-letter">D</span>
+                    <span class="option-text">kqr</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="quiz-question" data-index="7" data-qid="26"
+            style="display:none">
+            <div class="question-number">Question 8 of 10</div>
+            <div class="question-text">An ideal gas at 300K is compressed isothermally to half its volume. The work done on the gas (n=1 mol) is:</div>
+            <div class="quiz-options">
+                <button class="quiz-option" data-option="A" onclick="selectOption(this, 7)">
+                    <span class="option-letter">A</span>
+                    <span class="option-text">1728 J</span>
+                </button>
+                <button class="quiz-option" data-option="B" onclick="selectOption(this, 7)">
+                    <span class="option-letter">B</span>
+                    <span class="option-text">2078 J</span>
+                </button>
+                <button class="quiz-option" data-option="C" onclick="selectOption(this, 7)">
+                    <span class="option-letter">C</span>
+                    <span class="option-text">862 J</span>
+                </button>
+                <button class="quiz-option" data-option="D" onclick="selectOption(this, 7)">
+                    <span class="option-letter">D</span>
+                    <span class="option-text">3456 J</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="quiz-question" data-index="8" data-qid="14"
+            style="display:none">
+            <div class="question-number">Question 9 of 10</div>
+            <div class="question-text">A car moves in a circle of radius 50 m at 20 m/s. What is the centripetal acceleration?</div>
+            <div class="quiz-options">
+                <button class="quiz-option" data-option="A" onclick="selectOption(this, 8)">
+                    <span class="option-letter">A</span>
+                    <span class="option-text">8 m/s²</span>
+                </button>
+                <button class="quiz-option" data-option="B" onclick="selectOption(this, 8)">
+                    <span class="option-letter">B</span>
+                    <span class="option-text">4 m/s²</span>
+                </button>
+                <button class="quiz-option" data-option="C" onclick="selectOption(this, 8)">
+                    <span class="option-letter">C</span>
+                    <span class="option-text">10 m/s²</span>
+                </button>
+                <button class="quiz-option" data-option="D" onclick="selectOption(this, 8)">
+                    <span class="option-letter">D</span>
+                    <span class="option-text">2 m/s²</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="quiz-question" data-index="9" data-qid="5"
+            style="display:none">
+            <div class="question-number">Question 10 of 10</div>
+            <div class="question-text">What is the work done by a force of 10 N moving an object 5 m at 60° to the displacement?</div>
+            <div class="quiz-options">
+                <button class="quiz-option" data-option="A" onclick="selectOption(this, 9)">
+                    <span class="option-letter">A</span>
+                    <span class="option-text">25 J</span>
+                </button>
+                <button class="quiz-option" data-option="B" onclick="selectOption(this, 9)">
+                    <span class="option-letter">B</span>
+                    <span class="option-text">50 J</span>
+                </button>
+                <button class="quiz-option" data-option="C" onclick="selectOption(this, 9)">
+                    <span class="option-letter">C</span>
+                    <span class="option-text">43.3 J</span>
+                </button>
+                <button class="quiz-option" data-option="D" onclick="selectOption(this, 9)">
+                    <span class="option-letter">D</span>
+                    <span class="option-text">8.66 J</span>
+                </button>
+            </div>
+        </div>
+        
+    </div>
+
+    <!-- Start Overlay -->
+    <div id="startOverlay" class="quiz-overlay">
+        <div class="quiz-start-card">
+            <div class="quiz-icon">📝</div>
+            <h2>Ready to start?</h2>
+            <p>You have <strong>10 minutes</strong> to answer <strong>10
+                    questions</strong>.</p>
+            <button class="arena-btn arena-btn-submit" onclick="startQuiz()">Start Quiz</button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="quiz-nav">
+        <button class="arena-btn arena-btn-nav" id="prevBtn" onclick="prevQuestion()" disabled>← Previous</button>
+        <div class="quiz-dots" id="quizDots">
+            
+            <span class="quiz-dot active" onclick="goToQuestion(0)">1</span>
+            
+            <span class="quiz-dot " onclick="goToQuestion(1)">2</span>
+            
+            <span class="quiz-dot " onclick="goToQuestion(2)">3</span>
+            
+            <span class="quiz-dot " onclick="goToQuestion(3)">4</span>
+            
+            <span class="quiz-dot " onclick="goToQuestion(4)">5</span>
+            
+            <span class="quiz-dot " onclick="goToQuestion(5)">6</span>
+            
+            <span class="quiz-dot " onclick="goToQuestion(6)">7</span>
+            
+            <span class="quiz-dot " onclick="goToQuestion(7)">8</span>
+            
+            <span class="quiz-dot " onclick="goToQuestion(8)">9</span>
+            
+            <span class="quiz-dot " onclick="goToQuestion(9)">10</span>
+            
+        </div>
+        <button class="arena-btn arena-btn-nav" id="nextBtn" onclick="nextQuestion()">Next →</button>
+        <button class="arena-btn arena-btn-submit" id="submitBtn" onclick="submitQuiz()" style="display:none">
+            🚀 Submit Quiz
+        </button>
+    </div>
+    
+</main>
+
+<script>
+    window.QUIZ_DATA = {
+        questions: [{"correct_option": "A", "created_at": "2026-02-18 20:40:53", "difficulty": "Medium", "estimated_time_seconds": 60, "exam": "JEE", "explanation": "On a frictionless incline, a = g sin \u03b8 = 9.8 \u00d7 sin 30\u00b0 = 9.8 \u00d7 0.5 = 4.9 m/s\u00b2", "id": 6, "option_a": "4.9 m/s\u00b2", "option_b": "9.8 m/s\u00b2", "option_c": "2.45 m/s\u00b2", "option_d": "7.35 m/s\u00b2", "question_text": "A block of mass 5 kg is placed on a frictionless inclined plane of angle 30\u00b0. What is the acceleration of the block?", "source_tag": "SEED", "subject": "Physics", "topic_tag": "Mechanics"}, {"correct_option": "A", "created_at": "2026-02-18 20:40:53", "difficulty": "Medium", "estimated_time_seconds": 90, "exam": "JEE", "explanation": "T\u2082/T\u2081 = (V\u2081/V\u2082)^(\u03b3-1) = 2^0.4 \u2248 1.32", "id": 23, "option_a": "1.32", "option_b": "2.0", "option_c": "1.4", "option_d": "0.76", "question_text": "For an adiabatic process, if \u03b3=1.4 and volume is halved, the temperature ratio T\u2082/T\u2081 is:", "source_tag": "SEED", "subject": "Physics", "topic_tag": "Thermodynamics"}, {"correct_option": "A", "created_at": "2026-02-18 20:40:53", "difficulty": "Medium", "estimated_time_seconds": 75, "exam": "JEE", "explanation": "a = (m\u2082-m\u2081)g/(m\u2081+m\u2082) = 2\u00d79.8/8 = 2.45 m/s\u00b2", "id": 8, "option_a": "2.45 m/s\u00b2", "option_b": "4.9 m/s\u00b2", "option_c": "1.225 m/s\u00b2", "option_d": "3.675 m/s\u00b2", "question_text": "Two masses 3 kg and 5 kg are connected by a string over a pulley. Find the acceleration.", "source_tag": "SEED", "subject": "Physics", "topic_tag": "Mechanics"}, {"correct_option": "A", "created_at": "2026-02-18 20:40:53", "difficulty": "Easy", "estimated_time_seconds": 75, "exam": "JEE", "explanation": "a = (m\u2082-m\u2081)g/(m\u2081+m\u2082) = 2\u00d79.8/8 = 2.45 m/s\u00b2", "id": 3, "option_a": "2.45 m/s\u00b2", "option_b": "4.9 m/s\u00b2", "option_c": "1.225 m/s\u00b2", "option_d": "3.675 m/s\u00b2", "question_text": "Two masses 3 kg and 5 kg are connected by a string over a pulley. Find the acceleration.", "source_tag": "SEED", "subject": "Physics", "topic_tag": "Mechanics"}, {"correct_option": "A", "created_at": "2026-02-18 20:40:53", "difficulty": "Hard", "estimated_time_seconds": 60, "exam": "JEE", "explanation": "E = \u00bdCV\u00b2 = 0.5\u00d710\u00d710\u207b\u2076\u00d710000 = 0.05 J", "id": 42, "option_a": "0.05 J", "option_b": "0.5 J", "option_c": "0.1 J", "option_d": "1 J", "question_text": "A capacitor of 10 \u03bcF is charged to 100V. The energy stored is:", "source_tag": "SEED", "subject": "Physics", "topic_tag": "Electrostatics"}, {"correct_option": "A", "created_at": "2026-02-18 20:40:53", "difficulty": "Medium", "estimated_time_seconds": 60, "exam": "JEE", "explanation": "\u03b7 = 1 - T_cold/T_hot = 1 - 300/500 = 0.4 = 40%", "id": 22, "option_a": "40%", "option_b": "60%", "option_c": "50%", "option_d": "30%", "question_text": "The efficiency of a Carnot engine operating between 500K and 300K is:", "source_tag": "SEED", "subject": "Physics", "topic_tag": "Thermodynamics"}, {"correct_option": "A", "created_at": "2026-02-18 20:40:53", "difficulty": "Hard", "estimated_time_seconds": 30, "exam": "JEE", "explanation": "V = kq/r is the electric potential due to a point charge", "id": 44, "option_a": "kq/r", "option_b": "kq/r\u00b2", "option_c": "kq\u00b2/r", "option_d": "kqr", "question_text": "The electric potential at a distance r from a point charge q is:", "source_tag": "SEED", "subject": "Physics", "topic_tag": "Electrostatics"}, {"correct_option": "A", "created_at": "2026-02-18 20:40:53", "difficulty": "Hard", "estimated_time_seconds": 90, "exam": "JEE", "explanation": "W = nRT ln(V\u2081/V\u2082) = 1\u00d78.314\u00d7300\u00d7ln(2) \u2248 1728 J", "id": 26, "option_a": "1728 J", "option_b": "2078 J", "option_c": "862 J", "option_d": "3456 J", "question_text": "An ideal gas at 300K is compressed isothermally to half its volume. The work done on the gas (n=1 mol) is:", "source_tag": "SEED", "subject": "Physics", "topic_tag": "Thermodynamics"}, {"correct_option": "A", "created_at": "2026-02-18 20:40:53", "difficulty": "Hard", "estimated_time_seconds": 60, "exam": "JEE", "explanation": "a = v\u00b2/r = 400/50 = 8 m/s\u00b2", "id": 14, "option_a": "8 m/s\u00b2", "option_b": "4 m/s\u00b2", "option_c": "10 m/s\u00b2", "option_d": "2 m/s\u00b2", "question_text": "A car moves in a circle of radius 50 m at 20 m/s. What is the centripetal acceleration?", "source_tag": "SEED", "subject": "Physics", "topic_tag": "Mechanics"}, {"correct_option": "A", "created_at": "2026-02-18 20:40:53", "difficulty": "Easy", "estimated_time_seconds": 60, "exam": "JEE", "explanation": "W = Fd cos \u03b8 = 10\u00d75\u00d7cos60\u00b0 = 50\u00d70.5 = 25 J", "id": 5, "option_a": "25 J", "option_b": "50 J", "option_c": "43.3 J", "option_d": "8.66 J", "question_text": "What is the work done by a force of 10 N moving an object 5 m at 60\u00b0 to the displacement?", "source_tag": "SEED", "subject": "Physics", "topic_tag": "Mechanics"}],
+    quizType: "daily",
+    exam: "JEE",
+    subject: "Physics",
+    timeLimit: 600,
+    totalQuestions: 10
+    };
+</script>
+<script src="/static/js/arena_quiz.js?v=2.0.0"></script>
+
 
     <!-- Settings Modal -->
     <div class="settings-modal" id="settingsModal">
@@ -176,20 +498,20 @@
     </div>
 
     <!-- Toast Notification System -->
-    <script src="{{ url_for('static', filename='js/toast-notifications.js') }}?v={{ config.APP_VERSION }}"></script>
+    <script src="/static/js/toast-notifications.js?v=2.0.0"></script>
 
     <!-- Sidebar Toggle & UI Enhancements -->
-    <script src="{{ url_for('static', filename='js/sidebar-toggle.js') }}?v={{ config.APP_VERSION }}"></script>
+    <script src="/static/js/sidebar-toggle.js?v=2.0.0"></script>
 
     <!-- Service Worker -->
-    <script src="{{ url_for('static', filename='js/sw-register.js') }}?v={{ config.APP_VERSION }}"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}?v={{ config.APP_VERSION }}"></script>
-    <script src="{{ url_for('static', filename='js/premium-features.js') }}?v={{ config.APP_VERSION }}"></script>
-    <script src="{{ url_for('static', filename='js/ai-features.js') }}?v={{ config.APP_VERSION }}"></script>
-    <script src="{{ url_for('static', filename='js/panel-manager.js') }}?v={{ config.APP_VERSION }}"></script>
+    <script src="/static/js/sw-register.js?v=2.0.0"></script>
+    <script src="/static/js/main.js?v=2.0.0"></script>
+    <script src="/static/js/premium-features.js?v=2.0.0"></script>
+    <script src="/static/js/ai-features.js?v=2.0.0"></script>
+    <script src="/static/js/panel-manager.js?v=2.0.0"></script>
 
     <!-- Speed Widget -->
-    <script src="{{ url_for('static', filename='js/speed-widget.js') }}?v={{ config.APP_VERSION }}"></script>
+    <script src="/static/js/speed-widget.js?v=2.0.0"></script>
     <script>
         const themeToggle = {
             themes: ['futuristic', 'dark', 'light'],
@@ -667,7 +989,7 @@
                 <div class="settings-section">
                     <h3 class="settings-section-title">Accessibility</h3>
                     <div class="setting-item">
-                        <label for="fontSizeSelect">Font Size</label>
+                        <label>Font Size</label>
                         <select class="setting-select" id="fontSizeSelect">
                             <option value="normal">Normal</option>
                             <option value="large">Large</option>
@@ -676,8 +998,8 @@
                     </div>
                     <div class="setting-item">
                         <div class="setting-toggle">
-                            <label for="reducedMotion2">Reduced Motion</label>
-                            <input type="checkbox" class="toggle-switch" id="reducedMotion2">
+                            <label>Reduced Motion</label>
+                            <input type="checkbox" class="toggle-switch" id="reducedMotion">
                         </div>
                     </div>
                 </div>
@@ -686,8 +1008,8 @@
                 <div class="settings-section">
                     <h3 class="settings-section-title">AI Preferences</h3>
                     <div class="setting-item">
-                        <label for="aiVerbosity2">Verbosity</label>
-                        <select class="setting-select" id="aiVerbosity2">
+                        <label>Verbosity</label>
+                        <select class="setting-select" id="aiVerbosity">
                             <option value="balanced">Balanced</option>
                             <option value="concise">Concise</option>
                             <option value="detailed">Detailed</option>
@@ -695,8 +1017,8 @@
                     </div>
                     <div class="setting-item">
                         <div class="setting-toggle">
-                            <label for="highContrast2">High Contrast</label>
-                            <input type="checkbox" class="toggle-switch" id="highContrast2">
+                            <label>High Contrast</label>
+                            <input type="checkbox" class="toggle-switch" id="highContrast">
                         </div>
                     </div>
                 </div>
@@ -706,7 +1028,7 @@
                     <h3 class="settings-section-title">Network</h3>
                     <div class="setting-item">
                         <div class="setting-toggle">
-                            <span>Connection Speed</span>
+                            <label>Connection Speed</label>
                             <span id="networkSpeedIndicator"
                                 style="font-weight:bold; color:var(--primary);">Checking...</span>
                         </div>
@@ -720,9 +1042,9 @@
     </div>
 
     <!-- Toast Notifications -->
-    <script src="{{ url_for('static', filename='js/toast-notifications.js') }}?v={{ config.APP_VERSION }}"></script>
+    <script src="/static/js/toast-notifications.js?v=2.0.0"></script>
 
-    {% block extra_js %}{% endblock %}
+    
 </body>
 
 </html>

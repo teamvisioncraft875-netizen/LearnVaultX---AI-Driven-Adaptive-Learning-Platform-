@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+
+{% block title %}Arena Lobby - KyKnoX Game | LearnVaultX{% endblock %}
+
+{% block meta_description %}Gamified Exam Arena - Complete missions, earn XP, and level up your exam readiness.{%
+endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/arena.css') }}?v={{ config.get('APP_VERSION','2') }}">
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='css/arena_mission_map.css') }}?v={{ config.get('APP_VERSION','3') }}">
+<style>
+    /* Critical Fallback Styles */
+    .arena-lobby-main {
+        max-width: 1400px;
+        margin: 0 auto;
+        color: white;
+        min-height: 100vh;
+    }
+
+    .arena-game-grid {
+        display: grid;
+        grid-template-columns: 280px 1fr 280px;
+        gap: 2rem;
+    }
+
+    @media (max-width: 1024px) {
+        .arena-game-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="arena-lobby-main">
+
+    <!-- 1. HEADS UP DISPLAY (HUD) -->
+    <div class="arena-hud">
+        <div class="hud-profile">
+            <div class="hud-level-circle">
+                <span class="hud-level-num">{{ level|default(1) }}</span>
+                <svg viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" class="hud-track"></circle>
+                    <circle cx="50" cy="50" r="45" class="hud-progress" stroke-dasharray="283"
+                        stroke-dashoffset="{{ 283 - (283 * (progress_percent|default(0)) / 100) }}"></circle>
+                </svg>
+            </div>
+            <div class="hud-info">
+                <div class="hud-name">{{ (profile.exam if profile else 'Player')|default('Player') }} Agent</div>
+                <div class="hud-xp-text">{{ (rank.xp_total if rank else 0)|default(0) }} XP / {{ next_xp|default(100) }}
+                    XP</div>
+            </div>
+        </div>
+
+        <div class="hud-stats">
+            <div class="hud-stat-item" title="Daily Streak">
+                <span class="hud-icon">🔥</span>
+                <span class="hud-val">{{ (rank.streak_days if rank else 0)|default(0) }}</span>
+            </div>
+            <div class="hud-stat-item" title="Rank">
+                <span class="hud-icon">🏆</span>
+                <span class="hud-val {{ (rank.rank_name if rank else 'Bronze')|lower }}">{{ (rank.rank_name if rank else
+                    'Bronze') }}</span>
+            </div>
+            <div class="hud-stat-item" title="Readiness">
+                <span class="hud-icon">📊</span>
+                <span class="hud-val">{{ readiness|default(0)|int }}%</span>
+            </div>
+        </div>
+
+        <div class="hud-actions">
+            <a href="/student/dashboard" class="hud-btn-back">Exit Arena</a>
+        </div>
+    </div>
+
+    <div class="arena-game-grid">
+
+        <!-- 2. LEFT SIDEBAR (Profile & Readiness) -->
+        <aside class="arena-sidebar sidebar-left">
+            <!-- Exam Profile -->
+            <div class="game-card profile-mini-card">
+                <h3>Mission Profile</h3>
+                <div class="profile-summary">
+                    <div class="p-row"><span>Exam:</span> <strong>{{ (profile.exam if profile else 'JEE')|default('JEE')
+                            }}</strong></div>
+                    <div class="p-row"><span>Subject:</span> <strong>{{ (profile.subject if profile else
+                            'Physics')|default('Physics') }}</strong></div>
+                </div>
+                <button class="btn-micro" onclick="openProfileModal()">⚙️ Change</button>
+            </div>
+
+            <!-- Readiness Radar/Circle -->
+            <div class="game-card readiness-card">
+                <h3>Exam Readiness</h3>
+                <div class="readiness-visual">
+                    <div class="r-circle" style="--p:{{ readiness|default(0) }}">
+                        <span>{{ readiness|default(0)|int }}%</span>
+                    </div>
+                </div>
+                <div class="r-analysis">
+                    <div class="r-tag strong">💪 {{ strongest|default('None') }}</div>
+                    <div class="r-tag weak">⚠️ {{ weakest|default('None') }}</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 3. CENTER MAP — Glowing Arrow Mission Flow -->
+        <section class="arena-map-container">
+            {% if mission_map|default([])|length > 0 %}
+            <div class="mission-flow">
+
+                {% for mission in mission_map %}
+                {# Arrow connector BEFORE each node (except the first) #}
+                {% if not loop.first %}
+                <div class="mission-arrow" data-from="{{ mission_map[loop.index0 - 1].status }}"
+                    data-to="{{ mission.status }}">
+                    <div class="arrow-line"></div>
+                    <div class="arrow-head"></div>
+                </div>
+                {% endif %}
+
+                {# Mission Node #}
+                <div class="mission-step">
+                    <div class="mission-node {{ mission.status }}"
+                        onclick="handleMissionClick('{{ mission.id }}', '{{ mission.status }}', '{{ mission.type }}')"
+                        title="{{ mission.title }}">
+                        <div class="node-icon">{{ mission.icon }}</div>
+                        <div class="node-stars">
+                            {% for i in range(3) %}
+                            <span class="star {{ 'filled' if i < (mission.stars|default(0)) else '' }}">★</span>
+                            {% endfor %}
+                        </div>
+                        {% if mission.status == 'locked' %}
+                        <div class="lock-overlay">🔒</div>
+                        {% endif %}
+                        {% if mission.status == 'completed' %}
+                        <div class="check-badge">✔</div>
+                        {% endif %}
+                    </div>
+                    <div class="node-label">{{ mission.title }}</div>
+                </div>
+                {% endfor %}
+
+            </div>
+            {% else %}
+            <div
+                style="display:flex; align-items:center; justify-content:center; min-height:400px; text-align:center; flex-direction:column; color:#8892b0;">
+                <div style="font-size:3rem; margin-bottom:1rem; opacity:0.5;">🗺️</div>
+                <h3 style="color:#e0e6f0; margin-bottom:0.5rem;">No Missions Found</h3>
+                <p style="font-size:0.9rem;">Set up your exam profile to unlock your mission path.</p>
+                {% if error_msg|default('') %}
+                <div
+                    style="margin-top:1rem; padding:0.5rem 1rem; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); border-radius:8px; color:#ef4444; font-family:monospace; font-size:0.8rem; max-width:400px;">
+                    {{ error_msg }}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <div class="map-info-toast">
+                <span class="info-icon">💡</span>
+                <span id="mapMessage">Select a mission to start your journey.</span>
+            </div>
+        </section>
+
+        <!-- 4. RIGHT SIDEBAR (Leaderboard & Achievements) -->
+        <aside class="arena-sidebar sidebar-right">
+            <!-- Analytics Link Card -->
+            <div class="game-card analytics-card" onclick="window.location.href='{{ url_for('arena.progress_view') }}'"
+                style="cursor:pointer; background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(108, 93, 211, 0.2) 100%); border-color: rgba(108, 93, 211, 0.3);">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3>📊 Performance</h3>
+                    <span style="font-size:1.2rem;">➔</span>
+                </div>
+                <p style="color:#ccc; font-size:0.9rem; margin-top:0.5rem;">View your score trends and speed analysis.
+                </p>
+            </div>
+
+            <!-- Achievements Micro Grid -->
+            <div class="game-card achievements-card">
+                <h3>Recent Badges</h3>
+                <div class="badge-grid">
+                    {% for badge in achievements|default([]) %}
+                    <div class="badge-item" title="{{ badge.title }}: {{ badge.description }}">
+                        <span class="badge-icon">{{ badge.icon }}</span>
+                    </div>
+                    {% else %}
+                    <p class="empty-text">No badges yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Mini Leaderboard -->
+            <div class="game-card leaderboard-card" id="leaderboardContainer">
+                <h3>Top Agents</h3>
+                <div class="loader-spinner"></div>
+                <!-- Populated via JS -->
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- Modals -->
+    <div id="missionModal" class="game-modal">
+        <div class="modal-content glass-panel">
+            <span class="close-modal" onclick="closeModal('missionModal')">&times;</span>
+            <h2 id="modalTitle">Mission Title</h2>
+            <p id="modalDesc">Mission description goes here.</p>
+            <div class="modal-rewards">
+                <span class="reward-tag">XP: <span id="modalXP">50</span></span>
+                <span class="reward-tag">Time: <span id="modalTime">10m</span></span>
+            </div>
+            <a href="#" id="modalStartBtn" class="arena-btn arena-btn-start">Start Mission</a>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="game-modal">
+        <div class="modal-content glass-panel">
+            <span class="close-modal" onclick="closeModal('profileModal')">&times;</span>
+            <h2>Configure Profile</h2>
+            <div class="arena-form-group">
+                <label>Exam</label>
+                <select id="modalExam" onchange="updateSubjectDropdown()">
+                    <option value="JEE">JEE</option>
+                    <option value="NEET">NEET</option>
+                    <option value="OJEE">OJEE</option>
+                    <option value="UPSC">UPSC</option>
+                </select>
+            </div>
+            <div class="arena-form-group">
+                <label>Subject</label>
+                <select id="modalSubject">
+                    <!-- Populated dynamically by JS -->
+                </select>
+            </div>
+            <button class="arena-btn arena-btn-save" onclick="saveProfileFromModal()">Save &amp; Reload</button>
+        </div>
+    </div>
+
+</main>
+
+<script src="{{ url_for('static', filename='js/arena_dashboard.js') }}?v={{ config.get('APP_VERSION','3') }}"></script>
+<script
+    src="{{ url_for('static', filename='js/arena_mission_map.js') }}?v={{ config.get('APP_VERSION','3') }}"></script>
+<script>
+    // ── Exam → Subject Dynamic Dropdown ──────────────────────────
+    const EXAM_SUBJECT_MAP_FALLBACK = {
+        'JEE': ['Physics', 'Chemistry', 'Mathematics'],
+        'NEET': ['Physics', 'Chemistry', 'Biology'],
+        'OJEE': ['Physics', 'Chemistry', 'Mathematics', 'Biology', 'Logical Reasoning'],
+        'UPSC': ['General Studies', 'Indian Polity', 'Indian History', 'Geography', 'Economy', 'Environment', 'Current Affairs']
+    };
+    let EXAM_SUBJECT_MAP = { ...EXAM_SUBJECT_MAP_FALLBACK };
+
+    // Fetch map from backend (stays in sync with server)
+    fetch('/arena/api/exam_subjects')
+        .then(r => r.json())
+        .then(d => {
+            if (d.success && d.data) EXAM_SUBJECT_MAP = d.data;
+            initProfileDropdowns();
+        })
+        .catch(() => initProfileDropdowns());
+
+    function initProfileDropdowns() {
+        const examSelect = document.getElementById('modalExam');
+        const currentExam = '{{ (profile.exam if profile else "JEE")|default("JEE") }}';
+        if (examSelect) {
+            examSelect.value = currentExam;
+            updateSubjectDropdown();
+        }
+    }
+
+    function updateSubjectDropdown() {
+        const examSelect = document.getElementById('modalExam');
+        const subjectSelect = document.getElementById('modalSubject');
+        if (!examSelect || !subjectSelect) return;
+
+        const exam = examSelect.value;
+        const subjects = EXAM_SUBJECT_MAP[exam] || ['Physics'];
+        const currentSubject = '{{ (profile.subject if profile else "Physics")|default("Physics") }}';
+
+        subjectSelect.innerHTML = '';
+        subjects.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s;
+            opt.textContent = s;
+            if (s === currentSubject) opt.selected = true;
+            subjectSelect.appendChild(opt);
+        });
+    }
+</script>
+{% endblock %}

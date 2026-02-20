@@ -361,11 +361,19 @@
         if (result.question_results && result.question_results.length > 0) {
             html += '<div style="margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--border-color);">';
             html += '<h4 style="margin-bottom: var(--space-4); color: var(--text-primary);">Detailed Results</h4>';
+
+            // Attempt-gated messaging
+            if (!result.show_answers) {
+                html += `<div style="margin-bottom: var(--space-4); padding: var(--space-3); background: rgba(96, 165, 250, 0.1); border: 1px solid rgba(96, 165, 250, 0.3); border-radius: var(--radius-md); color: #60a5fa;">
+                    <strong>\uD83D\uDD12 Attempt ${result.attempt_number || '?'} of 3</strong> — Correct answers and explanations will be revealed on your 3rd attempt.
+                </div>`;
+            }
+
             html += '<div style="display: flex; flex-direction: column; gap: var(--space-4); max-height: 300px; overflow-y: auto; padding-right: var(--space-2); text-align: left;">';
 
             result.question_results.forEach((q, index) => {
                 const statusColor = q.is_correct ? 'var(--accent-success)' : 'var(--accent-warning)';
-                const icon = q.is_correct ? '✅' : '❌';
+                const icon = q.is_correct ? '\u2705' : '\u274C';
 
                 html += `
                     <div style="background: var(--bg-tertiary); padding: var(--space-3); border-radius: var(--radius-md); border-left: 4px solid ${statusColor};">
@@ -374,7 +382,7 @@
                         </div>
                         <div style="font-size: var(--text-sm); color: var(--text-secondary);">
                             <div style="margin-bottom: 4px;">Your Answer: <span style="color: ${q.is_correct ? 'var(--accent-success)' : 'var(--accent-warning)'}; font-weight: 500;">${escapeHtml(q.user_answer)} ${icon}</span></div>
-                            ${!q.is_correct ? `<div style="color: var(--text-muted);">Correct Answer: <span style="color: var(--accent-success); font-weight: 500;">${escapeHtml(q.correct_answer)}</span></div>` : ''}
+                            ${(result.show_answers && !q.is_correct && q.correct_answer) ? `<div style="color: var(--text-muted);">Correct Answer: <span style="color: var(--accent-success); font-weight: 500;">${escapeHtml(q.correct_answer)}</span></div>` : ''}
                         </div>
                     </div>
                 `;
@@ -402,8 +410,8 @@
 
         insightsDiv.innerHTML = html;
 
-        // Render KyKnoX Mistake Notes (after the main insights)
-        if (result.mistake_notes && result.mistake_notes.length > 0) {
+        // Render KyKnoX Mistake Notes (ONLY on attempt 3+ when show_answers is true)
+        if (result.show_answers && result.mistake_notes && result.mistake_notes.length > 0) {
             let notesHtml = `
                 <div style="margin-top: var(--space-6); padding-top: var(--space-4); border-top: 2px solid rgba(139, 92, 246, 0.3);">
                     <h3 style="font-size: var(--text-lg); margin-bottom: var(--space-4); color: #a78bfa; display: flex; align-items: center; gap: 8px;">

@@ -78,13 +78,12 @@ class AdaptiveQuizGenerator:
                 (student_id, class_id)
             )
             if existing:
-                self.db.execute_query(
+                self.db.execute_update(
                     '''UPDATE student_adaptive_profile
                        SET current_level = ?, weak_topics_json = ?, last_score = ?, updated_at = ?
                        WHERE student_id = ? AND class_id = ?''',
                     (new_level, json.dumps(weak_topics), score, datetime.now().isoformat(),
-                     student_id, class_id),
-                    fetch=False
+                     student_id, class_id)
                 )
             else:
                 self.db.execute_insert(

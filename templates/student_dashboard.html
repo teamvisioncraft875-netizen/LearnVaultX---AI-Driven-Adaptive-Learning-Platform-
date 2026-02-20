@@ -90,7 +90,7 @@ recommendations.{% endblock %}
     <main class="stud-center" id="studCenter">
         <!-- Mobile Header -->
         <div class="stud-mobile-head">
-            <button class="mob-sidebar-btn" onclick="toggleStudSidebar()">☰</button>
+            <button class="mob-sidebar-btn" onclick="toggleMobileSidebar()">☰</button>
             <span class="mob-brand-text">LearnVaultX</span>
             <button class="mob-ai-btn" onclick="toggleStudAI()">🤖</button>
         </div>
@@ -397,7 +397,7 @@ recommendations.{% endblock %}
     </button>
 
     <!-- Mobile Overlay -->
-    <div class="stud-overlay" id="studOverlay" onclick="closeAllStudMobile()"></div>
+    <div class="stud-overlay" id="studOverlay" onclick="closeStudMobileOverlay()"></div>
 
     <!-- Toast Notification -->
     <div class="toast-notification" id="toastNotification"></div>
@@ -405,12 +405,39 @@ recommendations.{% endblock %}
 
 <script>
     window.__STUDENT_CLASSES__ = {{ classes | tojson }};
+
+    // Close mobile sidebar overlay cleanly
+    function closeStudMobileOverlay() {
+        var s = document.getElementById('studSidebar');
+        if (s) { s.classList.remove('mobile-show', 'active', 'mobile-open'); }
+        var o = document.getElementById('studOverlay');
+        if (o) { o.classList.remove('show', 'active'); o.style.display = ''; }
+    }
 </script>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/learning_path.css') }}?v={{ config.APP_VERSION }}">
 <script src="{{ url_for('static', filename='js/learning_path.js') }}?v={{ config.APP_VERSION }}"></script>
 <script src="{{ url_for('static', filename='js/student-dashboard.js') }}?v={{ config.APP_VERSION }}"></script>
 
 <style>
+    /* ============================================
+   MOBILE OVERLAY FIX
+   ============================================ */
+
+    /* Overlay: hidden by default, only shown on mobile sidebar open */
+    .stud-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: 900;
+        cursor: pointer;
+    }
+
+    .stud-overlay.show,
+    .stud-overlay.active {
+        display: block !important;
+    }
+
     /* ============================================
    STUDENT DASHBOARD - FINAL POLISHED
    ============================================ */
@@ -1500,20 +1527,17 @@ recommendations.{% endblock %}
         }
 
         .stud-overlay {
-            display: block;
+            display: none;
             position: fixed;
             inset: 0;
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(4px);
             z-index: 180;
-            opacity: 0;
-            pointer-events: none;
             transition: opacity 0.3s;
         }
 
         .stud-overlay.show {
-            opacity: 1;
-            pointer-events: all;
+            display: block;
         }
 
         .quick-act-grid {

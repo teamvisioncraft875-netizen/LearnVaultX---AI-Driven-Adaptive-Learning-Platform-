@@ -173,14 +173,55 @@ function renderNextAction(action) {
     }
 }
 
-function startModuleQuiz(moduleId, moduleTitle, isLocked, quizId) {
+async function startModuleQuiz(moduleId, moduleTitle, isLocked, quizId) {
     if (isLocked) return;
 
     if (quizId) {
         // Redirect to quiz page
-        window.location.href = `/student/quiz/${quizId}`;
+        window.location.href = `/quiz/${quizId}`;
     } else {
-        alert("No quiz available for this module yet.");
+        // No quiz linked to this module — generate one via the adaptive quiz API
+        const select = document.getElementById('lpSubjectSelect');
+        const classId = select ? select.value : null;
+        if (!classId) {
+            alert('Could not determine the class. Please try again.');
+            return;
+        }
+
+        // Show loading state on the clicked button
+        const btn = event && event.target ? event.target.closest('button') : null;
+        const origText = btn ? btn.textContent : '';
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = 'Generating Quiz...';
+        }
+
+        try {
+            const response = await fetch('/api/generate-adaptive-quiz', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ class_id: classId })
+            });
+            const data = await response.json();
+
+            if (data.success && data.data && data.data.quiz_id) {
+                window.location.href = `/quiz/${data.data.quiz_id}`;
+            } else {
+                alert(data.error || 'Failed to generate quiz. Please try again.');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = origText;
+                }
+            }
+        } catch (error) {
+            console.error('Quiz generation error:', error);
+            alert('Network error. Please try again.');
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = origText;
+            }
+        }
     }
 }
 

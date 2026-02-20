@@ -35,14 +35,10 @@
         const sidebar = getSidebar();
         const overlay = getOverlay();
         if (!sidebar) return;
-        const openClass = sidebar.classList.contains('mobile-show') ? 'mobile-show' : 'active';
-        const willOpen = !sidebar.classList.contains(openClass);
-        sidebar.classList.toggle(openClass, willOpen);
-        sidebar.classList.toggle('mobile-open', willOpen);
+        const willOpen = !sidebar.classList.contains('mobile-show');
+        sidebar.classList.toggle('mobile-show', willOpen);
         if (overlay) {
             overlay.classList.toggle('show', willOpen);
-            overlay.classList.toggle('active', willOpen);
-            overlay.style.display = willOpen ? 'block' : '';
         }
     }
 
@@ -73,10 +69,8 @@
         overlay.dataset.sidebarBound = 'true';
         overlay.addEventListener('click', () => {
             const sidebar = getSidebar();
-            if (!sidebar) return;
-            sidebar.classList.remove('mobile-show', 'active', 'mobile-open');
+            if (sidebar) { sidebar.classList.remove('mobile-show', 'active', 'mobile-open'); }
             overlay.classList.remove('show', 'active');
-            overlay.style.display = '';
             document.body.classList.remove('sidebar-mobile-open');
         });
     }

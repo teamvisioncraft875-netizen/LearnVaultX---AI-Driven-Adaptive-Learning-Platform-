@@ -90,6 +90,99 @@
             transform: translateY(-5px) translateX(-50%);
         }
     }
+
+    /* ============================================
+       HOMEPAGE MOBILE RESPONSIVE
+       ============================================ */
+    @media (max-width: 768px) {
+
+        /* Navbar: tighter padding, keep both links visible */
+        nav[style*="position: absolute"] {
+            padding: 16px 18px !important;
+            flex-wrap: nowrap !important;
+        }
+
+        /* Brand text: slightly smaller on mobile */
+        nav[style*="position: absolute"]>div:first-child {
+            font-size: 18px !important;
+            gap: 8px !important;
+        }
+
+        nav[style*="position: absolute"]>div:first-child>span {
+            width: 26px !important;
+            height: 26px !important;
+            font-size: 14px !important;
+            flex-shrink: 0 !important;
+        }
+
+        /* Nav buttons: smaller padding on mobile */
+        nav[style*="position: absolute"] a {
+            padding: 8px 14px !important;
+            font-size: 13px !important;
+        }
+
+        /* Nav links container: tighter gap */
+        nav[style*="position: absolute"]>div:last-child {
+            gap: 8px !important;
+        }
+
+        /* Hero title: scale down significantly */
+        .hero-title {
+            font-size: 2.2rem !important;
+            letter-spacing: -1px !important;
+            margin-bottom: 16px !important;
+        }
+
+        /* Hero section: less top padding on mobile */
+        section[style*="min-height: 100vh"] {
+            padding: 100px 16px 60px !important;
+        }
+
+        /* Hero description text: smaller */
+        section[style*="min-height: 100vh"] p.text-muted {
+            font-size: 15px !important;
+        }
+
+        /* Hero CTA buttons: stack vertically on small screens */
+        section[style*="min-height: 100vh"]>div>div[style*="display: flex; gap: 16px"] {
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 12px !important;
+        }
+
+        section[style*="min-height: 100vh"]>div>div[style*="display: flex; gap: 16px"] a {
+            width: 100% !important;
+            max-width: 320px !important;
+            text-align: center !important;
+        }
+
+        /* Hide floating decorative cards on mobile — they overlap content */
+        .floating-card {
+            display: none !important;
+        }
+
+        /* Feature grid: single column on mobile */
+        .feature-grid {
+            grid-template-columns: 1fr !important;
+        }
+
+        /* Footer bottom bar: stack on mobile */
+        footer div[style*="justify-content: space-between"] {
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .hero-title {
+            font-size: 1.9rem !important;
+        }
+
+        nav[style*="position: absolute"] {
+            padding: 14px 14px !important;
+        }
+    }
 </style>
 {% endblock %}
 
