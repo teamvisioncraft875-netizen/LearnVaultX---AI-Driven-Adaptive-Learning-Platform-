@@ -527,6 +527,10 @@ function attachAccountSettingsListeners() {
 }
 
 function loadUserData() {
+    // Only fetch on authenticated dashboard pages, skip public pages
+    var publicPaths = ['/', '/login', '/register', '/forgot-password', '/verify-otp', '/reset-password'];
+    if (publicPaths.includes(window.location.pathname)) return;
+
     // Try to get user data from API
     fetch('/api/user/data')
         .then(res => res.json())
