@@ -51,8 +51,8 @@ from ensure_schema import ensure_schema
 ensure_schema('education.db')
 
 adaptive = adaptive_learning_new.AdaptiveEngine(db)
-micro_learning = MicroLearningManager(db, adaptive)
 kyknox = kyknox_ai_new.KyKnoX()
+micro_learning = MicroLearningManager(db, adaptive, kyknox)
 adaptive_quiz = AdaptiveQuizGenerator(db, kyknox, adaptive)
 skill_tree = SkillTreeEngine(db, kyknox)
 exam_predictor = ExamPredictor(db)
@@ -2940,8 +2940,12 @@ def student_micro_learning():
         else:
             return render_template('student_dashboard.html', error="Please join a class first.")
 
+    # Get class title for AI context
+    class_info = db.execute_one('SELECT title FROM classes WHERE id = ?', (class_id,))
+    class_title = class_info['title'] if class_info else 'General'
+
     # Get Daily Tasks
-    daily_data = micro_learning.get_daily_tasks(user_id, class_id)
+    daily_data = micro_learning.get_daily_tasks(user_id, class_id, class_title)
     
     return render_template('micro_learning.html', data=daily_data, class_id=class_id)
 
@@ -2964,6 +2968,32 @@ def complete_micro_task():
         return json_success("Marked complete", data=updated_task['stats'])
     else:
         return json_error("Failed to update status")
+
+@app.route('/api/micro-learning/refresh', methods=['POST'])
+@login_required
+@student_required
+def refresh_micro_tasks():
+    """Delete today's micro-learning tasks and regenerate fresh content"""
+    user_id = get_current_user_id()
+    data = request.json or {}
+    class_id = data.get('class_id')
+
+    if not class_id:
+        enrollment = db.execute_one('SELECT class_id FROM enrollments WHERE student_id = ? LIMIT 1', (user_id,))
+        if enrollment:
+            class_id = enrollment['class_id']
+        else:
+            return json_error("No enrolled class found")
+
+    class_info = db.execute_one('SELECT title FROM classes WHERE id = ?', (class_id,))
+    class_title = class_info['title'] if class_info else 'General'
+
+    try:
+        new_data = micro_learning.refresh_tasks(user_id, class_id, class_title)
+        return json_success("Tasks refreshed with new content", data=new_data)
+    except Exception as e:
+        logger.exception('Failed to refresh micro-learning tasks')
+        return json_error("Failed to refresh tasks")
 
 @app.route('/api/student/quiz-history')
 @api_login_required

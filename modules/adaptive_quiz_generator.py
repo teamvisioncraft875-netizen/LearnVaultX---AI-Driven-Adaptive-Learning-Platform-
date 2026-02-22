@@ -115,7 +115,14 @@ class AdaptiveQuizGenerator:
         level = self.get_student_level(student_id, class_id)
         weak_topics = self._get_weak_topics(student_id, class_id)
 
-        prompt = self._build_quiz_prompt(class_title, level, weak_topics)
+        # Count previous quizzes for this class to vary content
+        attempt_row = self.db.execute_one(
+            'SELECT COUNT(*) as cnt FROM quizzes WHERE class_id = ? AND generated_by = ?',
+            (class_id, student_id)
+        )
+        attempt_num = (attempt_row['cnt'] if attempt_row else 0) + 1
+
+        prompt = self._build_quiz_prompt(class_title, level, weak_topics, attempt_num)
 
         try:
             response_text, provider = self.kyknox.generate_response(
@@ -124,11 +131,11 @@ class AdaptiveQuizGenerator:
             questions = self._parse_quiz_response(response_text, level)
         except Exception as e:
             logger.error(f"AI quiz generation failed: {e}")
-            questions = self._generate_fallback_questions(class_title, level)
+            questions = self._generate_fallback_questions(class_title, level, attempt_num)
 
         if not questions or len(questions) < 5:
             logger.warning("AI returned too few questions, using fallback")
-            questions = self._generate_fallback_questions(class_title, level)
+            questions = self._generate_fallback_questions(class_title, level, attempt_num)
 
         # Save to database
         quiz_title = f"{class_title} - Adaptive Quiz ({level.title()})"
@@ -154,7 +161,7 @@ class AdaptiveQuizGenerator:
             'question_count': len(questions[:10])
         }
 
-    def _build_quiz_prompt(self, class_title, level, weak_topics):
+    def _build_quiz_prompt(self, class_title, level, weak_topics, attempt_num=1):
         """Build the prompt for quiz generation."""
         difficulty_desc = {
             'easy': 'basic, beginner-friendly questions covering fundamental concepts. Use simple language.',
@@ -166,10 +173,15 @@ class AdaptiveQuizGenerator:
         if weak_topics:
             weak_section = f"\nFocus more on these weak areas: {', '.join(weak_topics[:5])}"
 
+        # Use attempt number and a random seed to ensure variety
+        variety_seed = random.randint(1000, 9999)
+
         return f"""Generate exactly 10 multiple-choice quiz questions for the subject: "{class_title}".
 
 Difficulty: {level.upper()} - {difficulty_desc.get(level, difficulty_desc['medium'])}
 {weak_section}
+
+This is attempt #{attempt_num} (seed: {variety_seed}). Generate COMPLETELY DIFFERENT questions from any previous attempt. Cover diverse topics within {class_title}.
 
 CRITICAL: Return ONLY a valid JSON array. No markdown, no code blocks, no extra text.
 
@@ -244,34 +256,91 @@ Return ONLY the JSON array, nothing else."""
 
         return valid_questions
 
-    def _generate_fallback_questions(self, class_title, level):
-        """Generate fallback questions when AI fails."""
-        templates = {
-            'easy': [
-                {"question_text": f"Which of the following is a key concept in {class_title}?",
-                 "options": ["Fundamentals", "Advanced Theory", "Research Methods", "None of the above"],
-                 "correct_option_index": 0, "explanation": f"Fundamentals are the building blocks of {class_title}.",
-                 "topic_tag": "basics", "difficulty": "easy"},
-            ],
-            'medium': [
-                {"question_text": f"In {class_title}, which approach is commonly used for problem solving?",
-                 "options": ["Trial and error", "Systematic analysis", "Random guessing", "Ignoring the problem"],
-                 "correct_option_index": 1, "explanation": "Systematic analysis is the standard approach.",
-                 "topic_tag": "methodology", "difficulty": "medium"},
-            ],
-            'hard': [
-                {"question_text": f"What is the most complex aspect of advanced {class_title}?",
-                 "options": ["Basic definitions", "Optimization and scalability", "Simple syntax", "Memorization"],
-                 "correct_option_index": 1, "explanation": "Optimization and scalability require deep understanding.",
-                 "topic_tag": "advanced", "difficulty": "hard"},
-            ]
-        }
-        base = templates.get(level, templates['medium'])
-        # Repeat to fill 10 questions with variations
+    def _generate_fallback_questions(self, class_title, level, attempt_num=1):
+        """Generate fallback questions when AI fails — varied per difficulty."""
+        easy_pool = [
+            {"question_text": f"Which of the following is a fundamental concept in {class_title}?",
+             "options": ["Core principles and definitions", "Advanced research only", "Unrelated topics", "None of the above"],
+             "correct_option_index": 0, "explanation": f"Core principles form the foundation of {class_title}.",
+             "topic_tag": "basics", "difficulty": "easy"},
+            {"question_text": f"What is the best first step when studying a new topic in {class_title}?",
+             "options": ["Understand the key definitions", "Skip to advanced problems", "Memorize random facts", "Avoid reading textbooks"],
+             "correct_option_index": 0, "explanation": "Starting with key definitions builds a solid foundation.",
+             "topic_tag": "study-skills", "difficulty": "easy"},
+            {"question_text": f"Why is practice important in {class_title}?",
+             "options": ["It reinforces concepts through application", "It is not important", "Only theory matters", "Practice wastes time"],
+             "correct_option_index": 0, "explanation": "Practice helps solidify understanding through application.",
+             "topic_tag": "methodology", "difficulty": "easy"},
+            {"question_text": f"In {class_title}, what does 'conceptual understanding' mean?",
+             "options": ["Grasping the why behind facts", "Memorizing formulas only", "Copying solutions", "Ignoring theory"],
+             "correct_option_index": 0, "explanation": "Conceptual understanding means knowing why something works, not just what.",
+             "topic_tag": "understanding", "difficulty": "easy"},
+            {"question_text": f"Which resource is most helpful for learning {class_title}?",
+             "options": ["Textbooks and practice problems", "Random internet articles", "Social media posts", "Guessing answers"],
+             "correct_option_index": 0, "explanation": "Textbooks and structured practice are the most reliable resources.",
+             "topic_tag": "resources", "difficulty": "easy"},
+        ]
+
+        medium_pool = [
+            {"question_text": f"In {class_title}, which approach is most effective for problem solving?",
+             "options": ["Trial and error", "Systematic analysis and reasoning", "Random guessing", "Ignoring the problem"],
+             "correct_option_index": 1, "explanation": "Systematic analysis ensures a structured approach to solutions.",
+             "topic_tag": "methodology", "difficulty": "medium"},
+            {"question_text": f"How do you verify your answer in a {class_title} problem?",
+             "options": ["Assume it is correct", "Cross-check with a different method", "Skip verification", "Ask someone without trying"],
+             "correct_option_index": 1, "explanation": "Cross-checking with an alternative method catches errors.",
+             "topic_tag": "verification", "difficulty": "medium"},
+            {"question_text": f"What connects theory and application in {class_title}?",
+             "options": ["Luck", "Practice problems based on theory", "Ignoring formulas", "Memorization alone"],
+             "correct_option_index": 1, "explanation": "Practice problems bridge the gap between theory and application.",
+             "topic_tag": "application", "difficulty": "medium"},
+            {"question_text": f"Which study technique is most effective for {class_title}?",
+             "options": ["Passive reading", "Active recall and spaced repetition", "Highlighting everything", "Cramming before exams"],
+             "correct_option_index": 1, "explanation": "Active recall and spaced repetition are proven study techniques.",
+             "topic_tag": "study-skills", "difficulty": "medium"},
+            {"question_text": f"Why are previous years' questions useful for {class_title} exams?",
+             "options": ["They are exact repeats", "They reveal patterns and important topics", "They are not useful", "They are outdated"],
+             "correct_option_index": 1, "explanation": "Previous questions show frequently tested concepts and question patterns.",
+             "topic_tag": "exam-prep", "difficulty": "medium"},
+        ]
+
+        hard_pool = [
+            {"question_text": f"What distinguishes an expert from a beginner in {class_title}?",
+             "options": ["Basic definitions", "Ability to apply concepts to novel problems", "Simple memorization", "Speed of reading"],
+             "correct_option_index": 1, "explanation": "Experts can transfer knowledge to unfamiliar problems.",
+             "topic_tag": "mastery", "difficulty": "hard"},
+            {"question_text": f"In advanced {class_title}, why is critical analysis important?",
+             "options": ["It isn't", "It helps evaluate and synthesize complex information", "Memorization is enough", "Analysis is basic"],
+             "correct_option_index": 1, "explanation": "Critical analysis is essential for advanced problem-solving.",
+             "topic_tag": "analysis", "difficulty": "hard"},
+            {"question_text": f"What is the role of interdisciplinary thinking in {class_title}?",
+             "options": ["Unnecessary distraction", "Connecting ideas across fields deepens understanding", "Only one subject matters", "It confuses students"],
+             "correct_option_index": 1, "explanation": "Interdisciplinary connections create deeper, more flexible understanding.",
+             "topic_tag": "interdisciplinary", "difficulty": "hard"},
+            {"question_text": f"How should you approach a completely unfamiliar problem in {class_title}?",
+             "options": ["Give up immediately", "Break it into known sub-problems", "Guess randomly", "Copy from others"],
+             "correct_option_index": 1, "explanation": "Decomposing complex problems into familiar sub-problems is a key strategy.",
+             "topic_tag": "problem-solving", "difficulty": "hard"},
+            {"question_text": f"What makes a {class_title} explanation 'deep' rather than 'surface-level'?",
+             "options": ["Using big words", "Explaining the underlying mechanisms and connections", "Being lengthy", "Repeating definitions"],
+             "correct_option_index": 1, "explanation": "Deep explanations reveal the 'why' and 'how', not just the 'what'.",
+             "topic_tag": "depth", "difficulty": "hard"},
+        ]
+
+        pools = {'easy': easy_pool, 'medium': medium_pool, 'hard': hard_pool}
+        pool = pools.get(level, medium_pool)
+
+        # Shuffle based on attempt number for variety
+        rng = random.Random(attempt_num * 42)
+        pool_copy = pool.copy()
+        rng.shuffle(pool_copy)
+
+        # Fill to 10 questions by cycling through the pool
         questions = []
         for i in range(10):
-            q = base[i % len(base)].copy()
-            q['question_text'] = f"Q{i+1}: {q['question_text']}"
+            q = pool_copy[i % len(pool_copy)].copy()
+            if i >= len(pool_copy):
+                q['question_text'] = f"(Variant {i - len(pool_copy) + 1}) {q['question_text']}"
             questions.append(q)
         return questions
 
