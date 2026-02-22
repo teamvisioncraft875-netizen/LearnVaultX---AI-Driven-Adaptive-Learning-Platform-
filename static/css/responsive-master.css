@@ -562,20 +562,46 @@ p,
         text-align: center;
     }
 
+    /* Hero Nav — wrap Login/SignUp/CTA on mobile */
+    .hero-nav {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 12px !important;
+        padding: 16px 20px !important;
+    }
+
+    .hero-nav-cta {
+        padding: 10px 22px !important;
+        font-size: 14px !important;
+    }
+
+    /* Hero CTA Buttons — stack vertically for ALL themes */
+    .hero-cta,
     .hero-cta-group,
     .hero-buttons {
         flex-direction: column !important;
         gap: 12px !important;
-        align-items: center;
+        align-items: center !important;
     }
 
+    .hero-cta a,
+    .hero-cta button,
     .hero-cta-group a,
     .hero-cta-group button,
     .hero-buttons a,
     .hero-buttons button {
-        width: 100%;
-        max-width: 300px;
-        text-align: center;
+        width: 100% !important;
+        max-width: 320px !important;
+        text-align: center !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+    }
+
+    .hero-cta .btn-hero-primary,
+    .hero-cta .btn-hero-secondary {
+        width: 100% !important;
+        max-width: 320px !important;
+        justify-content: center !important;
     }
 
     /* Feature cards stacking */
@@ -814,12 +840,35 @@ p,
         padding: 20px 12px !important;
     }
 
+    /* Hero Nav — tighter on small phones */
+    .hero-nav {
+        padding: 12px 12px !important;
+        gap: 8px !important;
+    }
+
+    .hero-nav-link {
+        font-size: 13px !important;
+    }
+
+    .hero-nav-separator {
+        display: none !important;
+    }
+
+    .hero-nav-cta {
+        padding: 8px 16px !important;
+        font-size: 13px !important;
+    }
+
+    /* Hero CTA — smaller on small phones */
+    .hero-cta a,
+    .hero-cta button,
     .hero-cta-group a,
     .hero-cta-group button,
     .hero-buttons a,
     .hero-buttons button {
         padding: 12px 20px !important;
         font-size: 14px !important;
+        max-width: 280px !important;
     }
 
     /* Trust metrics wrap */
