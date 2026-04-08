@@ -1,0 +1,46 @@
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+*.DS_Store
+Thumbs.db
+
+# Docker files (don't copy into image)
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Debug / scratch scripts
+_*.py
+_*.txt
+_*.html
+
+# SQLite databases (Postgres is used inside Docker)
+*.db
+
+# Node (if any)
+node_modules/
+
+# Large media not needed in image
+hero.mp4
+
+# Docs
+README.md
+
+# Gemini brain artifacts
+.gemini/

@@ -1,0 +1,324 @@
+========================================
+  LearnVaultX — Docker Entrypoint
+========================================
+Waiting for PostgreSQL to be ready...
+PostgreSQL is ready!
+Running database migrations...
+  No migrations/ folder found — initializing Flask-Migrate...
+INFO:modules.db_manager:DatabaseManager successfully connected to PostgreSQL
+Creating directory '/app/migrations' ...  done
+Creating directory '/app/migrations/versions' ...  done
+Generating /app/migrations/script.py.mako ...  done
+Generating /app/migrations/env.py ...  done
+Generating /app/migrations/README ...  done
+Generating /app/migrations/alembic.ini ...  done
+Please edit configuration/connection/logging settings in '/app/migrations/alembic.ini' before proceeding.
+INFO:modules.db_manager:DatabaseManager successfully connected to PostgreSQL
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.autogenerate.compare] Detected added table 'arena_question_bank'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_arena_question_bank_exam'' on '('exam',)'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_arena_question_bank_subject'' on '('subject',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'otp_requests'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_otp_requests_email'' on '('email',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'password_reset_otp'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_password_reset_otp_email'' on '('email',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'users'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_users_email'' on '('email',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'ai_context_sessions'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_ai_context_sessions_user_id'' on '('user_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'ai_queries'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_ai_queries_user_id'' on '('user_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'ai_tutor_sessions'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_ai_tutor_sessions_user_id'' on '('user_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'arena_achievements'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_arena_achievements_student_id'' on '('student_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'arena_attempts'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_arena_attempts_student_id'' on '('student_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'arena_missions'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_arena_missions_student_id'' on '('student_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'arena_profiles'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_arena_profiles_student_id'' on '('student_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'arena_rank_status'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_arena_rank_status_student_id'' on '('student_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'arena_topic_mastery'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_arena_topic_mastery_student_id'' on '('student_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'arena_xp_log'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_arena_xp_log_student_id'' on '('student_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'chat_memory'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_chat_memory_student_id'' on '('student_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'classes'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_classes_teacher_id'' on '('teacher_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'feedback'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_feedback_user_id'' on '('user_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'recommendations'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_recommendations_user_id'' on '('user_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'user_badges'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_user_badges_user_id'' on '('user_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'arena_ai_notes'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_arena_ai_notes_student_id'' on '('student_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'arena_attempt_answers'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_arena_attempt_answers_attempt_id'' on '('attempt_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'arena_revision_plans'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_arena_revision_plans_student_id'' on '('student_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'chat_messages'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_chat_messages_class_id'' on '('class_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'enrollments'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_enrollments_class_id'' on '('class_id',)'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_enrollments_student_id'' on '('student_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'learning_modules'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_learning_modules_class_id'' on '('class_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'learning_paths'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_learning_paths_user_id'' on '('user_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'lectures'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_lectures_class_id'' on '('class_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'live_sessions'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_live_sessions_class_id'' on '('class_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'micro_tasks'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_micro_tasks_student_id'' on '('student_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'quizzes'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_quizzes_class_id'' on '('class_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'skill_tree_nodes'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_skill_tree_nodes_class_id'' on '('class_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'student_adaptive_profile'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_student_adaptive_profile_student_id'' on '('student_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'student_metrics'
+INFO  [alembic.autogenerate.compare] Detected added table 'teacher_interventions'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_teacher_interventions_student_id'' on '('student_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'topics'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_topics_class_id'' on '('class_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'knowledge_gaps'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_knowledge_gaps_user_id'' on '('user_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'mistake_notes'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_mistake_notes_student_id'' on '('student_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'ml_coding'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_ml_coding_task_id'' on '('task_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'ml_flashcards'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_ml_flashcards_task_id'' on '('task_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'ml_quiz_booster'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_ml_quiz_booster_task_id'' on '('task_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'quiz_questions'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_quiz_questions_quiz_id'' on '('quiz_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'quiz_submissions'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_quiz_submissions_quiz_id'' on '('quiz_id',)'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_quiz_submissions_student_id'' on '('student_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'skill_tree_progress'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_skill_tree_progress_student_id'' on '('student_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'student_module_progress'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_student_module_progress_user_id'' on '('user_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'student_skill_progress'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_student_skill_progress_student_id'' on '('student_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'topic_mastery'
+INFO  [alembic.autogenerate.compare] Detected added index ''ix_topic_mastery_user_id'' on '('user_id',)'
+INFO  [alembic.autogenerate.compare] Detected added table 'question_topics'
+Generating /app/migrations/versions/5629ac32a2c1_initial_docker_schema.py ...  done
+INFO:modules.db_manager:DatabaseManager successfully connected to PostgreSQL
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 5629ac32a2c1, Initial Docker schema
+Database migrations complete!
+
+========================================
+  Starting LearnVaultX on port 5000
+========================================
+[2026-03-20 06:40:44 +0000] [1] [INFO] Starting gunicorn 23.0.0
+[2026-03-20 06:40:44 +0000] [1] [INFO] Listening at: http://0.0.0.0:5000 (1)
+[2026-03-20 06:40:44 +0000] [1] [INFO] Using worker: gthread
+[2026-03-20 06:40:44 +0000] [11] [INFO] Booting worker with pid: 11
+INFO:modules.db_manager:DatabaseManager successfully connected to PostgreSQL
+172.18.0.1 - - [20/Mar/2026:06:42:07 +0000] "GET /api/health HTTP/1.1" 200 124 "-" "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-IN) WindowsPowerShell/5.1.26100.7920"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET / HTTP/1.1" 200 69551 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/css/design-tokens.css?v=2.0.2 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/css/global-layout.css?v=2.0.2 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/css/midnight-theme.css?v=2.0.2 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/css/glassmorphism-production.css?v=2.0.2 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/css/unified-design-system.css?v=2.0.2 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/css/toast-notifications.css?v=2.0.2 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/css/neon-ui-upgrade.css?v=2.0.2 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/css/responsive-layout.css?v=2.0.2 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/css/hero-exact-clone.css?v=2.0.2 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/css/components.css?v=2.0.2 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/css/auth-pages-redesign.css?v=2.0.2 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/css/spacing-fixes.css?v=2.0.2 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/css/layout-corrections.css?v=2.0.2 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/css/premium-enhancements.css?v=2.0.2 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/css/theme.css?v=2.0.2 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/css/responsive-master.css?v=2.0.2 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/images/subrat.png HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/images/logo.png HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/images/subha.jpg HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/js/sidebar-toggle.js?v=2.0.2 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/js/toast-notifications.js?v=2.0.2 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/js/sw-register.js?v=2.0.2 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/js/main.js?v=2.0.2 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/js/premium-features.js?v=2.0.2 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/js/ai-features.js?v=2.0.2 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/js/panel-manager.js?v=2.0.2 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/js/speed-widget.js?v=2.0.2 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /api/speed-test?size=50000&t=511.10000000009313 HTTP/1.1" 400 37 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/css/speed-widget.css?v=1773988948428 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:28 +0000] "GET /static/hero.mp4 HTTP/1.1" 206 2356479 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:29 +0000] "GET /static/favicon.ico HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:33 +0000] "GET /api/speed-test?size=50000&t=5513.600000000093 HTTP/1.1" 400 37 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:38 +0000] "GET /api/speed-test?size=50000&t=10512.799999999814 HTTP/1.1" 400 37 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+ERROR:app:Unhandled Exception: Could not build url for endpoint 'login' with values ['next']. Did you mean 'auth.login' instead?
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/flask/app.py", line 867, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/usr/local/lib/python3.10/site-packages/flask/app.py", line 852, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/app/routes/arena.py", line 626, in arena_dashboard
+    uid, err = _guard_arena()
+  File "/app/routes/arena.py", line 40, in _guard_arena
+    return None, redirect(url_for('login', next=request.path))
+  File "/usr/local/lib/python3.10/site-packages/flask/helpers.py", line 222, in url_for
+    return current_app.url_for(
+  File "/usr/local/lib/python3.10/site-packages/flask/app.py", line 1071, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+  File "/usr/local/lib/python3.10/site-packages/flask/app.py", line 1060, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+  File "/usr/local/lib/python3.10/site-packages/werkzeug/routing/map.py", line 919, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'login' with values ['next']. Did you mean 'auth.login' instead?
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /arena HTTP/1.1" 500 32797 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/css/design-tokens.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/css/global-layout.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/css/responsive-layout.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/css/unified-design-system.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/css/glassmorphism-production.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/css/midnight-theme.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/css/toast-notifications.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/css/components.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/css/neon-ui-upgrade.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/css/premium-enhancements.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/css/hero-exact-clone.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/css/auth-pages-redesign.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/css/spacing-fixes.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/css/layout-corrections.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/css/responsive-master.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/css/theme.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/js/main.js?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/js/sidebar-toggle.js?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/js/toast-notifications.js?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/js/sw-register.js?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/js/ai-features.js?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/js/panel-manager.js?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/js/premium-features.js?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/js/speed-widget.js?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /api/speed-test?size=50000&t=263 HTTP/1.1" 400 37 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:40 +0000] "GET /static/css/speed-widget.css?v=1773988960822 HTTP/1.1" 200 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:41 +0000] "GET /static/favicon.ico HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:41 +0000] "GET /api/user/data HTTP/1.1" 401 78 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /api/speed-test?size=50000&t=5265 HTTP/1.1" 400 37 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+ERROR:app:Unhandled Exception: Could not build url for endpoint 'login' with values ['next']. Did you mean 'auth.login' instead?
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/flask/app.py", line 867, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/usr/local/lib/python3.10/site-packages/flask/app.py", line 852, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/app/routes/arena.py", line 626, in arena_dashboard
+    uid, err = _guard_arena()
+  File "/app/routes/arena.py", line 40, in _guard_arena
+    return None, redirect(url_for('login', next=request.path))
+  File "/usr/local/lib/python3.10/site-packages/flask/helpers.py", line 222, in url_for
+    return current_app.url_for(
+  File "/usr/local/lib/python3.10/site-packages/flask/app.py", line 1071, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+  File "/usr/local/lib/python3.10/site-packages/flask/app.py", line 1060, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+  File "/usr/local/lib/python3.10/site-packages/werkzeug/routing/map.py", line 919, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'login' with values ['next']. Did you mean 'auth.login' instead?
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /arena HTTP/1.1" 500 32797 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /static/css/global-layout.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /static/css/design-tokens.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /static/css/responsive-layout.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /static/css/premium-enhancements.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /static/css/unified-design-system.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /static/css/neon-ui-upgrade.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /static/css/toast-notifications.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /static/css/hero-exact-clone.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /static/css/midnight-theme.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /static/css/glassmorphism-production.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /static/css/auth-pages-redesign.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /static/css/spacing-fixes.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /static/css/layout-corrections.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /static/css/theme.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /static/css/responsive-master.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /static/css/components.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /static/js/sidebar-toggle.js?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /static/js/main.js?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /static/js/sw-register.js?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /static/js/panel-manager.js?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /static/js/ai-features.js?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /static/js/premium-features.js?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:45 +0000] "GET /static/js/toast-notifications.js?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:46 +0000] "GET /static/js/speed-widget.js?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:46 +0000] "GET /api/speed-test?size=50000&t=196 HTTP/1.1" 400 37 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:46 +0000] "GET /static/css/speed-widget.css?v=1773988966038 HTTP/1.1" 200 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:46 +0000] "GET /static/favicon.ico HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:46 +0000] "GET /api/user/data HTTP/1.1" 401 78 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+ERROR:app:Unhandled Exception: Could not build url for endpoint 'login' with values ['next']. Did you mean 'auth.login' instead?
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.10/site-packages/flask/app.py", line 867, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/usr/local/lib/python3.10/site-packages/flask/app.py", line 852, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/app/routes/arena.py", line 626, in arena_dashboard
+    uid, err = _guard_arena()
+  File "/app/routes/arena.py", line 40, in _guard_arena
+    return None, redirect(url_for('login', next=request.path))
+  File "/usr/local/lib/python3.10/site-packages/flask/helpers.py", line 222, in url_for
+    return current_app.url_for(
+  File "/usr/local/lib/python3.10/site-packages/flask/app.py", line 1071, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+  File "/usr/local/lib/python3.10/site-packages/flask/app.py", line 1060, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+  File "/usr/local/lib/python3.10/site-packages/werkzeug/routing/map.py", line 919, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'login' with values ['next']. Did you mean 'auth.login' instead?
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /arena HTTP/1.1" 500 32797 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/css/design-tokens.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/css/responsive-layout.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/css/global-layout.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/css/unified-design-system.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/css/components.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/css/midnight-theme.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/css/toast-notifications.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/css/hero-exact-clone.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/css/premium-enhancements.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/css/glassmorphism-production.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/css/auth-pages-redesign.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/css/neon-ui-upgrade.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/css/spacing-fixes.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/css/theme.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/css/responsive-master.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/css/layout-corrections.css?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/js/toast-notifications.js?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/js/sidebar-toggle.js?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/js/main.js?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/js/premium-features.js?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/js/sw-register.js?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/js/ai-features.js?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/js/panel-manager.js?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/js/speed-widget.js?v=2.0.2 HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /api/speed-test?size=50000&t=162 HTTP/1.1" 400 37 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/css/speed-widget.css?v=1773988967275 HTTP/1.1" 200 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /static/favicon.ico HTTP/1.1" 304 0 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:47 +0000] "GET /api/user/data HTTP/1.1" 401 78 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:52 +0000] "GET /api/speed-test?size=50000&t=5165.5999999996275 HTTP/1.1" 400 37 "http://localhost:5000/arena" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:52 +0000] "GET /api/speed-test?size=50000&t=29.5 HTTP/1.1" 400 37 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:52 +0000] "GET /static/css/speed-widget.css?v=1773988972547 HTTP/1.1" 200 0 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:42:58 +0000] "GET /api/speed-test?size=50000&t=5669 HTTP/1.1" 400 37 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:43:03 +0000] "GET /api/speed-test?size=50000&t=10674.30000000028 HTTP/1.1" 400 37 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:43:08 +0000] "GET /api/speed-test?size=50000&t=15671.400000000373 HTTP/1.1" 400 37 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:43:13 +0000] "GET /api/speed-test?size=50000&t=20675.100000000093 HTTP/1.1" 400 37 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:43:18 +0000] "GET /api/speed-test?size=50000&t=25674.200000000186 HTTP/1.1" 400 37 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:43:23 +0000] "GET /api/speed-test?size=50000&t=30665.700000000186 HTTP/1.1" 400 37 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:43:28 +0000] "GET /api/speed-test?size=50000&t=35663.90000000037 HTTP/1.1" 400 37 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:43:33 +0000] "GET /api/speed-test?size=50000&t=40663 HTTP/1.1" 400 37 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:43:38 +0000] "GET /api/speed-test?size=50000&t=45665.40000000037 HTTP/1.1" 400 37 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:43:43 +0000] "GET /api/speed-test?size=50000&t=50676.30000000028 HTTP/1.1" 400 37 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:43:48 +0000] "GET /api/speed-test?size=50000&t=55667.200000000186 HTTP/1.1" 400 37 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:43:53 +0000] "GET /api/speed-test?size=50000&t=60665 HTTP/1.1" 400 37 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+172.18.0.1 - - [20/Mar/2026:06:44:25 +0000] "GET /api/speed-test?size=50000&t=92676 HTTP/1.1" 400 37 "http://localhost:5000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"

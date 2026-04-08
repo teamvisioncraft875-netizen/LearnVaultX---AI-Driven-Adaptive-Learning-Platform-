@@ -129,44 +129,56 @@ You must respond STRICTLY in **{target_lang}**.
         # Add user prompt (with reminder)
         messages.append({"role": "user", "content": f"Answer in {language}: {prompt}"})
         
-        try:
-            if self.api_key:
-                response = requests.post(
-                    self.api_url,
-                    headers={
-                        "Authorization": f"Bearer {self.api_key}",
-                        "Content-Type": "application/json"
-                    },
-                    json={
-                        "model": self.model,
-                        "messages": messages,
-                        "temperature": 0.7,
-                        "max_tokens": 2048
-                    },
-                    timeout=30
-                )
-                
-                if response.status_code == 200:
-                    result = response.json()
-                    answer = result['choices'][0]['message']['content']
-                    logger.info(f"KyKnoX responded successfully ({mode} mode)")
-                    return answer, "Groq"
+        import time
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                if self.api_key:
+                    response = requests.post(
+                        self.api_url,
+                        headers={
+                            "Authorization": f"Bearer {self.api_key}",
+                            "Content-Type": "application/json"
+                        },
+                        json={
+                            "model": self.model,
+                            "messages": messages,
+                            "temperature": 0.7,
+                            "max_tokens": 2048
+                        },
+                        timeout=30
+                    )
+                    
+                    if response.status_code == 200:
+                        result = response.json()
+                        answer = result['choices'][0]['message']['content']
+                        logger.info(f"KyKnoX responded successfully ({mode} mode)")
+                        return answer, "Groq"
+                    else:
+                        logger.error(f"Groq API Error {response.status_code}: {response.text}")
+                        if attempt < max_retries - 1:
+                            time.sleep(1)
+                            continue
+                        return self._fallback_response(prompt, mode), "Fallback"
                 else:
-                    logger.error(f"Groq API Error {response.status_code}: {response.text}")
-                    return self._fallback_response(prompt, mode), "Fallback"
-            else:
-                logger.warning("No GROQ_API_KEY found, using fallback mode")
-                return self._fallback_response(prompt, mode), "Local"
-                
-        except requests.exceptions.Timeout:
-            logger.error("Groq API timeout")
-            return "I'm taking a bit longer than usual to respond. Please try again.", "Error"
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Groq API request failed: {e}")
-            return self._fallback_response(prompt, mode), "Error"
-        except Exception as e:
-            logger.error(f"Unexpected error in AI generation: {e}")
-            return "I apologize, but I encountered an unexpected error. Please try asking your question again.", "Error"
+                    logger.warning("No GROQ_API_KEY found, using fallback mode")
+                    return self._fallback_response(prompt, mode), "Local"
+                    
+            except requests.exceptions.Timeout:
+                logger.error(f"Groq API timeout (Attempt {attempt+1}/{max_retries})")
+                if attempt < max_retries - 1:
+                    time.sleep(1.5)
+                    continue
+                return "I'm taking a bit longer than usual to respond. Please try again.", "Error"
+            except requests.exceptions.RequestException as e:
+                logger.error(f"Groq API request failed: {e}")
+                if attempt < max_retries - 1:
+                    time.sleep(1.5)
+                    continue
+                return self._fallback_response(prompt, mode), "Error"
+            except Exception as e:
+                logger.error(f"Unexpected error in AI generation: {e}")
+                return "I apologize, but I encountered an unexpected error. Please try asking your question again.", "Error"
 
     def _fallback_response(self, prompt, mode):
         """Generate fallback response when API is unavailable"""

@@ -241,9 +241,9 @@
         LearnVaultX
     </div>
     <div style="display: flex; gap: 16px;">
-        <a href="{{ url_for('login') }}" class="btn btn-secondary glass-panel"
+        <a href="{{ url_for('auth.login') }}" class="btn btn-secondary glass-panel"
             style="border-radius: 100px; padding: 10px 24px;">Log In</a>
-        <a href="{{ url_for('register') }}" class="btn btn-primary"
+        <a href="{{ url_for('auth.register') }}" class="btn btn-primary"
             style="border-radius: 100px; padding: 10px 24px;">Get Started</a>
     </div>
 </nav>
@@ -268,7 +268,7 @@
         </p>
 
         <div style="display: flex; gap: 16px; justify-content: center;">
-            <a href="{{ url_for('register') }}" class="btn btn-primary"
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary"
                 style="padding: 16px 40px; font-size: 16px; border-radius: 100px;">
                 Start Learning Free
             </a>

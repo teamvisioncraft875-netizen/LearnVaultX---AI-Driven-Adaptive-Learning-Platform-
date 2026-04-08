@@ -46,7 +46,7 @@ def ai_tutor_page():
     """Render the AI Tutor Avatar page."""
     if 'user_id' not in session:
         from flask import redirect, url_for
-        return redirect(url_for('login'))
+        return redirect(url_for('auth.login'))
     return render_template('ai_tutor.html')
 
 
@@ -484,21 +484,37 @@ def _build_tutor_context(user_id):
             # Get per-topic performance using topic_tag
             topic_perf = _db.execute_query(
                 '''SELECT qq.topic_tag,
-                          COUNT(*) as total_q,
-                          SUM(CASE WHEN CAST(
-                              json_extract(qs.answers, '$.' || CAST(qq.id AS TEXT))
-                          AS INTEGER) = qq.correct_option_index THEN 1 ELSE 0 END) as correct
+                          qq.id as q_id,
+                          qq.correct_option_index,
+                          qs.answers
                    FROM quiz_questions qq
                    JOIN quizzes q ON qq.quiz_id = q.id
                    JOIN quiz_submissions qs ON qs.quiz_id = q.id AND qs.student_id = ?
-                   WHERE q.class_id = ? AND qq.topic_tag IS NOT NULL AND qq.topic_tag != 'general'
-                   GROUP BY qq.topic_tag''',
+                   WHERE q.class_id = ? AND qq.topic_tag IS NOT NULL AND qq.topic_tag != 'general' ''',
                 (user_id, cid)
             )
 
+            # Aggregate per-topic accuracy in Python (avoids DB-specific JSON funcs)
+            import json as _json
+            topic_agg = {}  # topic -> {correct, total}
             for tp in topic_perf:
-                pct = round((tp['correct'] / tp['total_q']) * 100) if tp['total_q'] > 0 else 0
-                entry = {'topic': tp['topic_tag'], 'class': e['title'], 'accuracy': pct, 'attempts': tp['total_q']}
+                tag = tp.get('topic_tag', '')
+                if not tag:
+                    continue
+                if tag not in topic_agg:
+                    topic_agg[tag] = {'correct': 0, 'total': 0}
+                topic_agg[tag]['total'] += 1
+                try:
+                    answers = _json.loads(tp.get('answers') or '{}')
+                    q_id_str = str(tp['q_id'])
+                    if q_id_str in answers and str(answers[q_id_str]) == str(tp['correct_option_index']):
+                        topic_agg[tag]['correct'] += 1
+                except Exception:
+                    pass
+
+            for tag, stats in topic_agg.items():
+                pct = round((stats['correct'] / stats['total']) * 100) if stats['total'] > 0 else 0
+                entry = {'topic': tag, 'class': e['title'], 'accuracy': pct, 'attempts': stats['total']}
                 if pct < 60:
                     all_weak.append(entry)
                 elif pct >= 80:

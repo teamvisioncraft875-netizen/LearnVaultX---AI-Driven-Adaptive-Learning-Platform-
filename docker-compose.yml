@@ -1,0 +1,53 @@
+# ─── LearnVaultX Docker Compose ──────────────────────────────────
+# Run with: docker-compose up --build
+# ─────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── PostgreSQL Database ──────────────────────────────────────────
+  db:
+    image: postgres:15-alpine
+    container_name: lvx-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: learnvaultx
+    ports:
+      - "5433:5432"   # Host 5433 to avoid conflict with local Postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d learnvaultx"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── Flask Application ────────────────────────────────────────────
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lvx-web
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    environment:
+      # Override DATABASE_URL to point at the Docker 'db' service
+      # (replaces localhost with the service name)
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/learnvaultx
+      PORT: "5000"
+    volumes:
+      # Persist uploaded files across container restarts
+      - uploads:/app/instance/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+    driver: local
+  uploads:
+    driver: local

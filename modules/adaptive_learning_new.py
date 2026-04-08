@@ -14,8 +14,11 @@ class AdaptiveEngine:
 
         cols = set()
         try:
-            pragma_rows = self.db.execute_query(f'PRAGMA table_info({table_name})')
-            cols = {row.get('name') for row in pragma_rows if row.get('name')}
+            rows = self.db.execute_query(
+                "SELECT column_name FROM information_schema.columns WHERE table_schema='public' AND table_name=%s",
+                (table_name,)
+            )
+            cols = {row.get('column_name') for row in rows if row.get('column_name')}
         except Exception:
             cols = set()
         self._table_columns[table_name] = cols

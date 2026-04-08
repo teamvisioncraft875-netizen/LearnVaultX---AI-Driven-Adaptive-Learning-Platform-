@@ -16,21 +16,13 @@ if os.path.exists(secret_env_path):
     print("Loaded secret file from /etc/secrets/.env")
 
 # Import Flask app
-from app import app, initialize_database
+from app import app
 
 def create_app():
-    """Create and configure the Flask application"""
-    try:
-        # Initialize database if needed
-        if not os.path.exists('education.db'):
-            print("Creating database...")
-            initialize_database()
-            print("Database created successfully!")
-        
-        return app
-    except Exception as e:
-        print(f"Error creating app: {e}")
-        sys.exit(1)
+    """Create and configure the Flask application."""
+    # Database tables are managed by Flask-Migrate.
+    # Run 'flask db upgrade' to create/update tables before first start.
+    return app
 
 # WSGI application object for Gunicorn
 application = create_app()

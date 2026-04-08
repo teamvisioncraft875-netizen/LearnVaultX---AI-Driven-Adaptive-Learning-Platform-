@@ -5,7 +5,6 @@ Isolated module for competitive exam preparation with adaptive AI.
 from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for, flash
 from datetime import datetime, date
 import json, logging, random, os, requests as http_requests
-import sqlite3
 
 logger = logging.getLogger(__name__)
 arena_bp = Blueprint('arena', __name__)
@@ -38,7 +37,7 @@ def _guard_arena():
     """Check arena access. Returns (uid, error_response) tuple."""
     uid = _require_student()
     if uid == 'NO_AUTH':
-        return None, redirect(url_for('login', next=request.path))
+        return None, redirect(url_for('auth.login', next=request.path))
     if uid == 'WRONG_ROLE':
         flash('Exam Arena is available only for students.', 'warning')
         return None, redirect(url_for('teacher_dashboard'))
