@@ -825,9 +825,9 @@ def start_daily_challenge():
 
     attempt_id = _db.execute_insert(
         '''INSERT INTO arena_attempts 
-           (student_id, exam, subject, attempt_type, difficulty_start, status, questions_json, total_questions)
-           VALUES (?,?,?,?,?,?,?,?)''',
-        (uid, exam, subject, 'daily', difficulty, 'ongoing', json.dumps(final_ids), len(final_ids))
+           (student_id, exam, subject, attempt_type, difficulty_start, status, questions_json, total_questions, score, accuracy_percent, avg_time_per_question, time_taken_total, xp_earned, current_q_index)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+        (uid, exam, subject, 'daily', difficulty, 'ongoing', json.dumps(final_ids), len(final_ids), 0, 0.0, 0.0, 0, 0, 0)
     )
     logger.info(f"[ARENA-DAILY] Started adaptive daily for uid={uid} difficulty={difficulty} weak_topics={len(weak_topics) if weak_topics else 0}")
 
@@ -906,9 +906,9 @@ def start_mock_test():
 
     attempt_id = _db.execute_insert(
         '''INSERT INTO arena_attempts 
-           (student_id, exam, subject, attempt_type, difficulty_start, status, questions_json, total_questions)
-           VALUES (?,?,?,?,?,?,?,?)''',
-        (uid, exam, subject, 'mock', difficulty, 'ongoing', json.dumps(final_ids), len(final_ids))
+           (student_id, exam, subject, attempt_type, difficulty_start, status, questions_json, total_questions, score, accuracy_percent, avg_time_per_question, time_taken_total, xp_earned, current_q_index)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+        (uid, exam, subject, 'mock', difficulty, 'ongoing', json.dumps(final_ids), len(final_ids), 0, 0.0, 0.0, 0, 0, 0)
     )
 
     return jsonify({'success': True, 'redirect': url_for('arena.arena_session_view', session_id=attempt_id)})

@@ -1,0 +1,2 @@
+INFO:modules.db_manager:DatabaseManager successfully connected to PostgreSQL
+INFO:routes.arena:[ARENA-DAILY] Started adaptive daily for uid=1 difficulty=Medium weak_topics=0
